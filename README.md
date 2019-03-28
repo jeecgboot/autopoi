@@ -96,7 +96,8 @@ AutoPoi导出实例
 	传入导出参数,导出对象,以及对象列表即可完成导出
 	
 ```Java
-	HSSFWorkbook workbook = ExcelExportUtil.exportExcel(new ExportParams("2412312", "测试", "测试"), CourseEntity.class, list);
+	HSSFWorkbook workbook = ExcelExportUtil.exportExcel(new ExportParams(
+				"2412312", "测试", "测试"), CourseEntity.class, list);
 ```
 
 3.基础导出,带有索引
@@ -105,7 +106,8 @@ AutoPoi导出实例
 ```Java
 	ExportParams params = new ExportParams("2412312", "测试", "测试");
 	params.setAddIndex(true);
-	HSSFWorkbook workbook = ExcelExportUtil.exportExcel(params,TeacherEntity.class, telist);
+	HSSFWorkbook workbook = ExcelExportUtil.exportExcel(params,
+			TeacherEntity.class, telist);
 ```			
 
 4.导出Map
@@ -125,7 +127,8 @@ AutoPoi导出实例
 		list.add(map);
 	}
 
-	HSSFWorkbook workbook = ExcelExportUtil.exportExcel(new ExportParams("测试", "测试"), entity, list);	
+	HSSFWorkbook workbook = ExcelExportUtil.exportExcel(new ExportParams(
+			"测试", "测试"), entity, list);	
 ```		
 	
 5.模板导出
@@ -142,7 +145,8 @@ AutoPoi导出实例
     map.put("obj", obj);
     obj.put("name", list.size());
 	params.setTemplateUrl("org/jeecgframework/poi/excel/doc/exportTemp.xls");
-	Workbook book = ExcelExportUtil.exportExcel(params, CourseEntity.class, list,map);
+	Workbook book = ExcelExportUtil.exportExcel(params, CourseEntity.class, list,
+			map);
 ```			
 
 6.导入
@@ -155,7 +159,8 @@ AutoPoi导出实例
 	//params.setSheetNum(9);
 	params.setNeedSave(true);
 	long start = new Date().getTime();
-	List<CourseEntity> list = ExcelImportUtil.importExcel(new File("d:/tt.xls"), CourseEntity.class, params);
+	List<CourseEntity> list = ExcelImportUtil.importExcel(new File(
+			"d:/tt.xls"), CourseEntity.class, params);
 ```	
 
 7.和spring mvc的无缝融合
@@ -168,7 +173,8 @@ AutoPoi导出实例
 		List<JeecgDemo> pageList = jeecgDemoService.list();
 		mv.addObject(NormalExcelConstants.FILE_NAME,"Excel导入导出测试表");
 		mv.addObject(NormalExcelConstants.CLASS,JeecgDemo.class);
-		mv.addObject(NormalExcelConstants.PARAMS,new ExportParams("Excel导入导出测试表列表", "导出人:"+"AutoPOI"+"，导出信息"));
+		mv.addObject(NormalExcelConstants.PARAMS,new ExportParams("Excel导入导出测试表列表",
+					"导出人:"+"AutoPOI"+"，导出信息"));
 		mv.addObject(NormalExcelConstants.DATA_LIST,pageList);
 		return mv;
 	}
