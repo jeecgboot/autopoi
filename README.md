@@ -38,11 +38,11 @@ maven
 --------------------------
 
 ```xml
-		<dependency>
-			<groupId>org.jeecgframework</groupId>
-			<artifactId>autopoi-web</artifactId>
-			<version>1.0.0</version>
-		</dependency>
+	<dependency>
+	 <groupId>org.jeecgframework</groupId>
+	 <artifactId>autopoi-web</artifactId>
+	 <version>1.0.0</version>
+	</dependency>
 ```
 	
 ---------------------------
