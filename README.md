@@ -44,7 +44,6 @@ maven
 	 <version>1.0.2</version>
 	</dependency>
 ```
-	
 
 --------------------------
 AutoPoi 模板 表达式支持
@@ -244,8 +243,8 @@ AutoPoi导出实例
 ```
 
 13.高级字段转换用法
-    exportConvert：在导出的时候需要替换值则配置该值为true，同时增加一个方法，方法名为原get方法名前加convert。
-	importConvert：在导入的时候需要替换值则配置该值为true，同时增加一个方法，方法名为原set方法名前加convert。
+- exportConvert：在导出的时候需要替换值则配置该值为true，同时增加一个方法，方法名为原get方法名前加convert。
+- importConvert：在导入的时候需要替换值则配置该值为true，同时增加一个方法，方法名为原set方法名前加convert。
 
 ```Java
 	@Excel(name="测试转换",width=15,exportConvert=true,importConvert=true)
