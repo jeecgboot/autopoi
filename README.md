@@ -309,3 +309,82 @@ AutoPoi导出实例
 | orderNum | int      | 0               | 排序,支持name_id     |
 | type     | Class<?> | ArrayList.class | 导入时创建对象使用        |
 
+
+
+单表导出实体注解源码
+
+```Java
+public class SysUser implements Serializable {
+
+    /**id*/
+    private String id;
+
+    /**登录账号 */
+    @Excel(name = "登录账号", width = 15)
+    private String username;
+
+    /**真实姓名*/
+    @Excel(name = "真实姓名", width = 15)
+    private String realname;
+
+    /**头像*/
+    @Excel(name = "头像", width = 15)
+    private String avatar;
+
+    /**生日*/
+    @Excel(name = "生日", width = 15, format = "yyyy-MM-dd")
+    private Date birthday;
+
+    /**性别（1：男 2：女）*/
+    @Excel(name = "性别", width = 15,dicCode="sex")
+    private Integer sex;
+
+    /**电子邮件*/
+    @Excel(name = "电子邮件", width = 15)
+    private String email;
+
+    /**电话*/
+    @Excel(name = "电话", width = 15)
+    private String phone;
+
+    /**状态(1：正常  2：冻结 ）*/
+    @Excel(name = "状态", width = 15,replace={"正常_1","冻结_0"})
+    private Integer status;
+```
+
+一对多导出实体注解源码
+
+```Java
+@Data
+public class JeecgOrderMainPage {
+	
+	/**主键*/
+	private java.lang.String id;
+	/**订单号*/
+	@Excel(name="订单号",width=15)
+	private java.lang.String orderCode;
+	/**订单类型*/
+	private java.lang.String ctype;
+	/**订单日期*/
+	@Excel(name="订单日期",width=15,format = "yyyy-MM-dd")
+	private java.util.Date orderDate;
+	/**订单金额*/
+	@Excel(name="订单金额",width=15)
+	private java.lang.Double orderMoney;
+	/**订单备注*/
+	private java.lang.String content;
+	/**创建人*/
+	private java.lang.String createBy;
+	/**创建时间*/
+	private java.util.Date createTime;
+	/**修改人*/
+	private java.lang.String updateBy;
+	/**修改时间*/
+	private java.util.Date updateTime;
+	
+	@ExcelCollection(name="客户")
+	private List<JeecgOrderCustomer> jeecgOrderCustomerList;
+	@ExcelCollection(name="机票")
+	private List<JeecgOrderTicket> jeecgOrderTicketList;
+}
+```
