@@ -1,6 +1,6 @@
 AutoPOI (Excel和 Word简易工具类)
 ===========================
- AutoPOI 功能如同名字auto，追求的就是自动化，让一个没接触过poi的人员，可以智能化的快速实现Excel导入导出、Word模板导出、可以仅仅5行代码就可以完成Excel的导入导出。
+ AutoPOI 功能如同名字auto，追求的就是自动化，让一个没接触过poi的人员，可以傻瓜化的快速实现Excel导入导出、Word模板导出、可以仅仅5行代码就可以完成Excel的导入导出。
 	
 ---------------------------
 AutoPOI的主要特点
@@ -41,15 +41,10 @@ maven
 	<dependency>
 	 <groupId>org.jeecgframework</groupId>
 	 <artifactId>autopoi-web</artifactId>
-	 <version>1.0.0</version>
+	 <version>1.0.2</version>
 	</dependency>
 ```
 	
----------------------------
-AutoPoi 文档
----------------------------
-
-* [在线文档](http://jeecg3.mydoc.io)
 
 --------------------------
 AutoPoi 模板 表达式支持
@@ -144,7 +139,7 @@ AutoPoi导出实例
     Map<String,Object> obj = new HashMap<String, Object>();
     map.put("obj", obj);
     obj.put("name", list.size());
-	params.setTemplateUrl("org/jeecgframework/poi/excel/doc/exportTemp.xls");
+	 params.setTemplateUrl("org/jeecgframework/poi/excel/doc/exportTemp.xls");
 	Workbook book = ExcelExportUtil.exportExcel(params, CourseEntity.class, list,
 			map);
 ```			
@@ -163,18 +158,21 @@ AutoPoi导出实例
 			"d:/tt.xls"), CourseEntity.class, params);
 ```	
 
-7.和spring mvc的无缝融合
+7.SpringMvc的无缝融合
 	简单几句话,Excel导出搞定
 	
 ```Java
 	@RequestMapping(value = "/exportXls")
 	public ModelAndView exportXls(HttpServletRequest request, HttpServletResponse response) {
-		ModelAndView mv = new ModelAndView(new JeecgEntityExcelView()); //此处重点
+		ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
 		List<JeecgDemo> pageList = jeecgDemoService.list();
-		mv.addObject(NormalExcelConstants.FILE_NAME,"Excel导入导出测试表");
+		//导出文件名称
+		mv.addObject(NormalExcelConstants.FILE_NAME,"导出Excel文件名字");
+		//注解对象Class
 		mv.addObject(NormalExcelConstants.CLASS,JeecgDemo.class);
-		mv.addObject(NormalExcelConstants.PARAMS,new ExportParams("Excel导入导出测试表列表",
-					"导出人:"+"AutoPOI"+"，导出信息"));
+		//自定义表格参数
+		mv.addObject(NormalExcelConstants.PARAMS,new ExportParams("自定义导出Excel模板内容标题", "自定义Sheet名字"));
+		//导出数据列表
 		mv.addObject(NormalExcelConstants.DATA_LIST,pageList);
 		return mv;
 	}
@@ -183,10 +181,10 @@ AutoPoi导出实例
 
 | 自定义视图 | 用途 |  描述 |
 | ------ | ------ | ------ |
-| JeecgMapExcelView | 实体对象导出视图 | 1 |
-| JeecgEntityExcelView | Map对象导出视图 | 2 |
-| JeecgTemplateExcelView | Excel模板导出视图 | 3 | 
-| JeecgTemplateWordView | Word模板导出视图 | 4 |
+| JeecgMapExcelView | 实体对象导出视图 | 例如：List<JeecgDemo> |
+| JeecgEntityExcelView | Map对象导出视图 | List<Map<String, String>> list |
+| JeecgTemplateExcelView | Excel模板导出视图 | - | 
+| JeecgTemplateWordView | Word模板导出视图 | - |
 
 
 8.Excel导入校验,过滤不符合规则的数据,追加错误信息到Excel,提供常用的校验规则,已经通用的校验接口
@@ -219,4 +217,53 @@ AutoPoi导出实例
 	ImportParams params = new ImportParams();
 	List<Map<String,Object>> list = ExcelImportUtil.importExcel(new File(
 			"d:/tt.xls"), Map.class, params);
-```	
+```
+
+10.字典用法
+        在实体属性注解excel中添加dicCode="",此处dicCode即为jeecg系统中数据字典的Code
+	
+```Java
+   @Excel(name="性别",width=15,dicCode="sex")
+   private java.lang.String sex;
+```
+
+11.字典表用法
+       此处dictTable为数据库表名，dicCode为关联字段名，dicText为excel中显示的内容对应的字段
+	
+```Java
+	@Excel(name="部门",dictTable="t_s_depart",dicCode="id",dicText="departname")
+    private java.lang.String depart;
+```
+
+12.Replace用法
+       若数据库中存储的是0/1 ，则导出/导入的excel单元格中显示的是女/男
+	
+```Java
+	@Excel(name="测试替换",width=15,replace={"男_1","女_0"})
+	private java.lang.String fdReplace;
+```
+
+13.高级字段转换用法
+    exportConvert：在导出的时候需要替换值则配置该值为true，同时增加一个方法，方法名为原get方法名前加convert。
+	importConvert：在导入的时候需要替换值则配置该值为true，同时增加一个方法，方法名为原set方法名前加convert。
+
+```Java
+	@Excel(name="测试转换",width=15,exportConvert=true,importConvert=true)
+	private java.lang.String fdConvert;
+	
+	/**
+	  * 转换值示例： 在该字段值的后面加上元
+	  * @return
+	  */
+	public String convertgetFdConvert(){
+	  return this.fdConvert+"元";
+	}
+	  
+	/**
+	 * 转换值示例： 替换掉excel单元格中的"元"
+	 * @return
+	 */
+	public void convertsetFdConvert(String fdConvert){
+	  this.fdConvert = fdConvert.replace("元","");
+	}
+```
