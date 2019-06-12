@@ -266,7 +266,24 @@ AutoPoi导出实例
 	  this.fdConvert = fdConvert.replace("元","");
 	}
 ```
-
+14.枚举类型的导入导出
+在上述高级字段转换用法的基础上，exportConvert和上述说明一样，importConvert的参数需要为String：
+```Java
+    /**
+      * 枚举类型导出示例
+      * @return
+      */
+    public String convertgetEnumType(){
+      return this.enumType.getValue(); 
+    }
+	
+    /**
+     * 枚举类型导入示例
+     */
+    public void convertsetFdConvert(String enumString){
+      this.enumType = EnumType.valueOf(enumString);
+    }
+```
 ---------------------------
  Excel 注解说明
 ---------------------------

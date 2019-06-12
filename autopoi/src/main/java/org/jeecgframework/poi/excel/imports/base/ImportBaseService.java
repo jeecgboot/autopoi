@@ -153,7 +153,7 @@ public class ImportBaseService {
 				collection.setExcelName(field.getAnnotation(ExcelCollection.class).name());
 				additionalCollectionName(collection);
 				excelCollection.add(collection);
-			} else if (PoiPublicUtil.isJavaClass(field)) {
+			} else if (PoiPublicUtil.isJavaClass(field) || field.getType().isEnum()) {
 				addEntityToMap(targetId, field, excelEntity, pojoClass, getMethods, excelParams);
 			} else {
 				List<Method> newMethods = new ArrayList<Method>();
@@ -200,7 +200,7 @@ public class ImportBaseService {
 			if (PoiPublicUtil.isNotUserExcelUserThis(null, field, targetId)) {
 				continue;
 			}
-			if (PoiPublicUtil.isJavaClass(field)) {
+			if (PoiPublicUtil.isJavaClass(field) || field.getType().isEnum()) {
 				addEntityToMap(targetId, field, excelEntity, pojoClass, getMethods, temp);
 			} else {
 				List<Method> newMethods = new ArrayList<Method>();

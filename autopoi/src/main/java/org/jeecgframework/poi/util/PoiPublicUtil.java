@@ -93,6 +93,9 @@ public final class PoiPublicUtil {
 			if (clazz.equals(Map.class)) {
 				return new HashMap<String, Object>();
 			}
+			if (clazz.isEnum()) {
+				return obj;
+			}
 			obj = clazz.newInstance();
 			Field[] fields = getClassFields(clazz);
 			for (Field field : fields) {
@@ -188,7 +191,7 @@ public final class PoiPublicUtil {
 		StringBuffer getMethodName = new StringBuffer(PoiBaseConstants.SET);
 		getMethodName.append(name.substring(0, 1).toUpperCase());
 		getMethodName.append(name.substring(1));
-		return pojoClass.getMethod(getMethodName.toString(), new Class[] { type });
+		return pojoClass.getMethod(getMethodName.toString(), type);
 	}
 	
 	//update-begin-author:taoyan date:20180615 for:TASK #2798 导入扩展方法，支持自定义导入字段转换规则
@@ -234,6 +237,9 @@ public final class PoiPublicUtil {
 		setMethodName.append(PoiBaseConstants.SET);
 		setMethodName.append(name.substring(0, 1).toUpperCase());
 		setMethodName.append(name.substring(1));
+		if (convert && type.isEnum()) {
+			return pojoClass.getMethod(setMethodName.toString(), String.class);
+		}
 		return pojoClass.getMethod(setMethodName.toString(), new Class[] { type });
 	}
 	//update-end-author:taoyan date:20180615 for:TASK #2798 导入扩展方法，支持自定义导入字段转换规则
