@@ -22,6 +22,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -295,12 +296,19 @@ public final class PoiPublicUtil {
 	}
 
 	public static String getWebRootPath(String filePath) {
+
+
 		try {
-			String path = PoiPublicUtil.class.getClassLoader().getResource("").toURI().getPath();
+			
+			String path;
+			URL resource = PoiPublicUtil.class.getClassLoader().getResource("");
+
 			//update-begin--Author:zhangdaihao  Date:20190424 for：解决springboot 启动模式，上传路径获取为空问题---------------------
-			if (path == null || path == "") {
+			if (resource == null || resource.toURI().toString().length() == 0) {
 				//解决springboot 启动模式，上传路径获取为空问题
 				path = ClassUtils.getDefaultClassLoader().getResource("").getPath();
+			}else {
+				path = resource.toURI().toString();
 			}
 			//update-end--Author:zhangdaihao  Date:20190424 for：解决springboot 启动模式，上传路径获取为空问题----------------------
 			LOGGER.debug("--- getWebRootPath ----filePath--- " + path);
