@@ -20,14 +20,9 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.POIXMLDocument;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -44,6 +39,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.jeecgframework.core.util.ApplicationContextUtil;
 import org.jeecgframework.poi.excel.annotation.ExcelTarget;
 import org.jeecgframework.poi.excel.entity.ImportParams;
 import org.jeecgframework.poi.excel.entity.params.ExcelCollectionParams;
@@ -51,6 +47,7 @@ import org.jeecgframework.poi.excel.entity.params.ExcelImportEntity;
 import org.jeecgframework.poi.excel.entity.result.ExcelImportResult;
 import org.jeecgframework.poi.excel.entity.result.ExcelVerifyHanlderResult;
 import org.jeecgframework.poi.excel.imports.base.ImportBaseService;
+import org.jeecgframework.poi.excel.imports.base.ImportFileServiceI;
 import org.jeecgframework.poi.excel.imports.verifys.VerifyHandlerServer;
 import org.jeecgframework.poi.exception.excel.ExcelImportException;
 import org.jeecgframework.poi.exception.excel.enums.ExcelImportEnum;
@@ -88,7 +85,6 @@ public class ExcelImportServer extends ImportBaseService {
 	/***
 	 * 向List里面继续添加元素
 	 * 
-	 * @param exclusions
 	 * @param object
 	 * @param param
 	 * @param row
@@ -129,6 +125,9 @@ public class ExcelImportServer extends ImportBaseService {
 	 * @return
 	 */
 	private String getKeyValue(Cell cell) {
+		if(cell==null){
+			return null;
+		}
 		Object obj = null;
 		switch (cell.getCellType()) {
 		case Cell.CELL_TYPE_STRING:
@@ -180,8 +179,12 @@ public class ExcelImportServer extends ImportBaseService {
 			}
 			getAllExcelField(targetId, fileds, excelParams, excelCollection, pojoClass, null);
 		}
+		ignoreHeaderHandler(excelParams, params);
 		Iterator<Row> rows = sheet.rowIterator();
 		Map<Integer, String> titlemap = getTitleMap(sheet, rows, params, excelCollection);
+        Set<Integer> columnIndexSet = titlemap.keySet();
+        Integer maxColumnIndex = Collections.max(columnIndexSet);
+        Integer minColumnIndex = Collections.min(columnIndexSet);
 		Row row = null;
 		//跳过表头和标题行
 		for (int j = 0; j < params.getTitleRows() + params.getHeadRows(); j++) {
@@ -194,9 +197,9 @@ public class ExcelImportServer extends ImportBaseService {
 			//update-begin--Author:xuelin  Date:20171017 for：TASK #2373 【bug】表改造问题，导致 3.7.1批量导入用户bug-导入不成功--------------------
 			// 判断是集合元素还是不是集合元素,如果是就继续加入这个集合,不是就创建新的对象
 			//update-begin--Author:xuelin  Date:20171206 for：TASK #2451 【excel导出bug】online 一对多导入成功， 但是现在代码生成后的一对多online导入有问题了
-			if ((row.getCell(params.getKeyIndex()) == null || StringUtils.isEmpty(getKeyValue(row.getCell(params.getKeyIndex())))) 
-					&& object != null && !Map.class.equals(pojoClass)) {
-			//update-end--Author:xuelin  Date:20171206 for：TASK #2451 【excel导出bug】online 一对多导入成功， 但是现在代码生成后的一对多online导入有问题了
+			Cell keyIndexCell = row.getCell(params.getKeyIndex());
+			if (excelCollection.size()>0 && StringUtils.isEmpty(getKeyValue(keyIndexCell)) && object != null && !Map.class.equals(pojoClass)) {
+				//update-end--Author:xuelin  Date:20171206 for：TASK #2451 【excel导出bug】online 一对多导入成功， 但是现在代码生成后的一对多online导入有问题了
 				for (ExcelCollectionParams param : excelCollection) {
 					addListContinue(object, param, row, titlemap, targetId, pictures, params);
 				}
@@ -204,7 +207,16 @@ public class ExcelImportServer extends ImportBaseService {
 			} else {			
 				object = PoiPublicUtil.createObject(pojoClass, targetId);
 				try {
-					for (int i = row.getFirstCellNum(), le = row.getLastCellNum(); i < le; i++) {
+                    //update-begin-author:taoyan date:20200303 for:导入图片
+				    int firstCellNum = row.getFirstCellNum();
+				    if(firstCellNum>minColumnIndex){
+                        firstCellNum = minColumnIndex;
+                    }
+                    int lastCellNum = row.getLastCellNum();
+                    if(lastCellNum<maxColumnIndex+1){
+                        lastCellNum = maxColumnIndex+1;
+                    }
+					for (int i = firstCellNum, le = lastCellNum; i < le; i++) {
 						Cell cell = row.getCell(i);
 						String titleString = (String) titlemap.get(i);
 						if (excelParams.containsKey(titleString) || Map.class.equals(pojoClass)) {
@@ -212,7 +224,19 @@ public class ExcelImportServer extends ImportBaseService {
 								picId = row.getRowNum() + "_" + i;
 								saveImage(object, picId, excelParams, titleString, pictures, params);
 							} else {
-								saveFieldValue(params, object, cell, excelParams, titleString, row);
+								if(params.getImageList()!=null && params.getImageList().contains(titleString)){
+									if (pictures != null) {
+										picId = row.getRowNum() + "_" + i;
+										PictureData image = pictures.get(picId);
+										if(image!=null){
+											byte[] data = image.getData();
+											params.getDataHanlder().setMapValue((Map) object, titleString, data);
+										}
+									}
+								}else{
+									saveFieldValue(params, object, cell, excelParams, titleString, row);
+								}
+                        //update-end-author:taoyan date:20200303 for:导入图片
 							}
 						}
 					}
@@ -230,6 +254,22 @@ public class ExcelImportServer extends ImportBaseService {
 			//update-end--Author:xuelin  Date:20171017 for：TASK #2373 【bug】表改造问题，导致 3.7.1批量导入用户bug-导入不成功--------------------
 		}
 		return collection;
+	}
+
+	/**
+	 * 获取忽略的表头信息
+	 * @param excelParams
+	 * @param params
+	 */
+	private void ignoreHeaderHandler(Map<String, ExcelImportEntity> excelParams,ImportParams params){
+		List<String> ignoreList = new ArrayList<>();
+		for(String key:excelParams.keySet()){
+			String temp = excelParams.get(key).getGroupName();
+			if(temp!=null && temp.length()>0){
+				ignoreList.add(temp);
+			}
+		}
+		params.setIgnoreHeaderList(ignoreList);
 	}
 
 	/**
@@ -278,7 +318,11 @@ public class ExcelImportServer extends ImportBaseService {
 					//当前cell的上一行是否为合并单元格
 					if(ExcelUtil.isMergedRegion(sheet, cell.getRowIndex()-1, columnIndex)){
 						collectionName = ExcelUtil.getMergedRegionValue(sheet, cell.getRowIndex()-1, columnIndex);
-						titlemap.put(cell.getColumnIndex(), collectionName + "_" + value);
+						if(params.isIgnoreHeader(collectionName)){
+							titlemap.put(cell.getColumnIndex(), value);
+						}else{
+							titlemap.put(cell.getColumnIndex(), collectionName + "_" + value);
+						}
 					}else{
 						titlemap.put(cell.getColumnIndex(), value);
 					}
@@ -413,14 +457,16 @@ public class ExcelImportServer extends ImportBaseService {
 	 * @throws Exception
 	 */
 	private void saveImage(Object object, String picId, Map<String, ExcelImportEntity> excelParams, String titleString, Map<String, PictureData> pictures, ImportParams params) throws Exception {
-		if (pictures == null) {
+		if (pictures == null || pictures.get(picId)==null) {
 			return;
 		}
 		PictureData image = pictures.get(picId);
 		byte[] data = image.getData();
 		String fileName = "pic" + Math.round(Math.random() * 100000000000L);
 		fileName += "." + PoiPublicUtil.getFileExtendName(data);
-		if (excelParams.get(titleString).getSaveType() == 1) {
+		//update-beign-author:taoyan date:20200302 for:【多任务】online 专项集中问题 LOWCOD-159
+		int saveType = excelParams.get(titleString).getSaveType();
+		if ( saveType == 1) {
 			String path = PoiPublicUtil.getWebRootPath(getSaveUrl(excelParams.get(titleString), object));
 			File savefile = new File(path);
 			if (!savefile.exists()) {
@@ -431,9 +477,21 @@ public class ExcelImportServer extends ImportBaseService {
 			fos.write(data);
 			fos.close();
 			setValues(excelParams.get(titleString), object, getSaveUrl(excelParams.get(titleString), object) + "/" + fileName);
-		} else {
+		} else if(saveType==2) {
 			setValues(excelParams.get(titleString), object, data);
+		} else {
+			ImportFileServiceI importFileService = null;
+			try {
+				importFileService = ApplicationContextUtil.getContext().getBean(ImportFileServiceI.class);
+			} catch (Exception e) {
+				System.err.println(e.getMessage());
+			}
+			if(importFileService!=null){
+				String dbPath = importFileService.doUpload(data);
+				setValues(excelParams.get(titleString), object, dbPath);
+			}
 		}
+		//update-end-author:taoyan date:20200302 for:【多任务】online 专项集中问题 LOWCOD-159
 	}
 
 	private void createErrorCellStyle(Workbook workbook) {

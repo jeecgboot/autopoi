@@ -97,7 +97,7 @@ public class ExcelExportServer extends ExcelExportBase {
 		return 1;
 	}
 
-	public void createSheet(Workbook workbook, ExportParams entity, Class<?> pojoClass, Collection<?> dataSet) {
+	public void createSheet(Workbook workbook, ExportParams entity, Class<?> pojoClass, Collection<?> dataSet, String[] exportFields) {
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("Excel export start ,class is {}", pojoClass);
 			LOGGER.debug("Excel version is {}", entity.getType().equals(ExcelType.HSSF) ? "03" : "07");
@@ -130,10 +130,32 @@ public class ExcelExportServer extends ExcelExportBase {
 			}
 			// 得到所有字段
 			Field fileds[] = PoiPublicUtil.getClassFields(pojoClass);
+
+            //---update-begin-----autor:scott------date:20191016-------for:导出字段支持自定义--------
+            //支持自定义导出字段
+            if (exportFields != null) {
+                List<Field> list = new ArrayList<Field>(Arrays.asList(fileds));
+                for (int i = 0; i < list.size(); i++) {
+                    if (!Arrays.asList(exportFields).contains(list.get(i).getName())) {
+                        list.remove(i);
+                        i--;
+                    }
+                }
+
+                if (list != null && list.size() > 0) {
+                    fileds = list.toArray(new Field[0]);
+                } else {
+                    fileds = null;
+                }
+            }
+            //---update-end-----autor:scott------date:20191016-------for:导出字段支持自定义--------
+
 			ExcelTarget etarget = pojoClass.getAnnotation(ExcelTarget.class);
 			String targetId = etarget == null ? null : etarget.value();
 			getAllExcelField(entity.getExclusions(), targetId, fileds, excelParams, pojoClass, null);
-			sortAllParams(excelParams);
+			//update-begin-author:taoyan date:20200304 for:在此方法循环内设置一下图片磁盘目录，便于导出
+			reConfigExcelExportParams(excelParams,entity);
+			//update-end-author:taoyan date:20200304 for:在此方法循环内设置一下图片磁盘目录，便于导出
 			int index = entity.isCreateHeadRows() ? createHeaderAndTitle(entity, sheet, workbook, excelParams) : 0;
 			int titleHeight = index;
 			setCellWith(excelParams, sheet);
@@ -164,11 +186,10 @@ public class ExcelExportServer extends ExcelExportBase {
 
 			// 发现还有剩余list 继续循环创建Sheet
 			if (dataSet.size() > 0) {
-				createSheet(workbook, entity, pojoClass, dataSet);
+				createSheet(workbook, entity, pojoClass, dataSet,exportFields);
 			}
 
 		} catch (Exception e) {
-			LOGGER.error(e.getMessage(), e);
 			LOGGER.error(e.getMessage(), e);
 			throw new ExcelExportException(ExcelExportEnum.EXPORT_ERROR, e.getCause());
 		}
@@ -261,6 +282,16 @@ public class ExcelExportServer extends ExcelExportBase {
 		CellStyle titleStyle = getExcelExportStyler().getTitleStyle(title.getColor());
 		for (int i = 0, exportFieldTitleSize = excelParams.size(); i < exportFieldTitleSize; i++) {
 			ExcelExportEntity entity = excelParams.get(i);
+			//update-begin-author:taoyan date:20200319 for:建议autoPoi升级，优化数据返回List Map格式下的复合表头导出excel的体验 #873
+			if(entity.isColspan()){
+				List<String> subList = entity.getSubColumnList();
+				if(subList==null || subList.size()==0){
+					continue;
+				}else{
+					entity.initSubExportEntity(excelParams);
+				}
+			}
+			//update-end-author:taoyan date:20200319 for:建议autoPoi升级，优化数据返回List Map格式下的复合表头导出excel的体验 #873
 			if (StringUtils.isNotBlank(entity.getName())) {
 				createStringCell(row, cellIndex, entity.getName(), titleStyle, entity);
 			}
@@ -292,9 +323,12 @@ public class ExcelExportServer extends ExcelExportBase {
 	 */
 	private int getRowNums(List<ExcelExportEntity> excelParams) {
 		for (int i = 0; i < excelParams.size(); i++) {
-			if (excelParams.get(i).getList() != null && StringUtils.isNotBlank(excelParams.get(i).getName())) {
+			//update-begin-author:taoyan date:20200319 for:建议autoPoi升级，优化数据返回List Map格式下的复合表头导出excel的体验 #873
+			ExcelExportEntity temp = excelParams.get(i);
+			if ((temp.getList() != null || temp.isColspan()) && StringUtils.isNotBlank(temp.getName())) {
 				return 2;
 			}
+			//update-end-author:taoyan date:20200319 for:建议autoPoi升级，优化数据返回List Map格式下的复合表头导出excel的体验 #873
 		}
 		return 1;
 	}

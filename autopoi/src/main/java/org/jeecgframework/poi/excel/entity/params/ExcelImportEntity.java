@@ -29,11 +29,11 @@ public class ExcelImportEntity extends ExcelBaseEntity {
 	 */
 	private String collectionName;
 	/**
-	 * 保存图片的地址
+	 * 保存图片的地址 当saveType设置为3/4时，此值可以设置为：local,minio,alioss
 	 */
 	private String saveUrl;
 	/**
-	 * 保存图片的类型,1是文件,2是数据库
+	 * 保存图片的类型,1是文件_old,2是数据库字节,3文件地址_new,4网络地址
 	 */
 	private int saveType;
 	/**

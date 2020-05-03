@@ -87,6 +87,11 @@ public class ExportParams extends ExcelBaseParams {
 	 */
 	private boolean isCreateHeadRows = true;
 
+	/**
+	 * 本地文件存储基础路径
+	 */
+	private String imageBasePath;
+
 	public ExportParams() {
 
 	}
@@ -218,6 +223,14 @@ public class ExportParams extends ExcelBaseParams {
 
 	public void setCreateHeadRows(boolean isCreateHeadRows) {
 		this.isCreateHeadRows = isCreateHeadRows;
+	}
+
+	public String getImageBasePath() {
+		return imageBasePath;
+	}
+
+	public void setImageBasePath(String imageBasePath) {
+		this.imageBasePath = imageBasePath;
 	}
 
 }

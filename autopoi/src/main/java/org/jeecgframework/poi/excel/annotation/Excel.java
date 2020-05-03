@@ -51,9 +51,10 @@ public @interface Excel {
 	public double height() default 10;
 
 	/**
-	 * 导出类型 1 从file读取 2 是从数据库中读取 默认是文件 同样导入也是一样的
+	 * 导出类型 1 从file读取_old ,2 是从数据库中读取字节文件, 3文件地址_new, 4网络地址 同样导入也是一样的
+	 *
 	 */
-	public int imageType() default 1;
+	public int imageType() default 3;
 
 	/**
 	 * 导入的时间格式,以这个是否为空来判断是否需要格式化日期
@@ -103,7 +104,7 @@ public @interface Excel {
 	
 	/**
 	 * 导入路径,如果是图片可以填写,默认是upload/className/ IconEntity这个类对应的就是upload/Icon/
-	 * 
+	 *
 	 */
 	public String savePath() default "upload";
 
@@ -171,4 +172,16 @@ public @interface Excel {
 	 * @since 2018年8月1日
 	 */
 	public boolean multiReplace() default true;
+
+	/**
+	 * 父表头
+	 * @return
+	 */
+	String groupName() default "";
+
+	/**
+	 * 数字格式化,参数是Pattern,使用的对象是DecimalFormat
+	 * @return
+	 */
+	String numFormat() default "";
 }

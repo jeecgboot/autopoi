@@ -18,21 +18,18 @@ package org.jeecgframework.poi.excel.export.base;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.jeecgframework.core.util.ApplicationContextUtil;
 import org.jeecgframework.dict.service.AutoPoiDictServiceI;
 import org.jeecgframework.poi.excel.annotation.Excel;
 import org.jeecgframework.poi.excel.annotation.ExcelCollection;
 import org.jeecgframework.poi.excel.annotation.ExcelEntity;
+import org.jeecgframework.poi.excel.entity.ExportParams;
 import org.jeecgframework.poi.excel.entity.params.ExcelExportEntity;
 import org.jeecgframework.poi.handler.inter.IExcelDataHandler;
 import org.jeecgframework.poi.util.PoiPublicUtil;
@@ -171,6 +168,12 @@ public class ExportBase {
 		} else {
 			value = entity.getMethods() != null ? getFieldBySomeMethod(entity.getMethods(), obj) : entity.getMethod().invoke(obj, new Object[] {});
 		}
+		//update-begin-author:taoyan date:2020319 for:Excel注解的numFormat方法似乎未实现 #970
+		if (StringUtils.isNotEmpty(entity.getNumFormat()) && value!=null) {
+			value = new DecimalFormat(entity.getNumFormat()).format(value);
+		}
+		//update-end-author:taoyan date:2020319 for:Excel注解的numFormat方法似乎未实现 #970
+
 		if (StringUtils.isNotEmpty(entity.getFormat())) {
 			value = formatValue(value, entity);
 		}
@@ -252,12 +255,24 @@ public class ExportBase {
 		excelEntity.setFormat(StringUtils.isNotEmpty(excel.exportFormat()) ? excel.exportFormat() : excel.format());
 		excelEntity.setStatistics(excel.isStatistics());
 		String fieldname = field.getName();
+		//update-begin-author:taoyan date:20200319 for:autopoi 双表头问题 #862 基于注解的解决方案
+		excelEntity.setKey(fieldname);
+		//update-end-author:taoyan date:20200319 for:autopoi 双表头问题 #862 基于注解的解决方案
+		//update-begin-author:taoyan date:20200319 for:Excel注解的numFormat方法似乎未实现 #970
+		excelEntity.setNumFormat(excel.numFormat());
+		//update-end-author:taoyan date:20200319 for:Excel注解的numFormat方法似乎未实现 #970
 		//update-begin-author:taoyan date:20180615 for:TASK #2798 【例子】导入扩展方法，支持自定义导入字段转换规则
 		excelEntity.setMethod(PoiPublicUtil.getMethod(fieldname, pojoClass,excel.exportConvert()));
 		//update-end-author:taoyan date:20180615 for:TASK #2798 【例子】导入扩展方法，支持自定义导入字段转换规则
 		//update-begin-author:taoyan date:20180801 for:TASK #3038 【bug】Excel 导出多个值（逗号隔开的情况下，导出字典值是ID值）
 		excelEntity.setMultiReplace(excel.multiReplace());
 		//update-end-author:taoyan date:20180801 for:TASK #3038 【bug】Excel 导出多个值（逗号隔开的情况下，导出字典值是ID值）
+		//update-begin-author:taoyan date:20200319 for:autopoi 双表头问题 #862 基于实体注解的解决方案
+		if(StringUtils.isNotEmpty(excel.groupName())){
+			excelEntity.setGroupName(excel.groupName());
+			excelEntity.setColspan(true);
+		}
+		//update-end-author:taoyan date:20200319 for:autopoi 双表头问题 #862 基于实体注解的解决方案
 	}
 
 	/**
@@ -385,6 +400,54 @@ public class ExportBase {
 				Collections.sort(entity.getList());
 			}
 		}
+	}
+
+	/**
+	 * 循环ExcelExportEntity集合 附加配置信息<br>
+	 * 1.列排序<br>
+	 * 2.读取图片根路径设置(如果有字段是图片类型 并且存储在本地 则设置磁盘路径获取全地址导出)<br>
+	 * 3.多表头配置(仅限于单表 会走这个逻辑处理)
+	 */
+	public void reConfigExcelExportParams(List<ExcelExportEntity> excelParams, ExportParams exportParams) {
+		Set<String> NameSet = new HashSet<String>();
+		Map<String,List<String>> groupAndColumnList = new HashMap<String,List<String>>();
+		Map<String,Integer> groupOrder = new HashMap<>();
+		int index = -99;
+		for (ExcelExportEntity entity : excelParams) {
+			if(entity.getOrderNum()==0){
+				entity.setOrderNum(index++);
+			}
+			if(entity.getExportImageType()==3){
+				entity.setImageBasePath(exportParams.getImageBasePath());
+			}
+			if (entity.getList() != null) {
+				Collections.sort(entity.getList());
+			}
+			String groupName = entity.getGroupName();
+			if(StringUtils.isNotEmpty(groupName)){
+				List<String> ls = groupAndColumnList.get(groupName);
+				if(ls==null){
+					ls = new ArrayList<String>();
+					groupAndColumnList.put(groupName,ls);
+				}
+				ls.add(entity.getKey().toString());
+
+				Integer order = groupOrder.get(groupName);
+				if(order==null || entity.getOrderNum()<order){
+					order = entity.getOrderNum();
+				}
+				groupOrder.put(groupName,order);
+			}
+		}
+
+		for(String key: groupAndColumnList.keySet()){
+			ExcelExportEntity temp = new ExcelExportEntity(key);
+			temp.setColspan(true);
+			temp.setSubColumnList(groupAndColumnList.get(key));
+			temp.setOrderNum(groupOrder.get(key));
+			excelParams.add(temp);
+		}
+		Collections.sort(excelParams);
 	}
 
 }

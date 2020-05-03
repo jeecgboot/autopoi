@@ -17,6 +17,8 @@ package org.jeecgframework.poi.excel.entity;
 
 import org.jeecgframework.poi.handler.inter.IExcelVerifyHandler;
 
+import java.util.List;
+
 /**
  * 导入参数设置
  * 
@@ -62,6 +64,16 @@ public class ImportParams extends ExcelBaseParams {
 	 * 最后的无效行数
 	 */
 	private int lastOfInvalidRow = 0;
+
+	/**
+	 * 不需要解析的表头 只作为多表头展示，无字段与其绑定
+	 */
+	private List<String> ignoreHeaderList;
+
+	/**
+	 * 图片列 集合
+	 */
+	private List<String> imageList;
 
 	public int getHeadRows() {
 		return headRows;
@@ -135,4 +147,31 @@ public class ImportParams extends ExcelBaseParams {
 		this.lastOfInvalidRow = lastOfInvalidRow;
 	}
 
+	public List<String> getImageList() {
+		return imageList;
+	}
+
+	public void setImageList(List<String> imageList) {
+		this.imageList = imageList;
+	}
+
+	public List<String> getIgnoreHeaderList() {
+		return ignoreHeaderList;
+	}
+
+	public void setIgnoreHeaderList(List<String> ignoreHeaderList) {
+		this.ignoreHeaderList = ignoreHeaderList;
+	}
+
+	/**
+	 * 根据表头显示的文字 判断是否忽略该表头
+	 * @param text
+	 * @return
+	 */
+	public boolean isIgnoreHeader(String text){
+		if(ignoreHeaderList!=null && ignoreHeaderList.indexOf(text)>=0){
+			return true;
+		}
+		return false;
+	}
 }

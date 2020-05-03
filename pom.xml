@@ -3,9 +3,8 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.jeecgframework</groupId>
 	<artifactId>autopoi-parent</artifactId>
-	<version>1.0.3</version>
+	<version>1.1.1</version>
 	<packaging>pom</packaging>
-	<name>autopoi</name>
 	<url>http://www.jeecg.org</url>
 	
 	<modules>
@@ -34,10 +33,10 @@
     </developers>
 
 	<properties>
-		<autopoi.version>1.0.3</autopoi.version>
+		<autopoi.version>1.1.1</autopoi.version>
 		<poi.version>3.9</poi.version>
 		<xerces.version>2.9.1</xerces.version>
-		<guava.version>20.0</guava.version>
+		<guava.version>26.0-jre</guava.version>
 		<commons-lang.version>3.2.1</commons-lang.version>
 		<slf4j.version>1.6.1</slf4j.version>
 		<spring.version>5.0.7.RELEASE</spring.version>
@@ -161,78 +160,17 @@
 		</plugins>
 	</build>
 
-	<profiles>
-        <profile>
-            <id>release</id>
-            <build>
-                <plugins>
-                	<!-- Source -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <version>2.2.1</version>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>jar-no-fork</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                	<!-- Javadoc -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>2.9.1</version>
-                        <executions>
-                            <execution>
-								<phase>package</phase>
-								<goals>
-									<goal>jar</goal>
-								</goals>
-								<configuration>
-									<encoding>UTF-8</encoding>
-									<additionalparam>-Xdoclint:none</additionalparam>
-								</configuration>
-							</execution>
-                        </executions>
-                    </plugin>
-                    <!-- GPG -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.5</version>
-                        <executions>
-                            <execution>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                     <plugin>
-				        <artifactId>maven-compiler-plugin</artifactId>
-				        <configuration>
-				          <source>1.8</source>
-				          <target>1.8</target>
-				          <encoding>UTF-8</encoding>
-				        </configuration>
-				      </plugin>
-                </plugins>
-            </build>
-            <distributionManagement>
-                <snapshotRepository>
-                    <id>oss</id>
-                    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-                </snapshotRepository>
-                <repository>
-                    <id>oss</id>
-                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-                </repository>
-            </distributionManagement>
-        </profile>
-    </profiles>
+	<distributionManagement>
+	  	<repository>
+	           <id>jeecg</id>
+	           <name>jeecg Repository</name>
+	           <url>http://maven.jeecg.com:8090/nexus/content/repositories/jeecg</url>
+	       </repository>
+	       <snapshotRepository>
+	        <id>jeecg-snapshots</id>
+	           <name>jeecg Snapshot Repository</name>
+	           <url>http://maven.jeecg.com:8090/nexus/content/repositories/snapshots/</url>
+	    </snapshotRepository>
+	</distributionManagement>
 
 </project>

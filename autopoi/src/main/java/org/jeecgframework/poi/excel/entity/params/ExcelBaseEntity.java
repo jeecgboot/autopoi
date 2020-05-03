@@ -41,6 +41,11 @@ public class ExcelBaseEntity {
 	 * 导出日期格式
 	 */
 	private String format;
+
+	/**
+	 * 数字格式化,参数是Pattern,使用的对象是DecimalFormat
+	 */
+	private String numFormat;
 	/**
 	 * 替换值表达式 ："男_1","女_0"
 	 */
@@ -49,6 +54,11 @@ public class ExcelBaseEntity {
 	 * 替换是否是替换多个值
 	 */
 	private boolean multiReplace;
+
+	/**
+	 * 表头组名称
+	 */
+	private String groupName;
 	
 	/**
 	 * set/get方法
@@ -120,5 +130,19 @@ public class ExcelBaseEntity {
 		this.multiReplace = multiReplace;
 	}
 
-	
+	public String getNumFormat() {
+		return numFormat;
+	}
+
+	public void setNumFormat(String numFormat) {
+		this.numFormat = numFormat;
+	}
+
+	public String getGroupName() {
+		return groupName;
+	}
+
+	public void setGroupName(String groupName) {
+		this.groupName = groupName;
+	}
 }

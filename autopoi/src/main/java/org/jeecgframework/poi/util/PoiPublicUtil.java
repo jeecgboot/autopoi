@@ -296,7 +296,12 @@ public final class PoiPublicUtil {
 
 	public static String getWebRootPath(String filePath) {
 		try {
-			String path = PoiPublicUtil.class.getClassLoader().getResource("").toURI().getPath();
+			String path = null;
+			try {
+				path = PoiPublicUtil.class.getClassLoader().getResource("").toURI().getPath();
+			} catch (URISyntaxException e) {
+				//e.printStackTrace();
+			}
 			//update-begin--Author:zhangdaihao  Date:20190424 for：解决springboot 启动模式，上传路径获取为空问题---------------------
 			if (path == null || path == "") {
 				//解决springboot 启动模式，上传路径获取为空问题
@@ -309,7 +314,7 @@ public final class PoiPublicUtil {
 			LOGGER.debug("--- path---  " + path);
 			LOGGER.debug("--- filePath---  " + filePath);
 			return path + filePath;
-		} catch (URISyntaxException e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -499,7 +504,9 @@ public final class PoiPublicUtil {
 			BigDecimal bigDecimal = new BigDecimal(temp);
 			temp = bigDecimal.toPlainString();
 		}
-		return temp;
+		//---update-begin-----autor:scott------date:20191016-------for:excel导入数字类型，去掉后缀.0------
+		return ExcelUtil.remove0Suffix(temp);
+		//---update-end-----autor:scott------date:20191016-------for:excel导入数字类型，去掉后缀.0------
 	}
 
 }

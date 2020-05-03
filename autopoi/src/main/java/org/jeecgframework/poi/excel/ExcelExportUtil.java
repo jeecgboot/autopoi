@@ -42,9 +42,37 @@ public final class ExcelExportUtil {
 	private ExcelExportUtil() {
 	}
 
+	//---update-begin-----autor:scott------date:20191016-------for:导出字段支持自定义--------
 	/**
 	 * 根据Entity创建对应的Excel
 	 * 
+	 * @param entity
+	 *            表格标题属性
+	 * @param pojoClass
+	 *            Excel对象Class
+	 * @param dataSet
+	 *            Excel对象数据List
+	 * @param exportFields
+	 * 	          自定义导出Excel字段数组
+	 */
+	public static Workbook exportExcel(ExportParams entity, Class<?> pojoClass, Collection<?> dataSet,String[] exportFields) {
+		Workbook workbook;
+		if (ExcelType.HSSF.equals(entity.getType())) {
+			workbook = new HSSFWorkbook();
+		} else if (dataSet.size() < 1000) {
+			workbook = new XSSFWorkbook();
+		} else {
+			workbook = new SXSSFWorkbook();
+		}
+		new ExcelExportServer().createSheet(workbook, entity, pojoClass, dataSet,exportFields);
+		return workbook;
+	}
+	//---update-end-----autor:scott------date:20191016-------for:导出字段支持自定义--------
+
+
+	/**
+	 * 根据Entity创建对应的Excel
+	 *
 	 * @param entity
 	 *            表格标题属性
 	 * @param pojoClass
@@ -61,7 +89,7 @@ public final class ExcelExportUtil {
 		} else {
 			workbook = new SXSSFWorkbook();
 		}
-		new ExcelExportServer().createSheet(workbook, entity, pojoClass, dataSet);
+		new ExcelExportServer().createSheet(workbook, entity, pojoClass, dataSet,null);
 		return workbook;
 	}
 
@@ -105,7 +133,7 @@ public final class ExcelExportUtil {
 		}
 		for (Map<String, Object> map : list) {
 			ExcelExportServer server = new ExcelExportServer();
-			server.createSheet(workbook, (ExportParams) map.get("title"), (Class<?>) map.get("entity"), (Collection<?>) map.get("data"));
+			server.createSheet(workbook, (ExportParams) map.get("title"), (Class<?>) map.get("entity"), (Collection<?>) map.get("data"),null);
 		}
 		return workbook;
 	}

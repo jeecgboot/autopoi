@@ -71,6 +71,8 @@ public class ImportBaseService {
 		excelEntity.setDatabaseFormat(excel.databaseFormat());
 		excelEntity.setVerify(getImportVerify(field));
 		excelEntity.setSuffix(excel.suffix());
+		excelEntity.setNumFormat(excel.numFormat());
+		excelEntity.setGroupName(excel.groupName());
 		//update-begin-author:taoYan date:20180202 for:TASK #2067 【bug excel 问题】excel导入字典文本翻译问题
 		excelEntity.setMultiReplace(excel.multiReplace());
 		if(StringUtils.isNotEmpty(excel.dicCode())){

@@ -15,46 +15,33 @@
  */
 package org.jeecgframework.poi.excel.export.base;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.imageio.ImageIO;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
 import org.apache.poi.hssf.usermodel.HSSFRichTextString;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.ClientAnchor;
-import org.apache.poi.ss.usermodel.Drawing;
-import org.apache.poi.ss.usermodel.RichTextString;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.util.StringUtil;
 import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
+import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.entity.enmus.ExcelType;
 import org.jeecgframework.poi.excel.entity.params.ExcelExportEntity;
-import org.jeecgframework.poi.excel.entity.params.MergeEntity;
 import org.jeecgframework.poi.excel.entity.vo.PoiBaseConstants;
 import org.jeecgframework.poi.excel.export.styler.IExcelExportStyler;
 import org.jeecgframework.poi.util.PoiMergeCellUtil;
 import org.jeecgframework.poi.util.PoiPublicUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.text.DecimalFormat;
+import java.util.*;
 
 /**
  * 提供POI基础操作服务
@@ -92,7 +79,26 @@ public abstract class ExcelExportBase extends ExportBase {
 		cellNum += indexKey;
 		for (int k = indexKey, paramSize = excelParams.size(); k < paramSize; k++) {
 			entity = excelParams.get(k);
-			if (entity.getList() != null) {
+			//update-begin-author:taoyan date:20200319 for:建议autoPoi升级，优化数据返回List Map格式下的复合表头导出excel的体验 #873
+			if(entity.isSubColumn()){
+				continue;
+			}
+			if(entity.isMergeColumn()){
+				Map<String,Object> subColumnMap = new HashMap<>();
+				List<String> mapKeys = entity.getSubColumnList();
+				for (String subKey : mapKeys) {
+					Object subKeyValue = null;
+					if (t instanceof Map) {
+						subKeyValue = ((Map<?, ?>) t).get(subKey);
+					}else{
+						subKeyValue = PoiPublicUtil.getParamsValue(subKey,t);
+					}
+					subColumnMap.put(subKey,subKeyValue);
+				}
+				createListCells(patriarch, index, cellNum, subColumnMap, entity.getList(), sheet, workbook);
+				cellNum += entity.getSubColumnList().size();
+			//update-end-author:taoyan date:20200319 for:建议autoPoi升级，优化数据返回List Map格式下的复合表头导出excel的体验 #873
+			} else if (entity.getList() != null) {
 				Collection<?> list = getListCellValue(entity, t);
 				int listC = 0;
 				for (Object obj : list) {
@@ -159,28 +165,86 @@ public abstract class ExcelExportBase extends ExportBase {
 		if (StringUtils.isEmpty(imagePath)) {
 			return;
 		}
-		if (entity.getExportImageType() == 1) {
+
+		//update-beign-author:taoyan date:20200302 for:【多任务】online 专项集中问题 LOWCOD-159
+		int imageType = entity.getExportImageType();
+		byte[] value = null;
+		if(imageType == 2){
+			//原来逻辑 2
+			value = (byte[]) (entity.getMethods() != null ? getFieldBySomeMethod(entity.getMethods(), obj) : entity.getMethod().invoke(obj, new Object[] {}));
+		} else if(imageType==4 || imagePath.startsWith("http")){
+			//新增逻辑 网络图片4
+			try {
+				if (imagePath.indexOf(",") != -1) {
+					if(imagePath.startsWith(",")){
+						imagePath = imagePath.substring(1);
+					}
+					String[] images = imagePath.split(",");
+					imagePath = images[0];
+				}
+				URL url = new URL(imagePath);
+				HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+				conn.setRequestMethod("GET");
+				conn.setConnectTimeout(5 * 1000);
+				InputStream inStream = conn.getInputStream();
+				value = readInputStream(inStream);
+			} catch (Exception exception) {
+				LOGGER.warn(exception.getMessage());
+				//exception.printStackTrace();
+			}
+		} else {
 			ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream();
 			BufferedImage bufferImg;
-			try {
-				String path = PoiPublicUtil.getWebRootPath(imagePath);
+			String path = null;
+			if(imageType == 1){
+				//原来逻辑 1
+				path = PoiPublicUtil.getWebRootPath(imagePath);
 				LOGGER.debug("--- createImageCell getWebRootPath ----filePath--- "+ path);
 				path = path.replace("WEB-INF/classes/", "");
 				path = path.replace("file:/", "");
+			}else if(imageType==3){
+				//新增逻辑 本地图片3
+				if(!entity.getImageBasePath().endsWith(File.separator) && !imagePath.startsWith(File.separator)){
+					path = entity.getImageBasePath()+File.separator+imagePath;
+				}else{
+					path = entity.getImageBasePath()+imagePath;
+				}
+			}
+			try {
 				bufferImg = ImageIO.read(new File(path));
 				ImageIO.write(bufferImg, imagePath.substring(imagePath.indexOf(".") + 1, imagePath.length()), byteArrayOut);
-				byte[] value = byteArrayOut.toByteArray();
-				patriarch.createPicture(anchor, row.getSheet().getWorkbook().addPicture(value, getImageType(value)));
+				value = byteArrayOut.toByteArray();
 			} catch (IOException e) {
 				LOGGER.error(e.getMessage(), e);
 			}
-		} else {
-			byte[] value = (byte[]) (entity.getMethods() != null ? getFieldBySomeMethod(entity.getMethods(), obj) : entity.getMethod().invoke(obj, new Object[] {}));
-			if (value != null) {
-				patriarch.createPicture(anchor, row.getSheet().getWorkbook().addPicture(value, getImageType(value)));
-			}
 		}
+		if (value != null) {
+			patriarch.createPicture(anchor, row.getSheet().getWorkbook().addPicture(value, getImageType(value)));
+		}
+		//update-end-author:taoyan date:20200302 for:【多任务】online 专项集中问题 LOWCOD-159
 
+
+	}
+
+	/**
+	 * inStream读取到字节数组
+	 * @param inStream
+	 * @return
+	 * @throws Exception
+	 */
+	private byte[] readInputStream(InputStream inStream) throws Exception {
+		if(inStream==null){
+			return null;
+		}
+		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+		byte[] buffer = new byte[1024];
+		int len = 0;
+		//每次读取的字符串长度，如果为-1，代表全部读取完毕
+		while ((len = inStream.read(buffer)) != -1) {
+			outStream.write(buffer, 0, len);
+		}
+		inStream.close();
+		return outStream.toByteArray();
 	}
 
 	private int createIndexCell(Row row, int index, ExcelExportEntity excelExportEntity) {
@@ -377,7 +441,7 @@ public abstract class ExcelExportBase extends ExportBase {
 	 * 
 	 * @param sheet
 	 * @param excelParams
-	 * @param styles
+	 * @param titleHeight
 	 */
 	public void mergeCells(Sheet sheet, List<ExcelExportEntity> excelParams, int titleHeight) {
 		Map<Integer, int[]> mergeMap = getMergeDataMap(excelParams);

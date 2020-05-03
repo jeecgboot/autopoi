@@ -19,6 +19,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.sql.Time;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -192,33 +193,79 @@ public class CellValueServer {
 				return result;
 			}
 			if ("class java.lang.Boolean".equals(xclass) || "boolean".equals(xclass)) {
-				return Boolean.valueOf(String.valueOf(result));
+				//update-begin-author:taoYan date:20200319 for:Excel注解的numFormat方法似乎未实现 #970
+				Boolean temp = Boolean.valueOf(String.valueOf(result));
+				//if(StringUtils.isNotEmpty(entity.getNumFormat())){
+				//	return Boolean.valueOf(new DecimalFormat(entity.getNumFormat()).format(temp));
+				//}else{
+					return temp;
+				//}
+				//update-end-author:taoYan date:20200319 for:Excel注解的numFormat方法似乎未实现 #970
 			}
 			if ("class java.lang.Double".equals(xclass) || "double".equals(xclass)) {
-				return Double.valueOf(String.valueOf(result));
+				//update-begin-author:taoYan date:20200319 for:Excel注解的numFormat方法似乎未实现 #970
+				Double temp = Double.valueOf(String.valueOf(result));
+				//if(StringUtils.isNotEmpty(entity.getNumFormat())){
+				//	return Double.valueOf(new DecimalFormat(entity.getNumFormat()).format(temp));
+				//}else{
+					return temp;
+				//}
+				//update-end-author:taoYan date:20200319 for:Excel注解的numFormat方法似乎未实现 #970
 			}
 			if ("class java.lang.Long".equals(xclass) || "long".equals(xclass)) {
-				return Long.valueOf(ExcelUtil.remove0Suffix(String.valueOf(result)));
+				//update-begin-author:taoYan date:20200319 for:Excel注解的numFormat方法似乎未实现 #970
+				Long temp = Long.valueOf(ExcelUtil.remove0Suffix(String.valueOf(result)));
+				//if(StringUtils.isNotEmpty(entity.getNumFormat())){
+				//	return Long.valueOf(new DecimalFormat(entity.getNumFormat()).format(temp));
+				//}else{
+					return temp;
+				//}
+				//update-end-author:taoYan date:20200319 for:Excel注解的numFormat方法似乎未实现 #970
 			}
 			if ("class java.lang.Float".equals(xclass) || "float".equals(xclass)) {
-				return Float.valueOf(String.valueOf(result));
+				//update-begin-author:taoYan date:20200319 for:Excel注解的numFormat方法似乎未实现 #970
+				Float temp = Float.valueOf(String.valueOf(result));
+				//if(StringUtils.isNotEmpty(entity.getNumFormat())){
+				//	return Float.valueOf(new DecimalFormat(entity.getNumFormat()).format(temp));
+				//}else{
+					return temp;
+				//}
+				//update-end-author:taoYan date:20200319 for:Excel注解的numFormat方法似乎未实现 #970
 			}
 			if ("class java.lang.Integer".equals(xclass) || "int".equals(xclass)) {
-				return Integer.valueOf(ExcelUtil.remove0Suffix(String.valueOf(result)));
+				//update-begin-author:taoYan date:20200319 for:Excel注解的numFormat方法似乎未实现 #970
+				Integer temp = Integer.valueOf(ExcelUtil.remove0Suffix(String.valueOf(result)));
+				//if(StringUtils.isNotEmpty(entity.getNumFormat())){
+				//	return Integer.valueOf(new DecimalFormat(entity.getNumFormat()).format(temp));
+				//}else{
+					return temp;
+				//}
+				//update-end-author:taoYan date:20200319 for:Excel注解的numFormat方法似乎未实现 #970
 			}
 			if ("class java.math.BigDecimal".equals(xclass)) {
-				return new BigDecimal(String.valueOf(result));
+				//update-begin-author:taoYan date:20200319 for:Excel注解的numFormat方法似乎未实现 #970
+				BigDecimal temp = new BigDecimal(String.valueOf(result));
+				//if(StringUtils.isNotEmpty(entity.getNumFormat())){
+				//	return new BigDecimal(new DecimalFormat(entity.getNumFormat()).format(temp));
+				//}else{
+					return temp;
+				//}
+				//update-end-author:taoYan date:20200319 for:Excel注解的numFormat方法似乎未实现 #970
 			}
 			if ("class java.lang.String".equals(xclass)) {
 				// 针对String 类型,但是Excel获取的数据却不是String,比如Double类型,防止科学计数法
 				if (result instanceof String) {
-					return result;
+					//---update-begin-----autor:scott------date:20191016-------for:excel导入数字类型，去掉后缀.0------
+					return ExcelUtil.remove0Suffix(result);
+					//---update-end-----autor:scott------date:20191016-------for:excel导入数字类型，去掉后缀.0------
 				}
 				// double类型防止科学计数法
 				if (result instanceof Double) {
 					return PoiPublicUtil.doubleToString((Double) result);
 				}
-				return String.valueOf(result);
+				//---update-begin-----autor:scott------date:20191016-------for:excel导入数字类型，去掉后缀.0------
+				return ExcelUtil.remove0Suffix(String.valueOf(result));
+				//---update-end-----autor:scott------date:20191016-------for:excel导入数字类型，去掉后缀.0------
 			}
 			return result;
 		} catch (Exception e) {

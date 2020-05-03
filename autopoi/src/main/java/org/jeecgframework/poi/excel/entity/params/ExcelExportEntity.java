@@ -15,6 +15,7 @@
  */
 package org.jeecgframework.poi.excel.entity.params;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,9 +36,14 @@ public class ExcelExportEntity extends ExcelBaseEntity implements Comparable<Exc
 	private double height = 10;
 
 	/**
-	 * 图片的类型,1是文件,2是数据库
+	 * 图片的类型,1是文件地址(class目录),2是数据库字节,3是文件地址(磁盘目录)，4网络图片
 	 */
-	private int exportImageType = 0;
+	private int exportImageType = 3;
+
+	/**
+	 * 图片储存位置(磁盘目录) 用于导出获取图片绝对路径
+	 */
+	private String imageBasePath;
 
 	/**
 	 * 排序顺序
@@ -70,6 +76,21 @@ public class ExcelExportEntity extends ExcelBaseEntity implements Comparable<Exc
 	 */
 	private boolean isStatistics;
 
+	/**
+	 * 是否横向合并
+	 */
+	private boolean colspan;
+
+	/**
+	 * 被横向合并的列名称
+	 */
+	private List<String> subColumnList;
+
+	/**
+	 * 父表头的名称
+	 */
+	private String groupName;
+
 	private List<ExcelExportEntity> list;
 
 	public ExcelExportEntity() {
@@ -83,6 +104,18 @@ public class ExcelExportEntity extends ExcelBaseEntity implements Comparable<Exc
 	public ExcelExportEntity(String name, Object key) {
 		super.name = name;
 		this.key = key;
+	}
+
+	/**
+	 * 构造器
+	 * @param name 描述-文字
+	 * @param key 存储key 如果是MAP导出,这个是map的key
+	 * @param colspan 是否为合并列（a,b列公用一个表头c,则a,b,c都需要设置为true）
+	 */
+	public ExcelExportEntity(String name, Object key, boolean colspan) {
+		super.name = name;
+		this.key = key;
+		this.colspan = colspan;
 	}
 
 	public ExcelExportEntity(String name, Object key, int width) {
@@ -185,6 +218,71 @@ public class ExcelExportEntity extends ExcelBaseEntity implements Comparable<Exc
 
 	public void setStatistics(boolean isStatistics) {
 		this.isStatistics = isStatistics;
+	}
+
+	public String getImageBasePath() {
+		return imageBasePath;
+	}
+
+	public void setImageBasePath(String imageBasePath) {
+		this.imageBasePath = imageBasePath;
+	}
+
+	public boolean isColspan() {
+		return colspan;
+	}
+
+	public void setColspan(boolean colspan) {
+		this.colspan = colspan;
+	}
+
+	public List<String> getSubColumnList() {
+		return subColumnList;
+	}
+
+	public void setSubColumnList(List<String> subColumnList) {
+		this.subColumnList = subColumnList;
+	}
+
+	public String getGroupName() {
+		return groupName;
+	}
+
+	public void setGroupName(String groupName) {
+		this.groupName = groupName;
+	}
+
+	/**
+	 * 是否为合并子列
+	 * @return
+	 */
+	public boolean isSubColumn(){
+		return this.colspan && (this.subColumnList==null || this.subColumnList.size()==0);
+	}
+
+	/**
+	 * 是否为合并父列
+	 * @return
+	 */
+	public boolean isMergeColumn(){
+		return this.colspan && this.subColumnList!=null && this.subColumnList.size()>0;
+	}
+
+
+	/**
+	 * 获取被合并的子列
+	 * @param all
+	 * @return
+	 */
+	public List<ExcelExportEntity> initSubExportEntity(List<ExcelExportEntity> all){
+		List<ExcelExportEntity> sub = new ArrayList<ExcelExportEntity>();
+		for (ExcelExportEntity temp : all) {
+			if(this.subColumnList.contains(temp.getKey())){
+				sub.add(temp);
+			}
+		}
+		this.setList(sub);
+		return sub;
 	}
 
 	@Override
