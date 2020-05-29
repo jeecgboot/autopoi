@@ -100,6 +100,7 @@ public class ExcelImportServer extends ImportBaseService {
 		boolean isUsed = false;// 是否需要加上这个对象
 		for (int i = row.getFirstCellNum(); i < row.getLastCellNum(); i++) {
 			Cell cell = row.getCell(i);
+			cell = cell == null ? cell : cell.trim();
 			String titleString = (String) titlemap.get(i);
 			if (param.getExcelParams().containsKey(titleString)) {
 				if (param.getExcelParams().get(titleString).getType() == 2) {
@@ -218,6 +219,7 @@ public class ExcelImportServer extends ImportBaseService {
                     }
 					for (int i = firstCellNum, le = lastCellNum; i < le; i++) {
 						Cell cell = row.getCell(i);
+						cell = cell == null ? cell : cell.trim();
 						String titleString = (String) titlemap.get(i);
 						if (excelParams.containsKey(titleString) || Map.class.equals(pojoClass)) {
 							if (excelParams.get(titleString) != null && excelParams.get(titleString).getType() == 2) {
