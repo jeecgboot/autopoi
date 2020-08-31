@@ -124,7 +124,7 @@ public final class ExcelExportUtil {
 	 *            Collection 数据
 	 * @return
 	 */
-	public static Workbook exportExcel(List<Map<String, Object>> list, String type) {
+	public static Workbook exportExcel(List<Map<String, Object>> list, ExcelType type) {
 		Workbook workbook;
 		if (ExcelType.HSSF.equals(type)) {
 			workbook = new HSSFWorkbook();

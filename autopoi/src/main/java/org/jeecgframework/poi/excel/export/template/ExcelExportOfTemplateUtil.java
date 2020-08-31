@@ -199,8 +199,9 @@ public final class ExcelExportOfTemplateUtil extends ExcelExportBase {
 	 * @date 2013-11-11
 	 */
 	private Workbook getCloneWorkBook() throws Exception {
-		return ExcelCache.getWorkbook(teplateParams.getTemplateUrl(), teplateParams.getSheetNum(), teplateParams.isScanAllsheet());
-
+		//update-begin-author:wangshuai date:20200730 for:jar 包上传到服务器后 autopoi 读取不到excel模版文件 #1505
+		return ExcelCache.getWorkbookByTemplate(teplateParams.getTemplateUrl(), teplateParams.getSheetNum(), teplateParams.isScanAllsheet());
+		//update-end-author:wangshuai date:20200730 for:jar 包上传到服务器后 autopoi 读取不到excel模版文件 #1505
 	}
 
 	/**
@@ -354,7 +355,11 @@ public final class ExcelExportOfTemplateUtil extends ExcelExportBase {
 			setForEeachCellValue(isCreate, cell.getRow(), cell.getColumnIndex(), t, columns, map);
 		}
 		if (isShift) {
-			cell.getRow().getSheet().shiftRows(cell.getRowIndex() + 1, cell.getRow().getSheet().getLastRowNum(), datas.size() - 1, true, true);
+			//update-begin-author:taoyan date:20200710 for: 当数据只有一行的时候移动行的方法shiftRows会报错
+			if(datas.size()>1){
+				cell.getRow().getSheet().shiftRows(cell.getRowIndex() + 1, cell.getRow().getSheet().getLastRowNum(), datas.size() - 1, true, true);
+			}
+			//update-end-author:taoyan date:20200710 for: 当数据只有一行的时候移动行的方法shiftRows会报错
 		}
 		while (its.hasNext()) {
 			Object t = its.next();

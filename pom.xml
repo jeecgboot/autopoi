@@ -3,9 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.jeecgframework</groupId>
 	<artifactId>autopoi-parent</artifactId>
-	<version>1.1.1</version>
+	<version>1.2.1</version>
 	<packaging>pom</packaging>
-	<url>http://www.jeecg.org</url>
+
+	<name>autopoi-parent</name>
+	<url>http://www.jeecg.com</url>
 	
 	<modules>
 		<module>autopoi</module>
@@ -33,13 +35,13 @@
     </developers>
 
 	<properties>
-		<autopoi.version>1.1.1</autopoi.version>
-		<poi.version>3.9</poi.version>
+		<autopoi.version>1.2.1</autopoi.version>
+		<poi.version>3.16</poi.version>
 		<xerces.version>2.9.1</xerces.version>
 		<guava.version>26.0-jre</guava.version>
-		<commons-lang.version>3.2.1</commons-lang.version>
-		<slf4j.version>1.6.1</slf4j.version>
-		<spring.version>5.0.7.RELEASE</spring.version>
+		<commons-lang.version>3.10</commons-lang.version>
+		<slf4j.version>1.7.30</slf4j.version>
+		<spring.version>5.1.0.RELEASE</spring.version>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
@@ -141,36 +143,75 @@
 					<testFailureIgnore>true</testFailureIgnore>
 				</configuration>
 			</plugin>
-			<!-- 编译源码包 -->
+			<!--生成Source jar文件-->
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
 				<version>2.2.1</version>
-				<configuration>
-					<attach>true</attach>
-				</configuration>
 				<executions>
 					<execution>
-						<phase>compile</phase>
+						<id>attach-sources</id>
 						<goals>
-							<goal>jar</goal>
+							<goal>jar-no-fork</goal>
 						</goals>
 					</execution>
 				</executions>
 			</plugin>
+			<!--生成Javadoc，关闭doclint,避免注解检查不通过-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.9.1</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<additionalparam>-Xdoclint:none</additionalparam>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!--Maven GPG插件用于使用以下配置对组件进行签名-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>1.6</version>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!--Nexus Staging Maven插件是将组件部署到OSS并将其发布到Central Repository的推荐方法-->
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<version>1.6.7</version>
+				<extensions>true</extensions>
+				<configuration>
+					<serverId>oss</serverId>
+					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+					<autoReleaseAfterClose>true</autoReleaseAfterClose>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
-
 	<distributionManagement>
-	  	<repository>
-	           <id>jeecg</id>
-	           <name>jeecg Repository</name>
-	           <url>http://maven.jeecg.com:8090/nexus/content/repositories/jeecg</url>
-	       </repository>
-	       <snapshotRepository>
-	        <id>jeecg-snapshots</id>
-	           <name>jeecg Snapshot Repository</name>
-	           <url>http://maven.jeecg.com:8090/nexus/content/repositories/snapshots/</url>
-	    </snapshotRepository>
+		<snapshotRepository>
+			<id>oss</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+		</snapshotRepository>
+		<repository>
+			<id>oss</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
 	</distributionManagement>
 
 </project>

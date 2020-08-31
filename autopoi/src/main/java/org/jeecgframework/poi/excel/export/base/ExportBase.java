@@ -168,6 +168,14 @@ public class ExportBase {
 		} else {
 			value = entity.getMethods() != null ? getFieldBySomeMethod(entity.getMethods(), obj) : entity.getMethod().invoke(obj, new Object[] {});
 		}
+
+		// +++
+		value = Optional.ofNullable(value).orElse("");
+		if (StringUtils.isEmpty(value.toString())) {
+			return "";
+		}
+		// +++
+
 		//update-begin-author:taoyan date:2020319 for:Excel注解的numFormat方法似乎未实现 #970
 		if (StringUtils.isNotEmpty(entity.getNumFormat()) && value!=null) {
 			value = new DecimalFormat(entity.getNumFormat()).format(value);

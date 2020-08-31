@@ -280,17 +280,24 @@ public class ExcelImportServer extends ImportBaseService {
 	 * @param excelCollection
 	 * @return
 	 */
-	private Map<Integer, String> getTitleMap(Sheet sheet, Iterator<Row> rows, ImportParams params, List<ExcelCollectionParams> excelCollection) {
+	private Map<Integer, String> getTitleMap(Sheet sheet, Iterator<Row> rows, ImportParams params, List<ExcelCollectionParams> excelCollection) throws Exception {
 		Map<Integer, String> titlemap = new HashMap<Integer, String>();
 		Iterator<Cell> cellTitle = null;
 		String collectionName = null;
 		ExcelCollectionParams collectionParams = null;
 		Row headRow = null;
 		int headBegin = params.getTitleRows();
+		//update_begin-author:taoyan date:2020622 for：当文件行数小于代码里设置的TitleRows时headRow一直为空就会出现死循环
+		int allRowNum = sheet.getPhysicalNumberOfRows();
 		//找到首行表头，每个sheet都必须至少有一行表头
-		while(headRow == null){
+		while(headRow == null && headBegin < allRowNum){
 			headRow = sheet.getRow(headBegin++);
 		}
+		if(headRow==null){
+			throw new Exception("不识别该文件");
+		}
+		//update-end-author:taoyan date:2020622 for：当文件行数小于代码里设置的TitleRows时headRow一直为空就会出现死循环
+
 		//设置表头行数
 		if (ExcelUtil.isMergedRegion(sheet, headRow.getRowNum(), 0)) {
 			params.setHeadRows(2);

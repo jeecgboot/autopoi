@@ -110,14 +110,20 @@ public final class PoiElUtil {
 
 	/**
 	 * 是不是真
-	 * 
+	 * 这个方法两个地方用到
+	 * 1.三目表达式的判断,表达式需要设置空格 {{field == 1? field1:field2 }} 或者 {{field?field1:field2 }}
+	 * 2.取非表达式（判断为真则当前excel的一整列会被干掉）  {{!if:(field == 1)}} 或者 {{!if:(field)}}
+	 *
+	 * 如果字段field本身就能判断true或者false 他会走len==1的逻辑处理
+	 * 如果字段field需要结合其他固定值来判断true或者false 那么记住一定要再表达式里打空格 然后他会split空格 走len==3的逻辑处理
 	 * @param keys
 	 * @param map
 	 * @return
 	 * @throws Exception
 	 */
 	private static Boolean isTrue(String[] keys, Map<String, Object> map) throws Exception {
-		if (keys.length == 0) {
+		//update-author:taoyan date:20200622 for:此处判断len当为1
+		if (keys.length == 1) {
 			String constant = null;
 			if ((constant = isConstant(keys[0])) != null) {
 				return Boolean.valueOf(constant);
@@ -125,8 +131,11 @@ public final class PoiElUtil {
 			return Boolean.valueOf(PoiPublicUtil.getParamsValue(keys[0], map).toString());
 		}
 		if (keys.length == 3) {
-			Object first = eval(keys[0], map);
-			Object second = eval(keys[2], map);
+			if(keys[0]==null || keys[2]==null){
+				return false;
+			}
+			Object first = String.valueOf(eval(keys[0], map));
+			Object second = String.valueOf(eval(keys[2], map));
 			return PoiFunctionUtil.isTrue(first, keys[1], second);
 		}
 		throw new ExcelExportException("判断参数不对");

@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.jeecgframework</groupId>
 		<artifactId>autopoi-parent</artifactId>
-		<version>1.1.1</version>
+		<version>1.2.1</version>
 	</parent>
 	<artifactId>autopoi-web</artifactId>
 	<dependencies>
@@ -13,6 +13,7 @@
 		<dependency>
 			<groupId>org.jeecgframework</groupId>
 			<artifactId>autopoi</artifactId>
+			<version>${autopoi.version}</version>
 		</dependency>
 
 		<!--spring -->
