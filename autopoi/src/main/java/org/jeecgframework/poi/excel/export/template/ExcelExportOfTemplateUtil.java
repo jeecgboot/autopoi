@@ -1,6 +1,6 @@
 /**
  * Copyright 2013-2015 JEECG (jeecgos@163.com)
- *   
+ *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
@@ -53,7 +53,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Excel 导出根据模板导出
- * 
+ *
  * @author JEECG
  * @date 2013-10-17
  * @version 1.0
@@ -73,7 +73,7 @@ public final class ExcelExportOfTemplateUtil extends ExcelExportBase {
 
 	/**
 	 * 往Sheet 填充正常数据,根据表头信息 使用导入的部分逻辑,坐对象映射
-	 * 
+	 *
 	 * @param teplateParams
 	 * @param pojoClass
 	 * @param dataSet
@@ -117,7 +117,7 @@ public final class ExcelExportOfTemplateUtil extends ExcelExportBase {
 
 	/**
 	 * 下移数据
-	 * 
+	 *
 	 * @param its
 	 * @param excelParams
 	 * @return
@@ -134,7 +134,7 @@ public final class ExcelExportOfTemplateUtil extends ExcelExportBase {
 
 	/**
 	 * 获取单个对象的高度,主要是处理一堆多的情况
-	 * 
+	 *
 	 * @param styles
 	 * @param rowHeight
 	 * @throws Exception
@@ -192,7 +192,7 @@ public final class ExcelExportOfTemplateUtil extends ExcelExportBase {
 
 	/**
 	 * 克隆excel防止操作原对象,workbook无法克隆,只能对excel进行克隆
-	 * 
+	 *
 	 * @param teplateParams
 	 * @throws Exception
 	 * @Author JEECG
@@ -206,7 +206,7 @@ public final class ExcelExportOfTemplateUtil extends ExcelExportBase {
 
 	/**
 	 * 获取表头数据,设置表头的序号
-	 * 
+	 *
 	 * @param teplateParams
 	 * @param sheet
 	 * @return
@@ -251,7 +251,7 @@ public final class ExcelExportOfTemplateUtil extends ExcelExportBase {
 
 	/**
 	 * 先判断删除,省得影响效率
-	 * 
+	 *
 	 * @param sheet
 	 * @param map
 	 * @throws Exception
@@ -283,7 +283,7 @@ public final class ExcelExportOfTemplateUtil extends ExcelExportBase {
 
 	/**
 	 * 给每个Cell通过解析方式set值
-	 * 
+	 *
 	 * @param cell
 	 * @param map
 	 */
@@ -329,7 +329,7 @@ public final class ExcelExportOfTemplateUtil extends ExcelExportBase {
 
 	/**
 	 * 利用foreach循环输出数据
-	 * 
+	 *
 	 * @param cell
 	 * @param map
 	 * @param oldString
@@ -404,7 +404,7 @@ public final class ExcelExportOfTemplateUtil extends ExcelExportBase {
 
 	/**
 	 * 获取迭代的数据的值
-	 * 
+	 *
 	 * @param cell
 	 * @param name
 	 * @return
@@ -418,21 +418,25 @@ public final class ExcelExportOfTemplateUtil extends ExcelExportBase {
 		}
 		columns.add(new ExcelTemplateParams(name.trim(), cell.getCellStyle(), cell.getRow().getHeight()));
 		int index = cell.getColumnIndex();
+		//列数
+		int  lastCellNum = cell.getRow().getLastCellNum();
 		Cell tempCell;
 		while (true) {
 			tempCell = cell.getRow().getCell(++index);
-			if (tempCell == null) {
+			//--begin--date：2020/09/18---for：增加列数判断，防止提前跳出
+			if (tempCell == null&&index>=lastCellNum) {
 				break;
 			}
 			String cellStringString;
 			try {// 允许为空,单表示已经完结了,因为可能被删除了
 				cellStringString = tempCell.getStringCellValue();
-				if (StringUtils.isBlank(cellStringString)) {
+				if (StringUtils.isBlank(cellStringString)&&index>=lastCellNum) {
 					break;
 				}
 			} catch (Exception e) {
 				throw new ExcelExportException("for each 当中存在空字符串,请检查模板");
 			}
+			//--end--date：2020/09/18---for：增加列数判断，防止提前跳出
 			// 把读取过的cell 置为空
 			tempCell.setCellValue("");
 			if (cellStringString.contains(END_STR)) {
@@ -441,6 +445,9 @@ public final class ExcelExportOfTemplateUtil extends ExcelExportBase {
 			} else {
 				if (cellStringString.trim().contains(teplateParams.getTempParams())) {
 					columns.add(new ExcelTemplateParams(cellStringString.trim(), tempCell.getCellStyle(), tempCell.getRow().getHeight()));
+				}else if(cellStringString.trim().equals(EMPTY)){
+					//可能是合并的单元格，允许空数据的设置
+					columns.add(new ExcelTemplateParams(EMPTY, tempCell.getCellStyle(), tempCell.getRow().getHeight()));
 				} else {
 					// 最后一行被删除了
 					break;
@@ -453,7 +460,7 @@ public final class ExcelExportOfTemplateUtil extends ExcelExportBase {
 
 	/**
 	 * 对导出序列进行排序和塞选
-	 * 
+	 *
 	 * @param excelParams
 	 * @param titlemap
 	 * @return

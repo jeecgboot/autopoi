@@ -13,6 +13,8 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.jeecgframework.poi.excel.entity.params.MergeEntity;
 import org.jeecgframework.poi.exception.excel.ExcelExportException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 纵向合并单元格工具类
@@ -21,7 +23,7 @@ import org.jeecgframework.poi.exception.excel.ExcelExportException;
  * @date 2015年6月21日 上午11:21:40
  */
 public final class PoiMergeCellUtil {
-
+	private final static Logger LOGGER = LoggerFactory.getLogger(PoiMergeCellUtil.class);
 	private PoiMergeCellUtil() {
 	}
 
@@ -99,7 +101,14 @@ public final class PoiMergeCellUtil {
 		}
 		if (mergeDataMap.size() > 0) {
 			for (Integer index : mergeDataMap.keySet()) {
+				//update-begin-author:wangshuai date:20201118 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
+				try{
 				sheet.addMergedRegion(new CellRangeAddress(mergeDataMap.get(index).getStartRow(), mergeDataMap.get(index).getEndRow(), index, index));
+				}catch (IllegalArgumentException e){
+					LOGGER.error("合并单元格错误日志："+e.getMessage());
+					e.fillInStackTrace();
+				}
+				//update-end-author:wangshuai date:20201118 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
 			}
 		}
 
@@ -121,7 +130,14 @@ public final class PoiMergeCellUtil {
 			if (checkIsEqualByCellContents(mergeDataMap.get(index), text, cell, delys, rowNum)) {
 				mergeDataMap.get(index).setEndRow(rowNum);
 			} else {
+				//update-begin-author:wangshuai date:20201118 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
+				try{
 				sheet.addMergedRegion(new CellRangeAddress(mergeDataMap.get(index).getStartRow(), mergeDataMap.get(index).getEndRow(), index, index));
+				}catch (IllegalArgumentException e){
+					LOGGER.error("合并单元格错误日志："+e.getMessage());
+					e.fillInStackTrace();
+				}
+				//update-end-author:wangshuai date:20201118 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
 				mergeDataMap.put(index, createMergeEntity(text, rowNum, cell, delys));
 			}
 		} else {
@@ -138,7 +154,14 @@ public final class PoiMergeCellUtil {
 	 */
 	private static void mergeCellOrContinue(Integer index, Map<Integer, MergeEntity> mergeDataMap, Sheet sheet) {
 		if (mergeDataMap.containsKey(index) && mergeDataMap.get(index).getEndRow() != mergeDataMap.get(index).getStartRow()) {
+			//update-begin-author:wangshuai date:20201118 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
+			try{
 			sheet.addMergedRegion(new CellRangeAddress(mergeDataMap.get(index).getStartRow(), mergeDataMap.get(index).getEndRow(), index, index));
+			}catch (IllegalArgumentException e){
+				LOGGER.error("合并单元格错误日志："+e.getMessage());
+				e.fillInStackTrace();
+			}
+			//update-end-author:wangshuai date:20201118 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
 			mergeDataMap.remove(index);
 		}
 	}

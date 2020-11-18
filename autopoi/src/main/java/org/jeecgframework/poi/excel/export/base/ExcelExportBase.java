@@ -133,7 +133,14 @@ public abstract class ExcelExportBase extends ExportBase {
 					sheet.getRow(i).createCell(cellNum);
 					sheet.getRow(i).getCell(cellNum).setCellStyle(getStyles(false, entity));
 				}
+				//update-begin-author:wangshuai date:20201116 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
+				try {
 				sheet.addMergedRegion(new CellRangeAddress(index, index + maxHeight - 1, cellNum, cellNum));
+				}catch (IllegalArgumentException e){
+					LOGGER.error("合并单元格错误日志："+e.getMessage());
+					e.fillInStackTrace();
+				}
+				//update-end-author:wangshuai date:20201116 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
 				cellNum++;
 			}
 		}
@@ -380,7 +387,15 @@ public abstract class ExcelExportBase extends ExportBase {
 	public int getFieldWidth(List<ExcelExportEntity> excelParams) {
 		int length = -1;// 从0开始计算单元格的
 		for (ExcelExportEntity entity : excelParams) {
-			length += entity.getList() != null ? entity.getList().size() : 1;
+			//update-begin---author:liusq   Date:20200909  for：AutoPoi多表头导出，会多出一列空白列 #1513------------
+			if(entity.getGroupName()!=null){
+				continue;
+			}else if (entity.getSubColumnList()!=null&&entity.getSubColumnList().size()>0){
+				length += entity.getSubColumnList().size();
+			}else{
+				length += entity.getList() != null ? entity.getList().size() : 1;
+			}
+			//update-end---author:liusq   Date:20200909  for：AutoPoi多表头导出，会多出一列空白列 #1513------------
 		}
 		return length;
 	}

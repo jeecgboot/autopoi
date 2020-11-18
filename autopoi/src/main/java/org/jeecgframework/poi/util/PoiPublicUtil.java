@@ -509,4 +509,20 @@ public final class PoiPublicUtil {
 		//---update-end-----autor:scott------date:20191016-------for:excel导入数字类型，去掉后缀.0------
 	}
 
+	/**
+	 * 判断是否是数值类型
+	 * @param xclass
+	 * @return
+	 */
+	public static boolean isNumber(String xclass){
+		if(xclass==null){
+			return false;
+		}
+		String temp = xclass.toLowerCase();
+		if(temp.indexOf("int")>=0 || temp.indexOf("double")>=0 || temp.indexOf("decimal")>=0){
+			return true;
+		}
+		return false;
+	}
+
 }

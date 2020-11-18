@@ -81,7 +81,14 @@ public class ExcelExportServer extends ExcelExportBase {
 		for (int i = 1; i <= feildWidth; i++) {
 			createStringCell(row, i, "", getExcelExportStyler().getHeaderStyle(entity.getHeaderColor()), null);
 		}
+		//update-begin-author:wangshuai date:20201118 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
+		try {
 		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, feildWidth));
+		}catch (IllegalArgumentException e){
+			LOGGER.error("合并单元格错误日志："+e.getMessage());
+			e.fillInStackTrace();
+		}
+		//update-end-author:wangshuai date:20201118 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
 		if (entity.getSecondTitle() != null) {
 			row = sheet.createRow(1);
 			row.setHeight(entity.getSecondTitleHeight());
@@ -91,7 +98,14 @@ public class ExcelExportServer extends ExcelExportBase {
 			for (int i = 1; i <= feildWidth; i++) {
 				createStringCell(row, i, "", getExcelExportStyler().getHeaderStyle(entity.getHeaderColor()), null);
 			}
+			//update-begin-author:wangshuai date:20201118 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
+			try{
 			sheet.addMergedRegion(new CellRangeAddress(1, 1, 0, feildWidth));
+			}catch (IllegalArgumentException e){
+				LOGGER.error("合并单元格错误日志："+e.getMessage());
+			  e.fillInStackTrace();
+		  }
+		  //update-end-author:wangshuai date:20201118 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
 			return 2;
 		}
 		return 1;
@@ -297,8 +311,15 @@ public class ExcelExportServer extends ExcelExportBase {
 			}
 			if (entity.getList() != null) {
 				List<ExcelExportEntity> sTitel = entity.getList();
+				 //update-begin-author:wangshuai date:20201118 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
 				if (StringUtils.isNotBlank(entity.getName())) {
+					try {
 					sheet.addMergedRegion(new CellRangeAddress(index, index, cellIndex, cellIndex + sTitel.size() - 1));
+					}catch (IllegalArgumentException e){
+						LOGGER.error("合并单元格错误日志："+e.getMessage());
+						e.fillInStackTrace();
+					}
+					//update-end-author:wangshuai date:20201118 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
 				}
 				for (int j = 0, size = sTitel.size(); j < size; j++) {
 					createStringCell(rows == 2 ? listRow : row, cellIndex, sTitel.get(j).getName(), titleStyle, entity);
@@ -307,7 +328,14 @@ public class ExcelExportServer extends ExcelExportBase {
 				cellIndex--;
 			} else if (rows == 2) {
 				createStringCell(listRow, cellIndex, "", titleStyle, entity);
+				//update-begin-author:wangshuai date:20201118 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
+				try{
 				sheet.addMergedRegion(new CellRangeAddress(index, index + 1, cellIndex, cellIndex));
+				}catch (IllegalArgumentException e){
+					LOGGER.error("合并单元格错误日志："+e.getMessage());
+					e.fillInStackTrace();
+				}
+				//update-end-author:wangshuai date:20201118 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
 			}
 			cellIndex++;
 		}

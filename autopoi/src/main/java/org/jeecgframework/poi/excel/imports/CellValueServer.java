@@ -80,6 +80,9 @@ public class CellValueServer {
 			result = cell.getNumericCellValue();
 		} else if (Cell.CELL_TYPE_BOOLEAN == cell.getCellType()) {
 			result = cell.getBooleanCellValue();
+		} else if (Cell.CELL_TYPE_FORMULA == cell.getCellType() && PoiPublicUtil.isNumber(xclass)) {
+			//如果单元格是表达式 且 字段是数字类型
+			result = cell.getNumericCellValue();
 		} else {
 			result = cell.getStringCellValue();
 		}
@@ -140,7 +143,7 @@ public class CellValueServer {
 	 * 
 	 * @param dataHanlder
 	 * @param object
-	 * @param entity
+	 * @param cellEntity
 	 * @param excelParams
 	 * @param titleString
 	 * @return

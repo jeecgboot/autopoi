@@ -206,7 +206,13 @@ public class ExcelUtil {
      * @param lastCol 结束列
      */
     public static void mergeRegion(Sheet sheet, int firstRow, int lastRow, int firstCol, int lastCol) {
+        //update-begin-author:wangshuai date:20201118 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
+        try{
         sheet.addMergedRegion(new CellRangeAddress(firstRow, lastRow, firstCol, lastCol));
+        }catch (IllegalArgumentException e){
+            e.fillInStackTrace();
+        }
+        //update-end-author:wangshuai date:20201118 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
     }
 
     /**

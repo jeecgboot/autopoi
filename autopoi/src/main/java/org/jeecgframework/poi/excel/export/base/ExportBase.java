@@ -72,7 +72,12 @@ public class ExportBase {
 
 	private Object formatValue(Object value, ExcelExportEntity entity) throws Exception {
 		Date temp = null;
-		if (value instanceof String) {
+		//update-begin-author:wangshuai date:20201118 for:Excel导出错误原因，value为""字符串，gitee I249JF
+		if("".equals(value)){
+			value= null;
+		}
+		//update-begin-author:wangshuai date:20201118 for:Excel导出错误原因，value为""字符串，gitee I249JF
+		if (value instanceof String && entity.getDatabaseFormat()!=null) {
 			SimpleDateFormat format = new SimpleDateFormat(entity.getDatabaseFormat());
 			temp = format.parse(value.toString());
 		} else if (value instanceof Date) {
@@ -169,12 +174,12 @@ public class ExportBase {
 			value = entity.getMethods() != null ? getFieldBySomeMethod(entity.getMethods(), obj) : entity.getMethod().invoke(obj, new Object[] {});
 		}
 
-		// +++
+		//update-begin-author:scott date:20200831 for:导出excel实体反射，时间格式转换错误 #1573
 		value = Optional.ofNullable(value).orElse("");
 		if (StringUtils.isEmpty(value.toString())) {
 			return "";
 		}
-		// +++
+		//update-end-author:scott date:20200831 for:导出excel实体反射，时间格式转换错误 #1573
 
 		//update-begin-author:taoyan date:2020319 for:Excel注解的numFormat方法似乎未实现 #970
 		if (StringUtils.isNotEmpty(entity.getNumFormat()) && value!=null) {
