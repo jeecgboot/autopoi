@@ -27,12 +27,16 @@ import org.jeecgframework.poi.excel.entity.enmus.ExcelType;
 import org.jeecgframework.poi.excel.entity.params.ExcelExportEntity;
 import org.jeecgframework.poi.excel.entity.vo.PoiBaseConstants;
 import org.jeecgframework.poi.excel.export.styler.IExcelExportStyler;
+import org.jeecgframework.poi.util.MyX509TrustManager;
 import org.jeecgframework.poi.util.PoiMergeCellUtil;
 import org.jeecgframework.poi.util.PoiPublicUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -40,6 +44,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.SecureRandom;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -149,6 +154,41 @@ public abstract class ExcelExportBase extends ExportBase {
 	}
 
 	/**
+	 * 通过https地址获取图片数据
+	 * @param imagePath
+	 * @return
+	 * @throws Exception
+	 */
+	private byte[] getImageDataByHttps(String imagePath) throws Exception {
+		SSLContext sslcontext = SSLContext.getInstance("SSL","SunJSSE");
+		sslcontext.init(null, new TrustManager[]{new MyX509TrustManager()}, new SecureRandom());
+		URL url = new URL(imagePath);
+		HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+		conn.setSSLSocketFactory(sslcontext.getSocketFactory());
+		conn.setRequestMethod("GET");
+		conn.setConnectTimeout(5 * 1000);
+		InputStream inStream = conn.getInputStream();
+		byte[] value = readInputStream(inStream);
+		return value;
+	}
+
+	/**
+	 * 通过http地址获取图片数据
+	 * @param imagePath
+	 * @return
+	 * @throws Exception
+	 */
+	private byte[] getImageDataByHttp(String imagePath) throws Exception {
+		URL url = new URL(imagePath);
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		conn.setRequestMethod("GET");
+		conn.setConnectTimeout(5 * 1000);
+		InputStream inStream = conn.getInputStream();
+		byte[] value = readInputStream(inStream);
+		return value;
+	}
+
+	/**
 	 * 图片类型的Cell
 	 * 
 	 * @param patriarch
@@ -189,12 +229,11 @@ public abstract class ExcelExportBase extends ExportBase {
 					String[] images = imagePath.split(",");
 					imagePath = images[0];
 				}
-				URL url = new URL(imagePath);
-				HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-				conn.setRequestMethod("GET");
-				conn.setConnectTimeout(5 * 1000);
-				InputStream inStream = conn.getInputStream();
-				value = readInputStream(inStream);
+				if(imagePath.startsWith("https")){
+					value = getImageDataByHttps(imagePath);
+				}else{
+					value = getImageDataByHttp(imagePath);
+				}
 			} catch (Exception exception) {
 				LOGGER.warn(exception.getMessage());
 				//exception.printStackTrace();
@@ -221,8 +260,8 @@ public abstract class ExcelExportBase extends ExportBase {
 				bufferImg = ImageIO.read(new File(path));
 				ImageIO.write(bufferImg, imagePath.substring(imagePath.indexOf(".") + 1, imagePath.length()), byteArrayOut);
 				value = byteArrayOut.toByteArray();
-			} catch (IOException e) {
-				LOGGER.error(e.getMessage(), e);
+			} catch (Exception e) {
+				LOGGER.error(e.getMessage());
 			}
 		}
 		if (value != null) {

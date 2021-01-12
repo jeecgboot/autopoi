@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.jeecgframework</groupId>
 	<artifactId>autopoi-parent</artifactId>
-	<version>1.2.2</version>
+	<version>1.2.4</version>
 	<packaging>pom</packaging>
 
 	<name>autopoi-parent</name>
@@ -35,8 +35,9 @@
     </developers>
 
 	<properties>
-		<autopoi.version>1.2.2</autopoi.version>
+		<autopoi.version>1.2.4</autopoi.version>
 		<poi.version>3.16</poi.version>
+		<ooxml-schemas.version>1.4</ooxml-schemas.version>
 		<xerces.version>2.9.1</xerces.version>
 		<guava.version>26.0-jre</guava.version>
 		<commons-lang.version>3.10</commons-lang.version>
@@ -72,6 +73,13 @@
 				<groupId>org.apache.poi</groupId>
 				<artifactId>poi-scratchpad</artifactId>
 				<version>${poi.version}</version>
+			</dependency>
+
+			<!-- excel背景 -->
+			<dependency>
+				<groupId>org.apache.poi</groupId>
+				<artifactId>ooxml-schemas</artifactId>
+				<version>${ooxml-schemas.version}</version>
 			</dependency>
 
 			<!-- google 工具类 -->
