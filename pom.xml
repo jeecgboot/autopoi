@@ -36,7 +36,7 @@
 
 	<properties>
 		<autopoi.version>1.2.4</autopoi.version>
-		<poi.version>3.16</poi.version>
+		<poi.version>4.1.2</poi.version>
 		<ooxml-schemas.version>1.4</ooxml-schemas.version>
 		<xerces.version>2.9.1</xerces.version>
 		<guava.version>26.0-jre</guava.version>
