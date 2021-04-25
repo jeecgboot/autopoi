@@ -15,9 +15,7 @@
  */
 package org.jeecgframework.poi.excel.export.styler;
 
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 
 /**
  * 带有边框的Excel样式
@@ -37,24 +35,24 @@ public class ExcelExportStylerBorderImpl extends AbstractExcelExportStyler imple
 		Font font = workbook.createFont();
 		font.setFontHeightInPoints((short) 12);
 		titleStyle.setFont(font);
-		titleStyle.setBorderLeft((short) 1); // 左边框
-		titleStyle.setBorderRight((short) 1); // 右边框
-		titleStyle.setBorderBottom((short) 1);
-		titleStyle.setBorderTop((short) 1);
-		titleStyle.setAlignment(CellStyle.ALIGN_CENTER);
-		titleStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+		titleStyle.setBorderLeft(BorderStyle.THIN); // 左边框
+		titleStyle.setBorderRight(BorderStyle.THIN); // 右边框
+		titleStyle.setBorderBottom(BorderStyle.THIN);
+		titleStyle.setBorderTop(BorderStyle.THIN);
+		titleStyle.setAlignment(HorizontalAlignment.CENTER);
+		titleStyle.setVerticalAlignment(VerticalAlignment.CENTER);
 		return titleStyle;
 	}
 
 	@Override
 	public CellStyle stringNoneStyle(Workbook workbook, boolean isWarp) {
 		CellStyle style = workbook.createCellStyle();
-		style.setBorderLeft((short) 1); // 左边框
-		style.setBorderRight((short) 1); // 右边框
-		style.setBorderBottom((short) 1);
-		style.setBorderTop((short) 1);
-		style.setAlignment(CellStyle.ALIGN_CENTER);
-		style.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+		style.setBorderLeft(BorderStyle.THIN); // 左边框
+		style.setBorderRight(BorderStyle.THIN); // 右边框
+		style.setBorderBottom(BorderStyle.THIN);
+		style.setBorderTop(BorderStyle.THIN);
+		style.setAlignment(HorizontalAlignment.CENTER);
+		style.setVerticalAlignment(VerticalAlignment.CENTER);
 		style.setDataFormat(STRING_FORMAT);
 		if (isWarp) {
 			style.setWrapText(true);
@@ -65,12 +63,12 @@ public class ExcelExportStylerBorderImpl extends AbstractExcelExportStyler imple
 	@Override
 	public CellStyle getTitleStyle(short color) {
 		CellStyle titleStyle = workbook.createCellStyle();
-		titleStyle.setBorderLeft((short) 1); // 左边框
-		titleStyle.setBorderRight((short) 1); // 右边框
-		titleStyle.setBorderBottom((short) 1);
-		titleStyle.setBorderTop((short) 1);
-		titleStyle.setAlignment(CellStyle.ALIGN_CENTER);
-		titleStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+		titleStyle.setBorderLeft(BorderStyle.THIN); // 左边框
+		titleStyle.setBorderRight(BorderStyle.THIN); // 右边框
+		titleStyle.setBorderBottom(BorderStyle.THIN);
+		titleStyle.setBorderTop(BorderStyle.THIN);
+		titleStyle.setAlignment(HorizontalAlignment.CENTER);
+		titleStyle.setVerticalAlignment(VerticalAlignment.CENTER);
 		titleStyle.setWrapText(true);
 		return titleStyle;
 	}

@@ -15,7 +15,7 @@
  */
 package org.jeecgframework.poi.excel.entity;
 
-import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.jeecgframework.poi.excel.entity.enmus.ExcelType;
 import org.jeecgframework.poi.excel.export.styler.ExcelExportStylerDefaultImpl;
 
@@ -69,11 +69,11 @@ public class ExportParams extends ExcelBaseParams {
 	/**
 	 * 表头颜色
 	 */
-	private short color = HSSFColor.WHITE.index;
+	private short color = IndexedColors.WHITE.index;
 	/**
 	 * 属性说明行的颜色 例如:HSSFColor.SKY_BLUE.index 默认
 	 */
-	private short headerColor = HSSFColor.SKY_BLUE.index;
+	private short headerColor = IndexedColors.SKY_BLUE.index;
 	/**
 	 * Excel 导出版本
 	 */
@@ -88,7 +88,7 @@ public class ExportParams extends ExcelBaseParams {
 	private boolean isCreateHeadRows = true;
 
 	/**
-	 * 本地文件存储基础路径
+	 * 本地文件存储根路径  base path
 	 */
 	private String imageBasePath;
 
@@ -111,6 +111,13 @@ public class ExportParams extends ExcelBaseParams {
 		this.title = title;
 		this.secondTitle = secondTitle;
 		this.sheetName = sheetName;
+	}
+
+	public ExportParams(String title, String secondTitle, String sheetName,String imageBasePath) {
+		this.title = title;
+		this.secondTitle = secondTitle;
+		this.sheetName = sheetName;
+		this.imageBasePath = imageBasePath;
 	}
 
 	public short getColor() {

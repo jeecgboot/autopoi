@@ -15,9 +15,7 @@
  */
 package org.jeecgframework.poi.excel.export.styler;
 
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 
 /**
  * 样式的默认实现
@@ -34,8 +32,8 @@ public class ExcelExportStylerDefaultImpl extends AbstractExcelExportStyler impl
 	@Override
 	public CellStyle getTitleStyle(short color) {
 		CellStyle titleStyle = workbook.createCellStyle();
-		titleStyle.setAlignment(CellStyle.ALIGN_CENTER);
-		titleStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+		titleStyle.setAlignment(HorizontalAlignment.CENTER);
+		titleStyle.setVerticalAlignment(VerticalAlignment.CENTER);
 		titleStyle.setWrapText(true);
 		return titleStyle;
 	}
@@ -43,8 +41,8 @@ public class ExcelExportStylerDefaultImpl extends AbstractExcelExportStyler impl
 	@Override
 	public CellStyle stringSeptailStyle(Workbook workbook, boolean isWarp) {
 		CellStyle style = workbook.createCellStyle();
-		style.setAlignment(CellStyle.ALIGN_CENTER);
-		style.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+		style.setAlignment( HorizontalAlignment.CENTER);
+		style.setVerticalAlignment(VerticalAlignment.CENTER);
 		style.setDataFormat(STRING_FORMAT);
 		if (isWarp) {
 			style.setWrapText(true);
@@ -58,16 +56,16 @@ public class ExcelExportStylerDefaultImpl extends AbstractExcelExportStyler impl
 		Font font = workbook.createFont();
 		font.setFontHeightInPoints((short) 12);
 		titleStyle.setFont(font);
-		titleStyle.setAlignment(CellStyle.ALIGN_CENTER);
-		titleStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+		titleStyle.setAlignment( HorizontalAlignment.CENTER);
+		titleStyle.setVerticalAlignment(VerticalAlignment.CENTER);
 		return titleStyle;
 	}
 
 	@Override
 	public CellStyle stringNoneStyle(Workbook workbook, boolean isWarp) {
 		CellStyle style = workbook.createCellStyle();
-		style.setAlignment(CellStyle.ALIGN_CENTER);
-		style.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+		style.setAlignment(HorizontalAlignment.CENTER);
+		style.setVerticalAlignment(VerticalAlignment.CENTER);
 		style.setDataFormat(STRING_FORMAT);
 		if (isWarp) {
 			style.setWrapText(true);

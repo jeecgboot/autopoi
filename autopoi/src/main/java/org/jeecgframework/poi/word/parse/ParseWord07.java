@@ -105,10 +105,12 @@ public class ParseWord07 {
 	 */
 	private Object checkThisTableIsNeedIterator(XWPFTableCell cell, Map<String, Object> map) throws Exception {
 		String text = cell.getText().trim();
+        //begin-------author:liusq------date:20210129-----for:-------poi3升级到4兼容改造工作【重要敏感修改点】--------
 		// 判断是不是迭代输出
-		if (text.startsWith("{{") && text.endsWith("}}") && text.indexOf("in ") != -1) {
-			return PoiPublicUtil.getRealValue(text.replace("in ", "").trim(), map);
+		if (text != null&&text.startsWith("{{") && text.indexOf("$fe:") != -1) {
+			return PoiPublicUtil.getRealValue(text.replace("$fe:", "").trim(), map);
 		}
+        //end-------author:liusq------date:20210129-----for:-------poi3升级到4兼容改造工作【重要敏感修改点】--------
 		return null;
 	}
 
@@ -199,11 +201,21 @@ public class ParseWord07 {
 		XWPFTableRow row;
 		List<XWPFTableCell> cells;
 		Object listobj;
-		ExcelEntityParse excelEntityParse = new ExcelEntityParse();
 		for (int i = 0; i < table.getNumberOfRows(); i++) {
 			row = table.getRow(i);
 			cells = row.getTableCells();
-			if (cells.size() == 1) {
+			//begin-------author:liusq------date:20210129-----for:-------poi3升级到4兼容改造工作【重要敏感修改点】--------
+			listobj = checkThisTableIsNeedIterator(cells.get(0), map);
+			if (listobj == null) {
+				parseThisRow(cells, map);
+			} else if (listobj instanceof ExcelListEntity) {
+				new ExcelEntityParse().parseNextRowAndAddRow(table, i, (ExcelListEntity) listobj);
+				i = i + ((ExcelListEntity) listobj).getList().size() - 1;//删除之后要往上挪一行,然后加上跳过新建的行数
+			} else {
+				ExcelMapParse.parseNextRowAndAddRow(table, i, (List) listobj);
+				i = i + ((List) listobj).size() - 1;//删除之后要往上挪一行,然后加上跳过新建的行数
+			}
+			/*if (cells.size() == 1) {
 				listobj = checkThisTableIsNeedIterator(cells.get(0), map);
 				if (listobj == null) {
 					parseThisRow(cells, map);
@@ -216,7 +228,8 @@ public class ParseWord07 {
 				}
 			} else {
 				parseThisRow(cells, map);
-			}
+			}*/
+			//end-------author:liusq------date:20210129-----for:-------poi3升级到4兼容改造工作【重要敏感修改点】--------
 		}
 	}
 

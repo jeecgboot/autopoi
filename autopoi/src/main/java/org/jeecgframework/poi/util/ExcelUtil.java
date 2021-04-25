@@ -11,15 +11,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
+import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.ss.util.CellRangeAddress;
 
 public class ExcelUtil {
@@ -43,9 +40,7 @@ public class ExcelUtil {
         try {
             wb = WorkbookFactory.create(new File(path));
             result = readExcel(wb, 0, 2, 0);
-        } catch (InvalidFormatException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return result;
@@ -222,21 +217,23 @@ public class ExcelUtil {
      */
     public static String getCellValue(Cell cell){
 
-        if(cell == null) return "";
+        if(cell == null) {
+            return "";
+        }
 
-        if(cell.getCellType() == Cell.CELL_TYPE_STRING){
+        if(cell.getCellTypeEnum() == CellType.STRING){
 
             return cell.getStringCellValue();
 
-        }else if(cell.getCellType() == Cell.CELL_TYPE_BOOLEAN){
+        }else if(cell.getCellTypeEnum() == CellType.BOOLEAN){
 
             return String.valueOf(cell.getBooleanCellValue());
 
-        }else if(cell.getCellType() == Cell.CELL_TYPE_FORMULA){
+        }else if(cell.getCellTypeEnum() ==  CellType.FORMULA){
 
             return cell.getCellFormula() ;
 
-        }else if(cell.getCellType() == Cell.CELL_TYPE_NUMERIC){
+        }else if(cell.getCellTypeEnum() == CellType.NUMERIC){
 
             return String.valueOf(cell.getNumericCellValue());
 
@@ -284,21 +281,21 @@ public class ExcelUtil {
                 while (cells.hasNext()) {
                     Cell cell = cells.next();
                     System.out.println("Cell #" + cell.getColumnIndex());
-                    switch (cell.getCellType()) {   //根据cell中的类型来输出数据
-                        case HSSFCell.CELL_TYPE_NUMERIC:
+                    switch (cell.getCellTypeEnum()) {   //根据cell中的类型来输出数据
+                        case NUMERIC:
                             System.out.println(cell.getNumericCellValue());
                             break;
-                        case HSSFCell.CELL_TYPE_STRING:
+                        case STRING:
                             System.out.println(cell.getStringCellValue());
                             break;
-                        case HSSFCell.CELL_TYPE_BOOLEAN:
+                        case BOOLEAN:
                             System.out.println(cell.getBooleanCellValue());
                             break;
-                        case HSSFCell.CELL_TYPE_FORMULA:
+                        case FORMULA:
                             System.out.println(cell.getCellFormula());
                             break;
                         default:
-                            System.out.println("unsuported sell type======="+cell.getCellType());
+                            System.out.println("unsuported sell type======="+cell.getCellTypeEnum());
                             break;
                     }
                 }

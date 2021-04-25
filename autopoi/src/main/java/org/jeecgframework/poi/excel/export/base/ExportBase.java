@@ -195,12 +195,19 @@ public class ExportBase {
 			if(value == null){
 				value = "";//String.valueOf(value) 如果value为null 则返回"null"
 			}
+			String oldVal=value.toString();
 			if(entity.isMultiReplace()){
 				value = multiReplaceValue(entity.getReplace(), String.valueOf(value));
 			}else{
 				value = replaceValue(entity.getReplace(), String.valueOf(value));
 			}
 			//update-end-author:taoyan date：20180731 for:TASK #3038 【bug】Excel 导出多个值（逗号隔开的情况下，导出字典值是ID值）
+
+			//update-begin-author:liusq date：20210127 for: 两个数值相等，就证明处理翻译失败的情况
+			if(oldVal.equals(value)){
+
+			}
+			//update-end-author:liusq date：20210127 for: 两个数值相等，就证明处理翻译失败的情况
 		}
 		if (needHanlderList != null && needHanlderList.contains(entity.getName())) {
 			value = dataHanlder.exportHandler(obj, entity.getName(), value);
@@ -361,7 +368,10 @@ public class ExportBase {
 	private Object replaceValue(String[] replace, String value) {
 		String[] temp;
 		for (String str : replace) {
-			temp = str.split("_");
+			//temp = str.split("_"); {'男_sheng_1','女_2'}
+			//update-begin-author:liusq date：20210127 for:字符串截取修改
+			temp = getValueArr(str);
+			//update-end-author:liusq date：20210127 for:字符串截取修改
 			if (value.equals(temp[1])) {
 				value = temp[0];
 				break;
@@ -385,6 +395,9 @@ public class ExportBase {
 				String radio = radioVals[i];
 				for (String str : replace) {
 					temp = str.split("_");
+					//update-begin-author:liusq date：20210127 for:字符串截取修改
+					temp = getValueArr(str);
+					//update-end-author:liusq date：20210127 for:字符串截取修改
 					if (radio.equals(temp[1])) {
 						result = result.concat(temp[0])+",";
 						break;
@@ -463,4 +476,11 @@ public class ExportBase {
 		Collections.sort(excelParams);
 	}
 
+	public String[] getValueArr(String val) {
+		int i = val.lastIndexOf("_");//最后一个分隔符的位置
+		String[] c=new String[2];
+		c[0]=val.substring(0, i); //label
+		c[1]=val.substring(i+1); //key
+		return c;
+	}
 }

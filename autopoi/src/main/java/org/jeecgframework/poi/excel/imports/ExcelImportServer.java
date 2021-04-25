@@ -15,28 +15,14 @@
  */
 package org.jeecgframework.poi.excel.imports;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.PushbackInputStream;
-import java.lang.reflect.Field;
-import java.util.*;
-
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.POIXMLDocument;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.poifs.filesystem.FileMagic;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.formula.functions.T;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.PictureData;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jeecgframework.core.util.ApplicationContextUtil;
@@ -55,6 +41,10 @@ import org.jeecgframework.poi.util.ExcelUtil;
 import org.jeecgframework.poi.util.PoiPublicUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.lang.reflect.Field;
+import java.util.*;
 
 /**
  * Excel 导入服务
@@ -129,17 +119,17 @@ public class ExcelImportServer extends ImportBaseService {
 			return null;
 		}
 		Object obj = null;
-		switch (cell.getCellType()) {
-		case Cell.CELL_TYPE_STRING:
+		switch (cell.getCellTypeEnum()) {
+		case STRING:
 			obj = cell.getStringCellValue();
 			break;
-		case Cell.CELL_TYPE_BOOLEAN:
+		case BOOLEAN:
 			obj = cell.getBooleanCellValue();
 			break;
-		case Cell.CELL_TYPE_NUMERIC:
+		case NUMERIC:
 			obj = cell.getNumericCellValue();
 			break;
-		case Cell.CELL_TYPE_FORMULA:
+		case FORMULA:
 			obj = cell.getCellFormula();
 			break;
 		}
@@ -385,21 +375,35 @@ public class ExcelImportServer extends ImportBaseService {
 		}
 		List<T> result = new ArrayList<T>();
 		Workbook book = null;
-		boolean isXSSFWorkbook = true;
+		boolean isXSSFWorkbook = false;
 		if (!(inputstream.markSupported())) {
 			inputstream = new PushbackInputStream(inputstream, 8);
 		}
-		if (POIFSFileSystem.hasPOIFSHeader(inputstream)) {
-			book = new HSSFWorkbook(inputstream);
-			isXSSFWorkbook = false;
-		} else if (POIXMLDocument.hasOOXMLHeader(inputstream)) {
-			book = new XSSFWorkbook(OPCPackage.open(inputstream));
+		//begin-------author:liusq------date:20210129-----for:-------poi3升级到4兼容改造工作【重要敏感修改点】--------
+		//------poi4.x begin----
+//		FileMagic fm = FileMagic.valueOf(FileMagic.prepareToCheckMagic(inputstream));
+//		if(FileMagic.OLE2 == fm){
+//			isXSSFWorkbook=false;
+//		}
+		book = WorkbookFactory.create(inputstream);
+		if(book instanceof XSSFWorkbook){
+			isXSSFWorkbook=true;
 		}
+		LOGGER.info("  >>>  poi3升级到4.0兼容改造工作, isXSSFWorkbook = " +isXSSFWorkbook);
+		//end-------author:liusq------date:20210129-----for:-------poi3升级到4兼容改造工作【重要敏感修改点】--------
+
+		//begin-------author:liusq------date:20210313-----for:-------多sheet导入改造点--------
+		//获取导入文本的sheet数
+		int sheetNum = book.getNumberOfSheets();
+		if(sheetNum>1){
+			params.setSheetNum(sheetNum);
+		}
+		//end-------author:liusq------date:20210313-----for:-------多sheet导入改造点--------
 		createErrorCellStyle(book);
 		Map<String, PictureData> pictures;
 		for (int i = 0; i < params.getSheetNum(); i++) {
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug(" start to read excel by is ,startTime is {}", new Date().getTime());
+				LOGGER.debug(" start to read excel by is ,startTime is {}", System.currentTimeMillis());
 			}
 			if (isXSSFWorkbook) {
 				pictures = PoiPublicUtil.getSheetPictrues07((XSSFSheet) book.getSheetAt(i), (XSSFWorkbook) book);
@@ -418,6 +422,24 @@ public class ExcelImportServer extends ImportBaseService {
 			saveThisExcel(params, pojoClass, isXSSFWorkbook, book);
 		}
 		return new ExcelImportResult(result, verfiyFail, book);
+	}
+	/**
+	 *
+	 * @param is
+	 * @return
+	 * @throws IOException
+	 */
+	public static byte[] getBytes(InputStream is) throws IOException {
+		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+		int len;
+		byte[] data = new byte[100000];
+		while ((len = is.read(data, 0, data.length)) != -1) {
+			buffer.write(data, 0, len);
+		}
+
+		buffer.flush();
+		return buffer.toByteArray();
 	}
 
 	/**

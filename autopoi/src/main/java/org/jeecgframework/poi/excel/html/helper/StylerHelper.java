@@ -1,14 +1,5 @@
 package org.jeecgframework.poi.excel.html.helper;
 
-import static org.apache.poi.ss.usermodel.CellStyle.ALIGN_CENTER;
-import static org.apache.poi.ss.usermodel.CellStyle.ALIGN_CENTER_SELECTION;
-import static org.apache.poi.ss.usermodel.CellStyle.ALIGN_FILL;
-import static org.apache.poi.ss.usermodel.CellStyle.ALIGN_JUSTIFY;
-import static org.apache.poi.ss.usermodel.CellStyle.ALIGN_LEFT;
-import static org.apache.poi.ss.usermodel.CellStyle.ALIGN_RIGHT;
-import static org.apache.poi.ss.usermodel.CellStyle.VERTICAL_BOTTOM;
-import static org.apache.poi.ss.usermodel.CellStyle.VERTICAL_CENTER;
-import static org.apache.poi.ss.usermodel.CellStyle.VERTICAL_TOP;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,13 +14,7 @@ import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFPalette;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Color;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFFont;
@@ -48,9 +33,9 @@ public class StylerHelper {
 
 	private static final String DEFAULTS_CLASS = "excelDefaults";
 
-	private static final Map<Short, String> ALIGN = PoiPublicUtil.mapFor(ALIGN_LEFT, "left", ALIGN_CENTER, "center", ALIGN_RIGHT, "right", ALIGN_FILL, "left", ALIGN_JUSTIFY, "left", ALIGN_CENTER_SELECTION, "center");
+	private static final Map<Short, String> ALIGN = PoiPublicUtil.mapFor(HorizontalAlignment.LEFT.getCode(), "left",HorizontalAlignment.CENTER.getCode(), "center",HorizontalAlignment.RIGHT.getCode(), "right", HorizontalAlignment.FILL.getCode(), "left",HorizontalAlignment.JUSTIFY.getCode(), "left",HorizontalAlignment.CENTER_SELECTION.getCode(), "center");
 
-	private static final Map<Short, String> VERTICAL_ALIGN = PoiPublicUtil.mapFor(VERTICAL_BOTTOM, "bottom", VERTICAL_CENTER, "middle", VERTICAL_TOP, "top");
+	private static final Map<Short, String> VERTICAL_ALIGN = PoiPublicUtil.mapFor(VerticalAlignment.BOTTOM.getCode(), "bottom", VerticalAlignment.CENTER.getCode(), "middle",VerticalAlignment.TOP.getCode(), "top");
 
 	private Formatter out;
 
@@ -144,15 +129,15 @@ public class StylerHelper {
 	}
 
 	private void styleContents(CellStyle style) {
-		if (style.getAlignment() != 2) {
-			styleOut("text-align", style.getAlignment(), ALIGN);
-			styleOut("vertical-align", style.getAlignment(), VERTICAL_ALIGN);
+		if (style.getAlignmentEnum().getCode() != 2) {
+			styleOut("text-align", style.getAlignmentEnum().getCode(), ALIGN);
+			styleOut("vertical-align", style.getAlignmentEnum().getCode(), VERTICAL_ALIGN);
 		}
 		helper.colorStyles(style, out);
 	}
 
 	private void fontStyle(Font font) {
-		if (font.getBoldweight() >= Font.BOLDWEIGHT_BOLD)
+		if (font.getBold())
 			out.format("  font-weight: bold;%n");
 		if (font.getItalic())
 			out.format("  font-style: italic;%n");
@@ -205,7 +190,9 @@ public class StylerHelper {
 		private final HSSFWorkbook wb;
 		private final HSSFPalette colors;
 
-		private HSSFColor HSSF_AUTO = new HSSFColor.AUTOMATIC();
+		//-------author:liusq------date:20210129-----for:-------poi3升级到4兼容改造工作【重要敏感修改点】--------
+		private HSSFColor HSSF_AUTO = new HSSFColor(0x40,   -1, java.awt.Color.black);
+		//-------author:liusq------date:20210129-----for:-------poi3升级到4兼容改造工作【重要敏感修改点】--------
 
 		public HSSFHtmlHelper(HSSFWorkbook wb) {
 			this.wb = wb;

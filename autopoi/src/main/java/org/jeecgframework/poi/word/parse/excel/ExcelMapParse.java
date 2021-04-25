@@ -63,10 +63,13 @@ public final class ExcelMapParse {
 		table.removeRow(index);// 移除这一行
 		int cellIndex = 0;// 创建完成对象一行好像多了一个cell
 		for (Object obj : list) {
-			currentRow = table.createRow();
+            //begin-------author:liusq------date:20210129-----for:-------poi3升级到4兼容改造工作【重要敏感修改点】--------
+			currentRow = table.insertNewTableRow(index++);
 			for (cellIndex = 0; cellIndex < currentRow.getTableCells().size(); cellIndex++) {
-				currentRow.getTableCells().get(cellIndex).setText(PoiPublicUtil.getValueDoWhile(obj, params[cellIndex].split("\\."), 0).toString());
+				String text = PoiPublicUtil.getValueDoWhile(obj, params[cellIndex].split("\\."), 0).toString();
+				currentRow.getTableCells().get(cellIndex).setText(text);
 			}
+            //end-------author:liusq------date:20210129-----for:-------poi3升级到4兼容改造工作【重要敏感修改点】--------//-------author:liusq------date:20210129-----for:-------poi3升级到4兼容改造工作【重要敏感修改点】--------
 			for (; cellIndex < params.length; cellIndex++) {
 				currentRow.createCell().setText(PoiPublicUtil.getValueDoWhile(obj, params[cellIndex].split("\\."), 0).toString());
 			}

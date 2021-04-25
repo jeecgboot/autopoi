@@ -15,20 +15,9 @@
  */
 package org.jeecgframework.poi.excel.imports;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.math.BigDecimal;
-import java.sql.Time;
-import java.text.DecimalFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.jeecgframework.poi.excel.entity.params.ExcelImportEntity;
 import org.jeecgframework.poi.excel.entity.sax.SaxReadCellEntity;
 import org.jeecgframework.poi.exception.excel.ExcelImportException;
@@ -38,6 +27,17 @@ import org.jeecgframework.poi.util.ExcelUtil;
 import org.jeecgframework.poi.util.PoiPublicUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.math.BigDecimal;
+import java.sql.Time;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Cell 取值服务 判断类型处理数据 1.判断Excel中的类型 2.根据replace替换值 3.handler处理数据 4.判断返回类型转化数据返回
@@ -66,21 +66,21 @@ public class CellValueServer {
 		Object result = null;
 		// 日期格式比较特殊,和cell格式不一致
 		if ("class java.util.Date".equals(xclass) || ("class java.sql.Time").equals(xclass)) {
-			if (Cell.CELL_TYPE_NUMERIC == cell.getCellType()) {
+			if ( CellType.NUMERIC == cell.getCellTypeEnum()) {
 				// 日期格式
 				result = cell.getDateCellValue();
 			} else {
-				cell.setCellType(Cell.CELL_TYPE_STRING);
+				cell.setCellType( CellType.STRING);
 				result = getDateData(entity, cell.getStringCellValue());
 			}
 			if (("class java.sql.Time").equals(xclass)) {
 				result = new Time(((Date) result).getTime());
 			}
-		} else if (Cell.CELL_TYPE_NUMERIC == cell.getCellType()) {
+		} else if ( CellType.NUMERIC == cell.getCellTypeEnum()) {
 			result = cell.getNumericCellValue();
-		} else if (Cell.CELL_TYPE_BOOLEAN == cell.getCellType()) {
+		} else if ( CellType.BOOLEAN == cell.getCellTypeEnum()) {
 			result = cell.getBooleanCellValue();
-		} else if (Cell.CELL_TYPE_FORMULA == cell.getCellType() && PoiPublicUtil.isNumber(xclass)) {
+		} else if ( CellType.FORMULA == cell.getCellTypeEnum() && PoiPublicUtil.isNumber(xclass)) {
 			//如果单元格是表达式 且 字段是数字类型
 			result = cell.getNumericCellValue();
 		} else {
@@ -331,6 +331,11 @@ public class CellValueServer {
 		}else{
 			backValue = replaceSingleValue(replace, temp);
 		}
+		//update-begin-author:liusq date:20210204 for:字典替换失败提示日志
+		if(replace.length>0 && backValue.equals(temp)){
+			LOGGER.warn("====================字典替换失败,字典值:{},要转换的导入值:{}====================", replace, temp);
+		}
+		//update-end-author:liusq date:20210204 for:字典替换失败提示日志
 		return backValue;
 	}
 	/**

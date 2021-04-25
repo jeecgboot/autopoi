@@ -15,9 +15,7 @@
  */
 package org.jeecgframework.poi.excel.export.styler;
 
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 
 /**
  * 带有样式的导出服务
@@ -38,20 +36,20 @@ public class ExcelExportStylerColorImpl extends AbstractExcelExportStyler implem
 		font.setFontHeightInPoints((short) 24);
 		titleStyle.setFont(font);
 		titleStyle.setFillForegroundColor(headerColor);
-		titleStyle.setAlignment(CellStyle.ALIGN_CENTER);
-		titleStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+		titleStyle.setAlignment(HorizontalAlignment.CENTER);
+		titleStyle.setVerticalAlignment(VerticalAlignment.CENTER);
 		return titleStyle;
 	}
 
 	@Override
 	public CellStyle stringNoneStyle(Workbook workbook, boolean isWarp) {
 		CellStyle style = workbook.createCellStyle();
-		style.setBorderLeft((short) 1); // 左边框
-		style.setBorderRight((short) 1); // 右边框
-		style.setBorderBottom((short) 1);
-		style.setBorderTop((short) 1);
-		style.setAlignment(CellStyle.ALIGN_CENTER);
-		style.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+		style.setBorderLeft(BorderStyle.THIN); // 左边框
+		style.setBorderRight(BorderStyle.THIN); // 右边框
+		style.setBorderBottom(BorderStyle.THIN);
+		style.setBorderTop(BorderStyle.THIN);
+		style.setAlignment(HorizontalAlignment.CENTER);
+		style.setVerticalAlignment(VerticalAlignment.CENTER);
 		style.setDataFormat(STRING_FORMAT);
 		if (isWarp) {
 			style.setWrapText(true);
@@ -63,9 +61,9 @@ public class ExcelExportStylerColorImpl extends AbstractExcelExportStyler implem
 	public CellStyle getTitleStyle(short color) {
 		CellStyle titleStyle = workbook.createCellStyle();
 		titleStyle.setFillForegroundColor(color); // 填充的背景颜色
-		titleStyle.setAlignment(CellStyle.ALIGN_CENTER);
-		titleStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
-		titleStyle.setFillPattern(CellStyle.SOLID_FOREGROUND); // 填充图案
+		titleStyle.setAlignment(HorizontalAlignment.CENTER);
+		titleStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+		titleStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND); // 填充图案
 		titleStyle.setWrapText(true);
 		return titleStyle;
 	}
@@ -73,14 +71,14 @@ public class ExcelExportStylerColorImpl extends AbstractExcelExportStyler implem
 	@Override
 	public CellStyle stringSeptailStyle(Workbook workbook, boolean isWarp) {
 		CellStyle style = workbook.createCellStyle();
-		style.setBorderLeft((short) 1); // 左边框
-		style.setBorderRight((short) 1); // 右边框
-		style.setBorderBottom((short) 1);
-		style.setBorderTop((short) 1);
+		style.setBorderLeft(BorderStyle.THIN); // 左边框
+		style.setBorderRight(BorderStyle.THIN); // 右边框
+		style.setBorderBottom(BorderStyle.THIN);
+		style.setBorderTop(BorderStyle.THIN);
 		style.setFillForegroundColor((short) 41); // 填充的背景颜色
-		style.setFillPattern(CellStyle.SOLID_FOREGROUND); // 填充图案
-		style.setAlignment(CellStyle.ALIGN_CENTER);
-		style.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+		style.setFillPattern(FillPatternType.SOLID_FOREGROUND); // 填充图案
+		style.setAlignment(HorizontalAlignment.CENTER);
+		style.setVerticalAlignment(VerticalAlignment.CENTER);
 		style.setDataFormat(STRING_FORMAT);
 		if (isWarp) {
 			style.setWrapText(true);

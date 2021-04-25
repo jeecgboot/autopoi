@@ -116,7 +116,7 @@ public abstract class ExcelExportBase extends ExportBase {
 				}
 			} else {
 				Object value = getCellValue(entity, t);
-				//update-begin--Author:xuelin  Date:20171018 for：TASK #2372 【excel】easypoi 导出类型，type增加数字类型--------------------
+				//update-begin--Author:xuelin  Date:20171018 for：TASK #2372 【excel】AutoPoi 导出类型，type增加数字类型--------------------
 				if (entity.getType() == 1) {
 					createStringCell(row, cellNum++, value == null ? "" : value.toString(), index % 2 == 0 ? getStyles(false, entity) : getStyles(true, entity), entity);
 				} else if (entity.getType() == 4){
@@ -124,7 +124,7 @@ public abstract class ExcelExportBase extends ExportBase {
 				} else {
 					createImageCell(patriarch, entity, row, cellNum++, value == null ? "" : value.toString(), t);
 				}
-				//update-end--Author:xuelin  Date:20171018 for：TASK #2372 【excel】easypoi 导出类型，type增加数字类型--------------------
+				//update-end--Author:xuelin  Date:20171018 for：TASK #2372 【excel】AutoPoi 导出类型，type增加数字类型--------------------
 			}
 		}
 		// 合并需要合并的单元格
@@ -250,11 +250,17 @@ public abstract class ExcelExportBase extends ExportBase {
 				path = path.replace("file:/", "");
 			}else if(imageType==3){
 				//新增逻辑 本地图片3
-				if(!entity.getImageBasePath().endsWith(File.separator) && !imagePath.startsWith(File.separator)){
-					path = entity.getImageBasePath()+File.separator+imagePath;
+				//begin-------author：liusq---data：2021-01-27----for：本地图片ImageBasePath为空报错的问题
+				if(StringUtils.isNotBlank(entity.getImageBasePath())){
+					if(!entity.getImageBasePath().endsWith(File.separator) && !imagePath.startsWith(File.separator)){
+						path = entity.getImageBasePath()+File.separator+imagePath;
+					}else{
+						path = entity.getImageBasePath()+imagePath;
+					}
 				}else{
-					path = entity.getImageBasePath()+imagePath;
+					path = imagePath;
 				}
+				//end-------author：liusq---data：2021-01-27----for：本地图片ImageBasePath为空报错的问题
 			}
 			try {
 				bufferImg = ImageIO.read(new File(path));
@@ -319,7 +325,7 @@ public abstract class ExcelExportBase extends ExportBase {
 		for (int k = 0, paramSize = excelParams.size(); k < paramSize; k++) {
 			entity = excelParams.get(k);
 			Object value = getCellValue(entity, obj);
-			//update-begin--Author:xuelin  Date:20171018 for：TASK #2372 【excel】easypoi 导出类型，type增加数字类型--------------------
+			//update-begin--Author:xuelin  Date:20171018 for：TASK #2372 【excel】AutoPoi 导出类型，type增加数字类型--------------------
 			if (entity.getType() == 1) {
 				createStringCell(row, cellNum++, value == null ? "" : value.toString(), row.getRowNum() % 2 == 0 ? getStyles(false, entity) : getStyles(true, entity), entity);
 			} else if (entity.getType() == 4){
@@ -327,19 +333,19 @@ public abstract class ExcelExportBase extends ExportBase {
 			}  else{
 				createImageCell(patriarch, entity, row, cellNum++, value == null ? "" : value.toString(), obj);
 			}
-			//update-end--Author:xuelin  Date:20171018 for：TASK #2372 【excel】easypoi 导出类型，type增加数字类型--------------------
+			//update-end--Author:xuelin  Date:20171018 for：TASK #2372 【excel】AutoPoi 导出类型，type增加数字类型--------------------
 		}
 	}
 
-	//update-begin--Author:xuelin  Date:20171018 for：TASK #2372 【excel】easypoi 导出类型，type增加数字类型--------------------
+	//update-begin--Author:xuelin  Date:20171018 for：TASK #2372 【excel】AutoPoi 导出类型，type增加数字类型--------------------
 	public void createNumericCell (Row row, int index, String text, CellStyle style, ExcelExportEntity entity) {
 		Cell cell = row.createCell(index);	
 		if(StringUtils.isEmpty(text)){
 			cell.setCellValue("");
-			cell.setCellType(Cell.CELL_TYPE_BLANK);
+			cell.setCellType(CellType.BLANK);
 		}else{
 			cell.setCellValue(Double.parseDouble(text));
-			cell.setCellType(Cell.CELL_TYPE_NUMERIC);
+			cell.setCellType(CellType.NUMERIC);
 		}
 		if (style != null) {
 			cell.setCellStyle(style);
@@ -360,7 +366,7 @@ public abstract class ExcelExportBase extends ExportBase {
 		Cell cell = row.createCell(index);
 		if (style != null && style.getDataFormat() > 0 && style.getDataFormat() < 12) {
 			cell.setCellValue(Double.parseDouble(text));
-			cell.setCellType(Cell.CELL_TYPE_NUMERIC);
+			cell.setCellType(CellType.NUMERIC);
 		}else{
 			RichTextString Rtext;
 			if (type.equals(ExcelType.HSSF)) {
@@ -375,7 +381,7 @@ public abstract class ExcelExportBase extends ExportBase {
 		}
 		addStatisticsData(index, text, entity);
 	}
-	//update-end--Author:xuelin  Date:20171018 for：TASK #2372 【excel】easypoi 导出类型，type增加数字类型----------------------
+	//update-end--Author:xuelin  Date:20171018 for：TASK #2372 【excel】AutoPoi 导出类型，type增加数字类型----------------------
 	
 	/**
 	 * 创建统计行

@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.jeecgframework</groupId>
 		<artifactId>autopoi-parent</artifactId>
-		<version>1.2.4</version>
+		<version>1.3</version>
 	</parent>
 	<artifactId>autopoi</artifactId>
 	<dependencies>
@@ -56,13 +56,13 @@
 			<artifactId>slf4j-api</artifactId>
 			<optional>true</optional>
 		</dependency>
-		
+
 		<!--spring -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-webmvc</artifactId>
 			<optional>true</optional>
 		</dependency>
-		
+
 	</dependencies>
 </project>

@@ -226,10 +226,16 @@ public class ImportBaseService {
 		if (exportName.indexOf("_") < 0) {
 			return exportName;
 		}
+		if (StringUtils.isBlank(targetId)) {
+			return exportName;
+		}
 		String[] arr = exportName.split(",");
 		for (String str : arr) {
 			if (str.indexOf(targetId) != -1) {
-				return str.split("_")[0];
+				//update-begin-author:liusq date：20210127 for:targetId问题处理
+				//return str.split("_")[0];
+				return str.replace("_"+targetId,"");
+				//update-end-author:liusq date：20210127 for:targetId问题处理
 			}
 		}
 		return null;

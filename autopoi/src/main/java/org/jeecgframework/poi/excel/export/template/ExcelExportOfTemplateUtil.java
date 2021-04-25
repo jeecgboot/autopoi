@@ -27,11 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Drawing;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jeecgframework.poi.cache.ExcelCache;
 import org.jeecgframework.poi.excel.annotation.ExcelTarget;
@@ -267,8 +263,8 @@ public final class ExcelExportOfTemplateUtil extends ExcelExportBase {
 			}
 			for (int i = row.getFirstCellNum(); i < row.getLastCellNum(); i++) {
 				cell = row.getCell(i);
-				if (row.getCell(i) != null && (cell.getCellType() == Cell.CELL_TYPE_STRING || cell.getCellType() == Cell.CELL_TYPE_NUMERIC)) {
-					cell.setCellType(Cell.CELL_TYPE_STRING);
+				if (row.getCell(i) != null && (cell.getCellTypeEnum() == CellType.STRING || cell.getCellTypeEnum() == CellType.NUMERIC)) {
+					cell.setCellType(CellType.STRING);
 					String text = cell.getStringCellValue();
 					if (text.contains(IF_DELETE)) {
 						if (Boolean.valueOf(eval(text.substring(text.indexOf(START_STR) + 2, text.indexOf(END_STR)).trim(), map).toString())) {
@@ -288,12 +284,12 @@ public final class ExcelExportOfTemplateUtil extends ExcelExportBase {
 	 * @param map
 	 */
 	private void setValueForCellByMap(Cell cell, Map<String, Object> map) throws Exception {
-		int cellType = cell.getCellType();
-		if (cellType != Cell.CELL_TYPE_STRING && cellType != Cell.CELL_TYPE_NUMERIC) {
+        CellType cellType = cell.getCellTypeEnum();
+        if (cellType != CellType.STRING && cellType != CellType.NUMERIC) {
 			return;
 		}
 		String oldString;
-		cell.setCellType(Cell.CELL_TYPE_STRING);
+		cell.setCellType(CellType.STRING);
 		oldString = cell.getStringCellValue();
 		if (oldString != null && oldString.indexOf(START_STR) != -1 && !oldString.contains(FOREACH)) {
 			// step 2. 判断是否含有解析函数
@@ -311,7 +307,7 @@ public final class ExcelExportOfTemplateUtil extends ExcelExportBase {
 			// 如何是数值 类型,就按照数值类型进行设置
 			if (isNumber && StringUtils.isNotBlank(oldString)) {
 				cell.setCellValue(Double.parseDouble(oldString));
-				cell.setCellType(Cell.CELL_TYPE_NUMERIC);
+				cell.setCellType(CellType.NUMERIC);
 			} else {
 				cell.setCellValue(oldString);
 			}
@@ -392,7 +388,7 @@ public final class ExcelExportOfTemplateUtil extends ExcelExportBase {
 			String val = eval(tempStr, map).toString();
 			if (isNumber && StringUtils.isNotEmpty(val)) {
 				row.getCell(i + columnIndex).setCellValue(Double.parseDouble(val));
-				row.getCell(i + columnIndex).setCellType(Cell.CELL_TYPE_NUMERIC);
+				row.getCell(i + columnIndex).setCellType(CellType.NUMERIC);
 			} else {
 				row.getCell(i + columnIndex).setCellValue(val);
 			}

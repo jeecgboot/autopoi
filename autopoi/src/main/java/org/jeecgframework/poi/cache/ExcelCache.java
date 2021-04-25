@@ -15,17 +15,16 @@
  */
 package org.jeecgframework.poi.cache;
 
-import java.io.InputStream;
-import java.util.Arrays;
-import java.util.List;
-
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.jeecgframework.poi.cache.manager.POICacheManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ClassPathResource;
+
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Excel类型的缓存
@@ -53,8 +52,6 @@ public final class ExcelCache {
 				}
 			}
 			return wb;
-		} catch (InvalidFormatException e) {
-			LOGGER.error(e.getMessage(), e);
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
 		} finally {
@@ -71,8 +68,12 @@ public final class ExcelCache {
 		List<Integer> sheetList = Arrays.asList(sheetNums);
 		InputStream fis = null;
 		try {
-			ClassPathResource  resource = new ClassPathResource(url);
-			fis = resource.getInputStream();
+			//update-begin----author:liusq------date:20210129-----for:-------poi3升级到4兼容改造工作--------
+			//ClassPathResource  resource = new ClassPathResource(url);
+			fis = new FileInputStream(url);
+			LOGGER.info("  >>>  poi3升级到4兼容改造工作, url="+url);
+			//fis = resource.getInputStream();
+			//update-end-----author:liusq------date:20210129-----for:-------poi3升级到4兼容改造工作--------
 			Workbook wb = WorkbookFactory.create(fis);
 			// 删除其他的sheet
 			if (!needAll) {
@@ -83,8 +84,6 @@ public final class ExcelCache {
 				}
 			}
 			return wb;
-		} catch (InvalidFormatException e) {
-			LOGGER.error(e.getMessage(), e);
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
 		} finally {

@@ -20,7 +20,7 @@ import java.util.Map;
 import org.jeecgframework.poi.exception.excel.ExcelExportException;
 
 /**
- * EasyPoi的el 表达式支持工具类
+ * AutoPoi的el 表达式支持工具类
  * 
  * @author JEECG
  * @date 2015年4月25日 下午12:13:21
