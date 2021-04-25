@@ -43,7 +43,7 @@ maven
 	<dependency>
 	 <groupId>org.jeecgframework</groupId>
 	 <artifactId>autopoi-web</artifactId>
-	 <version>1.2.5</version>
+	 <version>1.3</version>
 	</dependency>
 ```
 
