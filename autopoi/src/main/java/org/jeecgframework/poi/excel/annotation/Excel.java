@@ -184,4 +184,9 @@ public @interface Excel {
 	 * @return
 	 */
 	String numFormat() default "";
+	/**
+	 *  是否需要隐藏该列
+	 * @return
+	 */
+	public boolean isColumnHidden() default  false;
 }

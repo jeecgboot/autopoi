@@ -169,6 +169,10 @@ public class ExcelExportServer extends ExcelExportBase {
 			int index = entity.isCreateHeadRows() ? createHeaderAndTitle(entity, sheet, workbook, excelParams) : 0;
 			int titleHeight = index;
 			setCellWith(excelParams, sheet);
+			//update-begin-author:liusq date:20210723 for:设置隐藏列
+			setColumnHidden(excelParams, sheet);
+			//update-end-author:liusq date:20210723 for:设置隐藏列
+
 			short rowHeight = getRowHeight(excelParams);
 			setCurrentIndex(1);
 			Iterator<?> its = dataSet.iterator();
@@ -240,6 +244,9 @@ public class ExcelExportServer extends ExcelExportBase {
 			int index = entity.isCreateHeadRows() ? createHeaderAndTitle(entity, sheet, workbook, excelParams) : 0;
 			int titleHeight = index;
 			setCellWith(excelParams, sheet);
+			//update-begin-author:liusq date:20210723 for:设置隐藏列
+			setColumnHidden(excelParams, sheet);
+			//update-end-author:liusq date:20210723 for:设置隐藏列
 			short rowHeight = getRowHeight(excelParams);
 			setCurrentIndex(1);
 			Iterator<?> its = dataSet.iterator();

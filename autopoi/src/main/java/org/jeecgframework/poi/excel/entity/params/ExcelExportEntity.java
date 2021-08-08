@@ -90,6 +90,10 @@ public class ExcelExportEntity extends ExcelBaseEntity implements Comparable<Exc
 	 * 父表头的名称
 	 */
 	private String groupName;
+	/**
+	 *  是否隐藏列
+	 */
+	private boolean isColumnHidden;
 
 	private List<ExcelExportEntity> list;
 
@@ -250,6 +254,14 @@ public class ExcelExportEntity extends ExcelBaseEntity implements Comparable<Exc
 
 	public void setGroupName(String groupName) {
 		this.groupName = groupName;
+	}
+
+	public boolean isColumnHidden() {
+		return isColumnHidden;
+	}
+
+	public void setColumnHidden(boolean columnHidden) {
+		isColumnHidden = columnHidden;
 	}
 
 	/**

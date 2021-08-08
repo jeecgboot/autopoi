@@ -131,7 +131,20 @@ public class ExportBase {
 				}
 				newMethods.add(PoiPublicUtil.getMethod(field.getName(), pojoClass));
 				ExcelEntity excel = field.getAnnotation(ExcelEntity.class);
-				getAllExcelField(exclusions, StringUtils.isNotEmpty(excel.id()) ? excel.id() : targetId, PoiPublicUtil.getClassFields(field.getType()), excelParams, field.getType(), newMethods);
+				//update-begin-author:taoyan date:20210531 for:excel导出支持 注解@ExcelEntity显示合并表头
+				if(excel.show()==true){
+					List<ExcelExportEntity> list = new ArrayList<ExcelExportEntity>();
+					// 这里有个设计的坑，导出的时候最后一个参数是null, 即getgetMethods获取的是空，导入的时候需要设置层级getmethod
+					getAllExcelField(exclusions, StringUtils.isNotEmpty(excel.id()) ? excel.id() : targetId, PoiPublicUtil.getClassFields(field.getType()), list, field.getType(), null);
+					excelEntity = new ExcelExportEntity();
+					excelEntity.setName(getExcelName(excel.name(), targetId));
+					excelEntity.setMethod(PoiPublicUtil.getMethod(field.getName(), pojoClass));
+					excelEntity.setList(list);
+					excelParams.add(excelEntity);
+				}else{
+					getAllExcelField(exclusions, StringUtils.isNotEmpty(excel.id()) ? excel.id() : targetId, PoiPublicUtil.getClassFields(field.getType()), excelParams, field.getType(), newMethods);
+				}
+				//update-end-author:taoyan date:20210531 for:excel导出支持 注解@ExcelEntity显示合并表头
 			}
 		}
 	}
@@ -231,7 +244,14 @@ public class ExportBase {
 		if (obj instanceof Map) {
 			value = ((Map<?, ?>) obj).get(entity.getKey());
 		} else {
-			value = (Collection<?>) entity.getMethod().invoke(obj, new Object[] {});
+			value = entity.getMethod().invoke(obj, new Object[] {});
+			if(value instanceof Collection){
+				return (Collection<?>)value;
+			}else{
+				List list = new ArrayList();
+				list.add(value);
+				return list;
+			}
 		}
 		return (Collection<?>) value;
 	}
@@ -281,6 +301,11 @@ public class ExportBase {
 		//update-begin-author:taoyan date:20200319 for:Excel注解的numFormat方法似乎未实现 #970
 		excelEntity.setNumFormat(excel.numFormat());
 		//update-end-author:taoyan date:20200319 for:Excel注解的numFormat方法似乎未实现 #970
+
+		//update-begin-author:liusq date:202010723 for:Excel注解的isColumnHidden方法未实现
+		excelEntity.setColumnHidden(excel.isColumnHidden());
+		//update-end-author:liusq date:202010723 for:Excel注解的isColumnHidden方法未实现
+
 		//update-begin-author:taoyan date:20180615 for:TASK #2798 【例子】导入扩展方法，支持自定义导入字段转换规则
 		excelEntity.setMethod(PoiPublicUtil.getMethod(fieldname, pojoClass,excel.exportConvert()));
 		//update-end-author:taoyan date:20180615 for:TASK #2798 【例子】导入扩展方法，支持自定义导入字段转换规则

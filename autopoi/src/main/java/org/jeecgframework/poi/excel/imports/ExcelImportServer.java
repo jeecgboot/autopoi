@@ -44,6 +44,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -234,7 +236,11 @@ public class ExcelImportServer extends ImportBaseService {
 					for (ExcelCollectionParams param : excelCollection) {
 						addListContinue(object, param, row, titlemap, targetId, pictures, params);
 					}
-					collection.add(object);
+					//update-begin-author:taoyan date:20210526 for:autopoi导入excel 如果单元格被设置边框，即使没有内容也会被当做是一条数据导入 #2484
+					if(isNotNullObject(pojoClass, object)){
+						collection.add(object);
+					}
+					//update-end-author:taoyan date:20210526 for:autopoi导入excel 如果单元格被设置边框，即使没有内容也会被当做是一条数据导入 #2484
 				} catch (ExcelImportException e) {
 					if (!e.getType().equals(ExcelImportEnum.VERIFY_ERROR)) {
 						throw new ExcelImportException(e.getType(), e);
@@ -244,6 +250,31 @@ public class ExcelImportServer extends ImportBaseService {
 			//update-end--Author:xuelin  Date:20171017 for：TASK #2373 【bug】表改造问题，导致 3.7.1批量导入用户bug-导入不成功--------------------
 		}
 		return collection;
+	}
+
+	/**
+	 * 判断当前对象不是空
+	 * @param pojoClass
+	 * @param object
+	 * @return
+	 */
+	private boolean isNotNullObject(Class pojoClass, Object object){
+		try {
+			Method method = pojoClass.getMethod("isNullObject");
+			if(method!=null){
+				Object flag = method.invoke(object);
+				if(flag!=null && true == Boolean.parseBoolean(flag.toString())){
+					return false;
+				}
+			}
+		} catch (NoSuchMethodException e) {
+			LOGGER.debug("未定义方法 isNullObject");
+		} catch (IllegalAccessException e) {
+			LOGGER.warn("没有权限访问该方法 isNullObject");
+		} catch (InvocationTargetException e) {
+			LOGGER.warn("方法调用失败 isNullObject");
+		}
+		return true;
 	}
 
 	/**

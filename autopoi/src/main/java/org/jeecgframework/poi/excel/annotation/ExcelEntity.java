@@ -40,4 +40,10 @@ public @interface ExcelEntity {
 	 * 导出排序跟定义了annotation的字段的顺序有关 可以使用a_id,b_id来确实是否使用
 	 */
 	public String name() default "";
+
+	/**
+	 * 导出时，是否展示name对应的文本
+	 * @return
+	 */
+	boolean show() default false;
 }

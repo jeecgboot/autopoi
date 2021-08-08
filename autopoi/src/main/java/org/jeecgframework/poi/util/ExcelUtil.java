@@ -10,6 +10,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -248,13 +250,30 @@ public class ExcelUtil {
      */
     public static String remove0Suffix(Object value){
     	if(value!=null) {
+    	    // update-begin-author:taoyan date:20210526 for:对于特殊的字符串 V1.0 也进行了去.0操作 这是不合理的
 			String val = value.toString();
-			if(val.endsWith(".0")) {
+			if(val.endsWith(".0") && isNumberString(val)) {
 				val = val.replace(".0", "");
 			}
+            // update-end-author:taoyan date:20210526 for:对于特殊的字符串 V1.0 也进行了去.0操作 这是不合理的
 			return val;
 		}
         return null;
+    }
+
+    /**
+     * 判断给定的字符串是不是只有数字
+     * @param str
+     * @return
+     */
+    private static boolean isNumberString(String str){
+        String regex = "^[0-9]+\\.0+$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher m = pattern.matcher(str);
+        if (m.find()) {
+            return true;
+        }
+        return false;
     }
     
     /**

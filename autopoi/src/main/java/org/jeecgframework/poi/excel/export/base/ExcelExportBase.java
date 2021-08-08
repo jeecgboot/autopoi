@@ -300,7 +300,7 @@ public abstract class ExcelExportBase extends ExportBase {
 	}
 
 	private int createIndexCell(Row row, int index, ExcelExportEntity excelExportEntity) {
-		if (excelExportEntity.getName().equals("序号") && excelExportEntity.getFormat().equals(PoiBaseConstants.IS_ADD_INDEX)) {
+		if (excelExportEntity.getName().equals("序号") && PoiBaseConstants.IS_ADD_INDEX.equals(excelExportEntity.getFormat())) {
 			createStringCell(row, 0, currentIndex + "", index % 2 == 0 ? getStyles(false, null) : getStyles(true, null), null);
 			currentIndex = currentIndex + 1;
 			return 1;
@@ -310,8 +310,14 @@ public abstract class ExcelExportBase extends ExportBase {
 
 	/**
 	 * 创建List之后的各个Cells
-	 * 
-	 * @param styles
+	 * @param patriarch
+	 * @param index
+	 * @param cellNum
+	 * @param obj
+	 * @param excelParams
+	 * @param sheet
+	 * @param workbook
+	 * @throws Exception
 	 */
 	public void createListCells(Drawing patriarch, int index, int cellNum, Object obj, List<ExcelExportEntity> excelParams, Sheet sheet, Workbook workbook) throws Exception {
 		ExcelExportEntity entity;
@@ -381,6 +387,38 @@ public abstract class ExcelExportBase extends ExportBase {
 		}
 		addStatisticsData(index, text, entity);
 	}
+
+	/**
+	 * 设置字段下划线
+	 * @param row
+	 * @param index
+	 * @param text
+	 * @param style
+	 * @param entity
+	 * @param workbook
+	 */
+	/*public void createStringCell(Row row, int index, String text, CellStyle style, ExcelExportEntity entity, Workbook workbook) {
+		Cell cell = row.createCell(index);
+		if (style != null && style.getDataFormat() > 0 && style.getDataFormat() < 12) {
+			cell.setCellValue(Double.parseDouble(text));
+			cell.setCellType(CellType.NUMERIC);
+		}else{
+			RichTextString Rtext;
+			if (type.equals(ExcelType.HSSF)) {
+				Rtext = new HSSFRichTextString(text);
+			} else {
+				Rtext = new XSSFRichTextString(text);
+			}
+			cell.setCellValue(Rtext);
+		}
+		if (style != null) {
+			Font font = workbook.createFont();
+			font.setUnderline(Font.U_SINGLE);
+			style.setFont(font);
+			cell.setCellStyle(style);
+		}
+		addStatisticsData(index, text, entity);
+	}*/
 	//update-end--Author:xuelin  Date:20171018 for：TASK #2372 【excel】AutoPoi 导出类型，type增加数字类型----------------------
 	
 	/**
@@ -524,6 +562,26 @@ public abstract class ExcelExportBase extends ExportBase {
 		}
 	}
 
+	/**
+	 * 设置隐藏列
+	 * @param excelParams
+	 * @param sheet
+	 */
+	public void setColumnHidden(List<ExcelExportEntity> excelParams, Sheet sheet) {
+		int index = 0;
+		for (int i = 0; i < excelParams.size(); i++) {
+			if (excelParams.get(i).getList() != null) {
+				List<ExcelExportEntity> list = excelParams.get(i).getList();
+				for (int j = 0; j < list.size(); j++) {
+					sheet.setColumnHidden(index, list.get(j).isColumnHidden());
+					index++;
+				}
+			} else {
+				sheet.setColumnHidden(index, excelParams.get(i).isColumnHidden());
+				index++;
+			}
+		}
+	}
 	public void setCurrentIndex(int currentIndex) {
 		this.currentIndex = currentIndex;
 	}

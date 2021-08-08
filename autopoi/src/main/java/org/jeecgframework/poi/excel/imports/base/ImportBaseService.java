@@ -35,6 +35,7 @@ import org.jeecgframework.core.util.ApplicationContextUtil;
 import org.jeecgframework.dict.service.AutoPoiDictServiceI;
 import org.jeecgframework.poi.excel.annotation.Excel;
 import org.jeecgframework.poi.excel.annotation.ExcelCollection;
+import org.jeecgframework.poi.excel.annotation.ExcelEntity;
 import org.jeecgframework.poi.excel.annotation.ExcelVerify;
 import org.jeecgframework.poi.excel.entity.ImportParams;
 import org.jeecgframework.poi.excel.entity.params.ExcelCollectionParams;
@@ -127,8 +128,6 @@ public class ImportBaseService {
 	/**
 	 * 获取需要导出的全部字段
 	 * 
-	 * 
-	 * @param exclusions
 	 * @param targetId
 	 *            目标ID
 	 * @param fields
@@ -163,7 +162,19 @@ public class ImportBaseService {
 					newMethods.addAll(getMethods);
 				}
 				newMethods.add(PoiPublicUtil.getMethod(field.getName(), pojoClass));
-				getAllExcelField(targetId, PoiPublicUtil.getClassFields(field.getType()), excelParams, excelCollection, field.getType(), newMethods);
+				//update-begin-author:taoyan date:20210531 for:excel导入支持 注解@ExcelEntity显示合并表头
+				ExcelEntity excel = field.getAnnotation(ExcelEntity.class);
+				if(excel.show()==true){
+					Map<String, ExcelImportEntity> subExcelParams = new HashMap<>();
+					// 这里有个设计的坑，导出的时候最后一个参数是null, 即getgetMethods获取的是空，导入的时候需要设置层级getmethod
+					getAllExcelField(targetId, PoiPublicUtil.getClassFields(field.getType()), subExcelParams, excelCollection, field.getType(), newMethods);
+					for(String key: subExcelParams.keySet()){
+						excelParams.put(excel.name()+"_"+key, subExcelParams.get(key));
+					}
+				}else{
+					getAllExcelField(targetId, PoiPublicUtil.getClassFields(field.getType()), excelParams, excelCollection, field.getType(), newMethods);
+				}
+				//update-end-author:taoyan date:20210531 for:excel导入支持 注解@ExcelEntity显示合并表头
 			}
 		}
 	}
