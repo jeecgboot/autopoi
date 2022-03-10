@@ -1,6 +1,6 @@
 /**
  * Copyright 2013-2015 JEECG (jeecgos@163.com)
- *   
+ *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
@@ -41,30 +41,31 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Excel导出服务
- * 
+ *
  * @author JEECG
  * @date 2014年6月17日 下午5:30:54
  */
 public class ExcelExportServer extends ExcelExportBase {
 
-	private final static Logger LOGGER = LoggerFactory.getLogger(ExcelExportServer.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ExcelExportServer.class);
 
-	// 最大行数,超过自动多Sheet
-	private int MAX_NUM = 60000;
+	/** 最大行数,超过自动多Sheet */
+	private int maxNum = 60000;
 
 	private int createHeaderAndTitle(ExportParams entity, Sheet sheet, Workbook workbook, List<ExcelExportEntity> excelParams) {
-		int rows = 0, feildWidth = getFieldWidth(excelParams);
+		int rows = 0;
+		int fieldWidth = getFieldWidth(excelParams);
 		if (entity.getTitle() != null) {
-			rows += createHeaderRow(entity, sheet, workbook, feildWidth);
+			rows += createHeaderRow(entity, sheet, workbook, fieldWidth);
 		}
-		rows += createTitleRow(entity, sheet, workbook, rows, excelParams);
+		rows += createTitleRow(entity, sheet, rows, excelParams);
 		sheet.createFreezePane(0, rows, 0, rows);
 		return rows;
 	}
 
 	/**
 	 * 创建 表头改变
-	 * 
+	 *
 	 * @param entity
 	 * @param sheet
 	 * @param workbook
@@ -79,9 +80,9 @@ public class ExcelExportServer extends ExcelExportBase {
 		}
 		//update-begin-author:wangshuai date:20201118 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
 		try {
-		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, feildWidth));
-		}catch (IllegalArgumentException e){
-			LOGGER.error("合并单元格错误日志："+e.getMessage());
+			sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, feildWidth));
+		} catch (IllegalArgumentException e){
+			LOGGER.error("合并单元格错误日志：{}", e.getMessage());
 			e.fillInStackTrace();
 		}
 		//update-end-author:wangshuai date:20201118 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
@@ -95,13 +96,13 @@ public class ExcelExportServer extends ExcelExportBase {
 				createStringCell(row, i, "", getExcelExportStyler().getHeaderStyle(entity.getHeaderColor()), null);
 			}
 			//update-begin-author:wangshuai date:20201118 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
-			try{
-			sheet.addMergedRegion(new CellRangeAddress(1, 1, 0, feildWidth));
-			}catch (IllegalArgumentException e){
-				LOGGER.error("合并单元格错误日志："+e.getMessage());
-			  e.fillInStackTrace();
-		  }
-		  //update-end-author:wangshuai date:20201118 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
+			try {
+				sheet.addMergedRegion(new CellRangeAddress(1, 1, 0, feildWidth));
+			} catch (IllegalArgumentException e){
+				LOGGER.error("合并单元格错误日志：{}", e.getMessage());
+				e.fillInStackTrace();
+			}
+			//update-end-author:wangshuai date:20201118 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
 			return 2;
 		}
 		return 1;
@@ -117,7 +118,7 @@ public class ExcelExportServer extends ExcelExportBase {
 		}
 		super.type = entity.getType();
 		if (type.equals(ExcelType.XSSF)) {
-			MAX_NUM = 1000000;
+			maxNum = 1000000;
 		}
 		Sheet sheet = null;
 		try {
@@ -134,31 +135,31 @@ public class ExcelExportServer extends ExcelExportBase {
 			// 创建表格样式
 			setExcelExportStyler((IExcelExportStyler) entity.getStyle().getConstructor(Workbook.class).newInstance(workbook));
 			Drawing patriarch = sheet.createDrawingPatriarch();
-			List<ExcelExportEntity> excelParams = new ArrayList<ExcelExportEntity>();
+			List<ExcelExportEntity> excelParams = new ArrayList<>();
 			if (entity.isAddIndex()) {
 				excelParams.add(indexExcelEntity(entity));
 			}
 			// 得到所有字段
-			Field fileds[] = PoiPublicUtil.getClassFields(pojoClass);
+			Field[] fileds = PoiPublicUtil.getClassFields(pojoClass);
 
-            //---update-begin-----autor:scott------date:20191016-------for:导出字段支持自定义--------
-            //支持自定义导出字段
-            if (exportFields != null) {
-                List<Field> list = new ArrayList<Field>(Arrays.asList(fileds));
-                for (int i = 0; i < list.size(); i++) {
-                    if (!Arrays.asList(exportFields).contains(list.get(i).getName())) {
-                        list.remove(i);
-                        i--;
-                    }
-                }
+			//---update-begin-----autor:scott------date:20191016-------for:导出字段支持自定义--------
+			//支持自定义导出字段
+			if (exportFields != null) {
+				List<Field> list = new ArrayList<>(Arrays.asList(fileds));
+				for (int i = 0; i < list.size(); i++) {
+					if (!Arrays.asList(exportFields).contains(list.get(i).getName())) {
+						list.remove(i);
+						i--;
+					}
+				}
 
-                if (list != null && list.size() > 0) {
-                    fileds = list.toArray(new Field[0]);
-                } else {
-                    fileds = null;
-                }
-            }
-            //---update-end-----autor:scott------date:20191016-------for:导出字段支持自定义--------
+				if (!list.isEmpty()) {
+					fileds = list.toArray(new Field[0]);
+				} else {
+					fileds = null;
+				}
+			}
+			//---update-end-----autor:scott------date:20191016-------for:导出字段支持自定义--------
 
 			ExcelTarget etarget = pojoClass.getAnnotation(ExcelTarget.class);
 			String targetId = etarget == null ? null : etarget.value();
@@ -176,12 +177,12 @@ public class ExcelExportServer extends ExcelExportBase {
 			short rowHeight = getRowHeight(excelParams);
 			setCurrentIndex(1);
 			Iterator<?> its = dataSet.iterator();
-			List<Object> tempList = new ArrayList<Object>();
+			List<Object> tempList = new ArrayList<>();
 			while (its.hasNext()) {
 				Object t = its.next();
 				index += createCells(patriarch, index, t, excelParams, sheet, workbook, rowHeight);
 				tempList.add(t);
-				if (index >= MAX_NUM)
+				if (index >= maxNum)
 					break;
 			}
 			mergeCells(sheet, excelParams, titleHeight);
@@ -196,13 +197,12 @@ public class ExcelExportServer extends ExcelExportBase {
 				its.remove();
 			}
 			// 创建合计信息
-			addStatisticsRow(getExcelExportStyler().getStyles(true, null), sheet);
+			addStatisticsRow(getExcelExportStyler().getStyles(true, null), sheet, excelParams);
 
 			// 发现还有剩余list 继续循环创建Sheet
-			if (dataSet.size() > 0) {
+			if (!dataSet.isEmpty()) {
 				createSheet(workbook, entity, pojoClass, dataSet,exportFields);
 			}
-
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
 			throw new ExcelExportException(ExcelExportEnum.EXPORT_ERROR, e.getCause());
@@ -218,7 +218,7 @@ public class ExcelExportServer extends ExcelExportBase {
 		}
 		super.type = entity.getType();
 		if (type.equals(ExcelType.XSSF)) {
-			MAX_NUM = 1000000;
+			maxNum = 1000000;
 		}
 		Sheet sheet = null;
 		try {
@@ -235,7 +235,7 @@ public class ExcelExportServer extends ExcelExportBase {
 			// 创建表格样式
 			setExcelExportStyler((IExcelExportStyler) entity.getStyle().getConstructor(Workbook.class).newInstance(workbook));
 			Drawing patriarch = sheet.createDrawingPatriarch();
-			List<ExcelExportEntity> excelParams = new ArrayList<ExcelExportEntity>();
+			List<ExcelExportEntity> excelParams = new ArrayList<>();
 			if (entity.isAddIndex()) {
 				excelParams.add(indexExcelEntity(entity));
 			}
@@ -250,12 +250,12 @@ public class ExcelExportServer extends ExcelExportBase {
 			short rowHeight = getRowHeight(excelParams);
 			setCurrentIndex(1);
 			Iterator<?> its = dataSet.iterator();
-			List<Object> tempList = new ArrayList<Object>();
+			List<Object> tempList = new ArrayList<>();
 			while (its.hasNext()) {
 				Object t = its.next();
 				index += createCells(patriarch, index, t, excelParams, sheet, workbook, rowHeight);
 				tempList.add(t);
-				if (index >= MAX_NUM)
+				if (index >= maxNum)
 					break;
 			}
 			if (entity.getFreezeCol() != 0) {
@@ -270,7 +270,7 @@ public class ExcelExportServer extends ExcelExportBase {
 				its.remove();
 			}
 			// 发现还有剩余list 继续循环创建Sheet
-			if (dataSet.size() > 0) {
+			if (!dataSet.isEmpty()) {
 				createSheetForMap(workbook, entity, entityList, dataSet);
 			}
 
@@ -282,11 +282,11 @@ public class ExcelExportServer extends ExcelExportBase {
 
 	/**
 	 * 创建表头
-	 * 
+	 *
 	 * @param title
 	 * @param index
 	 */
-	private int createTitleRow(ExportParams title, Sheet sheet, Workbook workbook, int index, List<ExcelExportEntity> excelParams) {
+	private int createTitleRow(ExportParams title, Sheet sheet, int index, List<ExcelExportEntity> excelParams) {
 		Row row = sheet.createRow(index);
 		int rows = getRowNums(excelParams);
 		row.setHeight((short) 450);
@@ -302,9 +302,9 @@ public class ExcelExportServer extends ExcelExportBase {
 			//update-begin-author:taoyan date:20200319 for:建议autoPoi升级，优化数据返回List Map格式下的复合表头导出excel的体验 #873
 			if(entity.isColspan()){
 				List<String> subList = entity.getSubColumnList();
-				if(subList==null || subList.size()==0){
+				if(subList==null || subList.isEmpty()){
 					continue;
-				}else{
+				} else {
 					entity.initSubExportEntity(excelParams);
 				}
 			}
@@ -314,28 +314,28 @@ public class ExcelExportServer extends ExcelExportBase {
 			}
 			if (entity.getList() != null) {
 				List<ExcelExportEntity> sTitel = entity.getList();
-				 //update-begin-author:wangshuai date:20201118 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
+				//update-begin-author:wangshuai date:20201118 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
 				if (StringUtils.isNotBlank(entity.getName())) {
 					try {
-					sheet.addMergedRegion(new CellRangeAddress(index, index, cellIndex, cellIndex + sTitel.size() - 1));
-					}catch (IllegalArgumentException e){
-						LOGGER.error("合并单元格错误日志："+e.getMessage());
+						sheet.addMergedRegion(new CellRangeAddress(index, index, cellIndex, cellIndex + sTitel.size() - 1));
+					} catch (IllegalArgumentException e){
+						LOGGER.error("合并单元格错误日志：{}", e.getMessage());
 						e.fillInStackTrace();
 					}
 					//update-end-author:wangshuai date:20201118 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
 				}
-				for (int j = 0, size = sTitel.size(); j < size; j++) {
-					createStringCell(rows == 2 ? listRow : row, cellIndex, sTitel.get(j).getName(), titleStyle, entity);
+				for (ExcelExportEntity excelExportEntity : sTitel) {
+					createStringCell(rows == 2 ? listRow : row, cellIndex, excelExportEntity.getName(), titleStyle, entity);
 					cellIndex++;
 				}
 				cellIndex--;
 			} else if (rows == 2) {
 				createStringCell(listRow, cellIndex, "", titleStyle, entity);
 				//update-begin-author:wangshuai date:20201118 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
-				try{
-				sheet.addMergedRegion(new CellRangeAddress(index, index + 1, cellIndex, cellIndex));
-				}catch (IllegalArgumentException e){
-					LOGGER.error("合并单元格错误日志："+e.getMessage());
+				try {
+					sheet.addMergedRegion(new CellRangeAddress(index, index + 1, cellIndex, cellIndex));
+				} catch (IllegalArgumentException e){
+					LOGGER.error("合并单元格错误日志：{}", e.getMessage());
 					e.fillInStackTrace();
 				}
 				//update-end-author:wangshuai date:20201118 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
@@ -348,14 +348,13 @@ public class ExcelExportServer extends ExcelExportBase {
 
 	/**
 	 * 判断表头是只有一行还是两行
-	 * 
+	 *
 	 * @param excelParams
 	 * @return
 	 */
 	private int getRowNums(List<ExcelExportEntity> excelParams) {
-		for (int i = 0; i < excelParams.size(); i++) {
+		for (ExcelExportEntity temp : excelParams) {
 			//update-begin-author:taoyan date:20200319 for:建议autoPoi升级，优化数据返回List Map格式下的复合表头导出excel的体验 #873
-			ExcelExportEntity temp = excelParams.get(i);
 			if ((temp.getList() != null || temp.isColspan()) && StringUtils.isNotBlank(temp.getName())) {
 				return 2;
 			}
