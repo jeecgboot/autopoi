@@ -68,14 +68,15 @@ public class StylerHelper {
 	}
 
 	private void prontFonts(Workbook wb) {
-		for (short i = 0, le = wb.getNumberOfFonts(); i <= le; i++) {
+        //update-begin---author:liusq  Date:20220228  for：[I4I3ZY]issue AutoPOi Workbook对象转HTML字符串 数组下标越界异常----
+		for (short i = 0, le = wb.getNumberOfFonts(); i < le; i++) {
 			Font font = wb.getFontAt(i);
 			out.format(".%s .%s {%n", DEFAULTS_CLASS, "font_" + i + "_" + cssRandom);
 			fontStyle(font);
 			out.format("}%n");
 		}
-
-	}
+        //update-end---author:liusq  Date:20220228  for：[I4I3ZY]issue AutoPOi Workbook对象转HTML字符串 数组下标越界异常整----
+    }
 
 	public void printStyles(Workbook wb) {
 		if (DEFAULTS_CLASS_CSS == null) {

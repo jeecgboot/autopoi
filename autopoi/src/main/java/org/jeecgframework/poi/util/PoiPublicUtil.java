@@ -30,6 +30,7 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
 import org.apache.poi.hssf.usermodel.HSSFPicture;
 import org.apache.poi.hssf.usermodel.HSSFPictureData;
@@ -301,7 +302,11 @@ public final class PoiPublicUtil {
 				path = PoiPublicUtil.class.getClassLoader().getResource("").toURI().getPath();
 			} catch (URISyntaxException e) {
 				//e.printStackTrace();
+			//update-begin-author:taoyan date:20211116 for: JAR包分离 发布出空指针 https://gitee.com/jeecg/jeecg-boot/issues/I4CMHK
+			}catch (NullPointerException e) {
+				path =  PoiPublicUtil.class.getProtectionDomain().getCodeSource().getLocation().getPath();
 			}
+			//update-end-author:taoyan date:20211116 for: JAR包分离 发布出空指针 https://gitee.com/jeecg/jeecg-boot/issues/I4CMHK
 			//update-begin--Author:zhangdaihao  Date:20190424 for：解决springboot 启动模式，上传路径获取为空问题---------------------
 			if (path == null || path == "") {
 				//解决springboot 启动模式，上传路径获取为空问题
@@ -414,7 +419,9 @@ public final class PoiPublicUtil {
 			path = path.replace("WEB-INF/classes/", "");
 			path = path.replace("file:/", "");
 			bufferImg = ImageIO.read(new File(path));
-			ImageIO.write(bufferImg, entity.getUrl().substring(entity.getUrl().indexOf(".") + 1, entity.getUrl().length()), byteArrayOut);
+			//update-begin-author:taoYan date:20211203 for: Excel 导出图片的文件带小数点符号 导出报错 https://gitee.com/jeecg/jeecg-boot/issues/I4JNHR
+			ImageIO.write(bufferImg, entity.getUrl().substring(entity.getUrl().lastIndexOf(".") + 1, entity.getUrl().length()), byteArrayOut);
+			//update-end-author:taoYan date:20211203 for: Excel 导出图片的文件带小数点符号 导出报错 https://gitee.com/jeecg/jeecg-boot/issues/I4JNHR
 			result[0] = byteArrayOut.toByteArray();
 			type = entity.getUrl().split("/.")[entity.getUrl().split("/.").length - 1];
 		} else {
@@ -457,7 +464,11 @@ public final class PoiPublicUtil {
 			params = currentText.substring(currentText.indexOf("{{") + 2, currentText.indexOf("}}"));
 			Object obj = getParamsValue(params.trim(), map);
 			// 判断图片或者是集合
-
+			// update-begin-author:taoyan date:20210914 for:autopoi模板导出，赋值的方法建议增加空判断或抛出异常说明。 /issues/3005
+			if(obj==null){
+				obj = "";
+			}
+			// update-end-author:taoyan date:20210914 for:autopoi模板导出，赋值的方法建议增加空判断或抛出异常说明。/issues/3005
 			if (obj instanceof WordImageEntity || obj instanceof List || obj instanceof ExcelListEntity) {
 				return obj;
 			} else {
@@ -524,5 +535,31 @@ public final class PoiPublicUtil {
 		}
 		return false;
 	}
+	//update-begin---author:liusq  Date:20211217  for：[LOWCOD-2521]【autopoi】大数据导出方法【全局】----
+	/**
+	 * 统一 key的获取规则
+	 * @param key
+	 * @param targetId
+	 * @date  2022年1月4号
+	 * @return
+	 */
+	public static String getValueByTargetId(String key, String targetId, String defalut) {
+		if (StringUtils.isEmpty(targetId) || key.indexOf("_") < 0) {
+			return key;
+		}
+		String[] arr = key.split(",");
+		String[] tempArr;
+		for (String str : arr) {
+			tempArr = str.split("_");
+			if (tempArr == null || tempArr.length < 2) {
+				return defalut;
+			}
+			if (targetId.equals(tempArr[1])) {
+				return tempArr[0];
+			}
+		}
+		return defalut;
+	}
+	//update-end---author:liusq  Date:20211217  for：[LOWCOD-2521]【autopoi】大数据导出方法【全局】----
 
 }

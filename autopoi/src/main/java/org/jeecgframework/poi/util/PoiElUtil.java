@@ -15,6 +15,7 @@
  */
 package org.jeecgframework.poi.util;
 
+import java.util.Collection;
 import java.util.Map;
 
 import org.jeecgframework.poi.exception.excel.ExcelExportException;
@@ -31,15 +32,21 @@ public final class PoiElUtil {
 	public static final String FOREACH = "fe:";
 	public static final String FOREACH_NOT_CREATE = "!fe:";
 	public static final String FOREACH_AND_SHIFT = "$fe:";
+	public static final String FOREACH_COL        = "#fe:";
+	public static final String FOREACH_COL_VALUE  = "v_fe:";
 	public static final String START_STR = "{{";
 	public static final String END_STR = "}}";
+	public static final String WRAP               = "]]";
 	public static final String NUMBER_SYMBOL = "n:";
 	public static final String FORMAT_DATE = "fd:";
 	public static final String FORMAT_NUMBER = "fn:";
 	public static final String IF_DELETE = "!if:";
 	public static final String EMPTY = "";
+	public static final String CONST              = "'";
+	public static final String NULL               = "&NULL&";
 	public static final String LEFT_BRACKET = "(";
 	public static final String RIGHT_BRACKET = ")";
+	public static final String DICT_HANDLER       = "dict:";
 
 	private PoiElUtil() {
 	}
@@ -249,4 +256,23 @@ public final class PoiElUtil {
 		return isTrue(testText.split(" "), map) ? first : second;
 	}
 
+	/**
+	 * 解析字符串, 不支持 le,fd,fn,!if,三目 ,获取是集合的字段前缀
+	 *
+	 * @param text
+	 * @param map
+	 * @return
+	 * @throws Exception
+	 */
+	public static String evalFindName(String text, Map<String, Object> map) throws Exception {
+		String[]      keys = text.split("\\.");
+		StringBuilder sb   = new StringBuilder().append(keys[0]);
+		for (int i = 1; i < keys.length; i++) {
+			sb.append(".").append(keys[i]);
+			if (eval(sb.toString(), map) instanceof Collection) {
+				return sb.toString();
+			}
+		}
+		return null;
+	}
 }

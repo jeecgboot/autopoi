@@ -43,10 +43,19 @@ public class ImportParams extends ExcelBaseParams {
 	 * 主键设置,如何这个cell没有值,就跳过 或者认为这个是list的下面的值
 	 */
 	private int keyIndex = 0;
+	//update-begin-author:liusq date:20220605 for:https://gitee.com/jeecg/jeecg-boot/issues/I57UPC 导入 ImportParams 中没有startSheetIndex参数
 	/**
-	 * 上传表格需要读取的sheet 数量,默认为1
+	 * 开始读取的sheet位置,默认为0
 	 */
-	private int sheetNum = 1;
+	private int                 startSheetIndex  = 0;
+	//update-end-author:liusq date:20220605 for:https://gitee.com/jeecg/jeecg-boot/issues/I57UPC 导入 ImportParams 中没有startSheetIndex参数
+
+	//update-begin-author:taoyan date:20211210 for:https://gitee.com/jeecg/jeecg-boot/issues/I45C32 导入空白sheet报错
+	/**
+	 * 上传表格需要读取的sheet 数量,默认为0
+	 */
+	private int sheetNum = 0;
+	//update-end-author:taoyan date:20211210 for:https://gitee.com/jeecg/jeecg-boot/issues/I45C32 导入空白sheet报错
 	/**
 	 * 是否需要保存上传的Excel,默认为false
 	 */
@@ -173,5 +182,12 @@ public class ImportParams extends ExcelBaseParams {
 			return true;
 		}
 		return false;
+	}
+	public int getStartSheetIndex() {
+		return startSheetIndex;
+	}
+
+	public void setStartSheetIndex(int startSheetIndex) {
+		this.startSheetIndex = startSheetIndex;
 	}
 }

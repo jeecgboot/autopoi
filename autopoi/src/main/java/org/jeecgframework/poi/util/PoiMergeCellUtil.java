@@ -211,5 +211,28 @@ public final class PoiMergeCellUtil {
 		}
 		return temp;
 	}
+	//update-begin---author:liusq  Date:20220104  for：[LOWCOD-2521]【autopoi】大数据导出方法【全局】----
+    /**
+     *处理合并的单元格区域
+     * @param sheet
+     * @param firstRow 开始行
+     * @param lastRow 结束行
+     * @param firstCol 开始列
+     * @param lastCol 结束列
+	 * @date    2022年1月4号
+     */
+	public static void addMergedRegion(Sheet sheet, int firstRow, int lastRow, int firstCol, int lastCol) {
+		try {
+			//添加合并的单元格区域
+			sheet.addMergedRegion(new CellRangeAddress(firstRow, lastRow, firstCol, lastCol));
+		} catch (Exception e) {
+			LOGGER.debug("发生了一次合并单元格错误,{},{},{},{}", new Integer[]{
+					firstRow, lastRow, firstCol, lastCol
+			});
+			// 忽略掉合并的错误,不打印异常
+			LOGGER.debug(e.getMessage(), e);
+		}
+	}
+	//update-end---author:liusq  Date:20220104  for：[LOWCOD-2521]【autopoi】大数据导出方法【全局】----
 
 }

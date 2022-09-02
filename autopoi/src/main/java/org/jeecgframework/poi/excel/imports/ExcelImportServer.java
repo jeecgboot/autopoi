@@ -174,7 +174,16 @@ public class ExcelImportServer extends ImportBaseService {
 		ignoreHeaderHandler(excelParams, params);
 		Iterator<Row> rows = sheet.rowIterator();
 		Map<Integer, String> titlemap = getTitleMap(sheet, rows, params, excelCollection);
-        Set<Integer> columnIndexSet = titlemap.keySet();
+		//update-begin-author:liusq date:20220310 for:[issues/I4PU45]@excel里面新增属性fixedIndex
+		Set<String> keys = excelParams.keySet();
+		for (String key : keys) {
+			if (key.startsWith("FIXED_")) {
+				String[] arr = key.split("_");
+				titlemap.put(Integer.parseInt(arr[1]), key);
+			}
+		}
+		//update-end-author:liusq date:20220310 for:[issues/I4PU45]@excel里面新增属性fixedIndex
+		Set<Integer> columnIndexSet = titlemap.keySet();
         Integer maxColumnIndex = Collections.max(columnIndexSet);
         Integer minColumnIndex = Collections.min(columnIndexSet);
 		Row row = null;
@@ -352,7 +361,15 @@ public class ExcelImportServer extends ImportBaseService {
 							titlemap.put(cell.getColumnIndex(), collectionName + "_" + value);
 						}
 					}else{
-						titlemap.put(cell.getColumnIndex(), value);
+						//update-begin-author:taoyan date:20220112 for: JT640 【online】导入 无论一对一还是一对多 如果子表只有一个字段 则子表无数据
+						// 上一行不是合并的情况下另有一种特殊的场景： 如果当前单元格和上面的单元格同一列 即子表字段只有一个 所以标题没有出现跨列
+						String prefixTitle = titlemap.get(cell.getColumnIndex());
+						if(prefixTitle!=null && !"".equals(prefixTitle)){
+							titlemap.put(cell.getColumnIndex(), prefixTitle + "_" +value);
+						}else{
+							titlemap.put(cell.getColumnIndex(), value);
+						}
+						//update-end-author:taoyan date:20220112 for: JT640 【online】导入 无论一对一还是一对多 如果子表只有一个字段 则子表无数据
 					}
 					/*int i = cell.getColumnIndex();
 					// 用以支持重名导入
@@ -425,14 +442,22 @@ public class ExcelImportServer extends ImportBaseService {
 
 		//begin-------author:liusq------date:20210313-----for:-------多sheet导入改造点--------
 		//获取导入文本的sheet数
-		int sheetNum = book.getNumberOfSheets();
-		if(sheetNum>1){
-			params.setSheetNum(sheetNum);
+		//update-begin-author:taoyan date:20211210 for:https://gitee.com/jeecg/jeecg-boot/issues/I45C32 导入空白sheet报错
+		if(params.getSheetNum()==0){
+			int sheetNum = book.getNumberOfSheets();
+			if(sheetNum>0){
+				params.setSheetNum(sheetNum);
+			}
 		}
+		//update-end-author:taoyan date:20211210 for:https://gitee.com/jeecg/jeecg-boot/issues/I45C32 导入空白sheet报错
 		//end-------author:liusq------date:20210313-----for:-------多sheet导入改造点--------
 		createErrorCellStyle(book);
 		Map<String, PictureData> pictures;
-		for (int i = 0; i < params.getSheetNum(); i++) {
+
+		//update-begin-author:liusq date:20220609 for:issues/I57UPC excel导入 ImportParams 中没有startSheetIndex参数
+		for (int i = params.getStartSheetIndex(); i < params.getStartSheetIndex()
+				+ params.getSheetNum(); i++) {
+		//update-end-author:liusq date:20220609 for:issues/I57UPC excel导入 ImportParams 中没有startSheetIndex参数
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug(" start to read excel by is ,startTime is {}", System.currentTimeMillis());
 			}

@@ -91,7 +91,27 @@ public class ExportParams extends ExcelBaseParams {
 	 * 本地文件存储根路径  base path
 	 */
 	private String imageBasePath;
+//update-begin---author:liusq  Date:20220104  for：[LOWCOD-2521]【autopoi】大数据导出方法【全局】----
+	/**
+	 * 是否固定表头
+	 */
+	private boolean isFixedTitle     = true;
+	/**
+	 * 单sheet最大值
+	 * 03版本默认6W行,07默认100W
+	 */
+	private int     maxNum           = 0;
+	/**
+	 * 导出时在excel中每个列的高度 单位为字符，一个汉字=2个字符
+	 * 全局设置,优先使用
+	 */
+	private short height = 0;
 
+	/**
+	 * 只读
+	 */
+	private boolean readonly = false;
+//update-end---author:liusq  Date:20220104  for：[LOWCOD-2521]【autopoi】大数据导出方法【全局】----
 	public ExportParams() {
 
 	}
@@ -240,4 +260,35 @@ public class ExportParams extends ExcelBaseParams {
 		this.imageBasePath = imageBasePath;
 	}
 
+	public int getMaxNum() {
+		return maxNum;
+	}
+
+	public void setMaxNum(int maxNum) {
+		this.maxNum = maxNum;
+	}
+
+	public short getHeight() {
+		return height == -1 ? -1 : (short) (height * 50);
+	}
+
+	public void setHeight(short height) {
+		this.height = height;
+	}
+
+	public boolean isFixedTitle() {
+		return isFixedTitle;
+	}
+
+	public void setFixedTitle(boolean fixedTitle) {
+		isFixedTitle = fixedTitle;
+	}
+
+	public boolean isReadonly() {
+		return readonly;
+	}
+
+	public void setReadonly(boolean readonly) {
+		this.readonly = readonly;
+	}
 }

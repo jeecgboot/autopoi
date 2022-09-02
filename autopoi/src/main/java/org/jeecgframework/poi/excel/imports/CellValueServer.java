@@ -344,12 +344,35 @@ public class CellValueServer {
 	private String replaceSingleValue(String[] replace, String temp){
 		String[] tempArr;
 		for (int i = 0; i < replace.length; i++) {
-			tempArr = replace[i].split("_");
-			if (temp.equals(tempArr[0])) {
-				return tempArr[1];
+			//update-begin---author:scott   Date:20211220  for：[issues/I4MBB3]@Excel dicText字段的值有下划线时，导入功能不能正确解析---
+			//tempArr = replace[i].split("_");
+			tempArr = getValueArr(replace[i]);
+			if (temp.equals(tempArr[0]) || temp.replace("_","---").equals(tempArr[0])) {
+                //update-begin---author:wangshuai ---date:20220422  for：导入字典替换需要将---替换成_，不然数据库会存--- ------------
+                if(tempArr[1].contains("---")){
+                    return tempArr[1].replace("---","_");
+                }
+                //update-end---author:wangshuai ---date:20220422  for：导入字典替换需要将---替换成_，不然数据库会存--- --------------
+                return tempArr[1];
 			}
+			//update-end---author:scott   Date:20211220  for：[issues/I4MBB3]@Excel dicText字段的值有下划线时，导入功能不能正确解析---
 		}
 		return temp;
 	}
 	//update-end-author:taoyan date:20180807 for:导入多值替换--
+
+	/**
+	 * 字典文本中含多个下划线横岗，取最后一个（解决空值情况）
+	 *
+	 * @param val
+	 * @return
+	 */
+	public String[] getValueArr(String val) {
+		int i = val.lastIndexOf("_");//最后一个分隔符的位置
+		String[] c = new String[2];
+		c[0] = val.substring(0, i); //label
+		c[1] = val.substring(i + 1); //key
+		return c;
+	}
+
 }

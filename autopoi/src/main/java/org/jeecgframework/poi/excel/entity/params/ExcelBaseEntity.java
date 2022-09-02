@@ -64,6 +64,18 @@ public class ExcelBaseEntity {
 	 * set/get方法
 	 */
 	private Method method;
+	/**
+	 * 固定的列
+	 */
+	private Integer      fixedIndex;
+	/**
+	 * 字典名称
+	 */
+	private String       dict;
+	/**
+	 * 这个是不是超链接,如果是需要实现接口返回对象
+	 */
+	private boolean     hyperlink;
 
 	private List<Method> methods;
 
@@ -144,5 +156,29 @@ public class ExcelBaseEntity {
 
 	public void setGroupName(String groupName) {
 		this.groupName = groupName;
+	}
+
+	public Integer getFixedIndex() {
+		return fixedIndex;
+	}
+
+	public void setFixedIndex(Integer fixedIndex) {
+		this.fixedIndex = fixedIndex;
+	}
+
+	public String getDict() {
+		return dict;
+	}
+
+	public void setDict(String dict) {
+		this.dict = dict;
+	}
+
+	public boolean isHyperlink() {
+		return hyperlink;
+	}
+
+	public void setHyperlink(boolean hyperlink) {
+		this.hyperlink = hyperlink;
 	}
 }

@@ -16,6 +16,7 @@
 package org.jeecgframework.poi.excel.export.base;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
 import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.ss.usermodel.*;
@@ -27,6 +28,8 @@ import org.jeecgframework.poi.excel.entity.enmus.ExcelType;
 import org.jeecgframework.poi.excel.entity.params.ExcelExportEntity;
 import org.jeecgframework.poi.excel.entity.vo.PoiBaseConstants;
 import org.jeecgframework.poi.excel.export.styler.IExcelExportStyler;
+import org.jeecgframework.poi.exception.excel.ExcelExportException;
+import org.jeecgframework.poi.exception.excel.enums.ExcelExportEnum;
 import org.jeecgframework.poi.util.MyX509TrustManager;
 import org.jeecgframework.poi.util.PoiMergeCellUtil;
 import org.jeecgframework.poi.util.PoiPublicUtil;
@@ -66,7 +69,10 @@ public abstract class ExcelExportBase extends ExportBase {
 
 	private static final DecimalFormat DOUBLE_FORMAT = new DecimalFormat("######0.00");
 
-	private IExcelExportStyler excelExportStyler;
+	//update-begin-author:liusq---date:20220527--for: 修改成protected，列循环时继承类需要用到 ---
+	protected IExcelExportStyler excelExportStyler;
+    //update-end-author:liusq---date:20220527--for: 修改成protected，列循环时继承类需要用到 ---
+
 
 	/**
 	 * 创建 最主要的 Cells
@@ -125,6 +131,15 @@ public abstract class ExcelExportBase extends ExportBase {
 					createImageCell(patriarch, entity, row, cellNum++, value == null ? "" : value.toString(), t);
 				}
 				//update-end--Author:xuelin  Date:20171018 for：TASK #2372 【excel】AutoPoi 导出类型，type增加数字类型--------------------
+
+				//update-begin-author:liusq---date:20220728--for:[issues/I5I840] @Excel注解中不支持超链接，但文档中支持 ---
+				if (entity.isHyperlink()) {
+					row.getCell(cellNum - 1)
+							.setHyperlink(dataHanlder.getHyperlink(
+									row.getSheet().getWorkbook().getCreationHelper(), t,
+									entity.getName(), value));
+				}
+               //update-end-author:liusq---date:20220728--for:[issues/I5I840] @Excel注解中不支持超链接，但文档中支持 ---
 			}
 		}
 		// 合并需要合并的单元格
@@ -264,7 +279,9 @@ public abstract class ExcelExportBase extends ExportBase {
 			}
 			try {
 				bufferImg = ImageIO.read(new File(path));
-				ImageIO.write(bufferImg, imagePath.substring(imagePath.indexOf(".") + 1, imagePath.length()), byteArrayOut);
+				//update-begin-author:taoYan date:20211203 for: Excel 导出图片的文件带小数点符号 导出报错 https://gitee.com/jeecg/jeecg-boot/issues/I4JNHR
+				ImageIO.write(bufferImg, imagePath.substring(imagePath.lastIndexOf(".") + 1, imagePath.length()), byteArrayOut);
+				//update-end-author:taoYan date:20211203 for: Excel 导出图片的文件带小数点符号 导出报错 https://gitee.com/jeecg/jeecg-boot/issues/I4JNHR
 				value = byteArrayOut.toByteArray();
 			} catch (Exception e) {
 				LOGGER.error(e.getMessage());
@@ -334,8 +351,24 @@ public abstract class ExcelExportBase extends ExportBase {
 			//update-begin--Author:xuelin  Date:20171018 for：TASK #2372 【excel】AutoPoi 导出类型，type增加数字类型--------------------
 			if (entity.getType() == 1) {
 				createStringCell(row, cellNum++, value == null ? "" : value.toString(), row.getRowNum() % 2 == 0 ? getStyles(false, entity) : getStyles(true, entity), entity);
+				//update-begin-author:liusq---date:20220728--for: 新增isHyperlink属性 ---
+				if (entity.isHyperlink()) {
+					row.getCell(cellNum - 1)
+							.setHyperlink(dataHanlder.getHyperlink(
+									row.getSheet().getWorkbook().getCreationHelper(), obj, entity.getName(),
+									value));
+				}
+				//update-end-author:liusq---date:20220728--for: 新增isHyperlink属性 ---
 			} else if (entity.getType() == 4){
 				createNumericCell(row, cellNum++, value == null ? "" : value.toString(), index % 2 == 0 ? getStyles(false, entity) : getStyles(true, entity), entity);
+				//update-begin-author:liusq---date:20220728--for: 新增isHyperlink属性 ---
+				if (entity.isHyperlink()) {
+					row.getCell(cellNum - 1)
+							.setHyperlink(dataHanlder.getHyperlink(
+									row.getSheet().getWorkbook().getCreationHelper(), obj, entity.getName(),
+									value));
+				}
+				//update-end-author:liusq---date:20220728--for: 新增isHyperlink属性 ---
 			}  else{
 				createImageCell(patriarch, entity, row, cellNum++, value == null ? "" : value.toString(), obj);
 			}
@@ -593,5 +626,123 @@ public abstract class ExcelExportBase extends ExportBase {
 	public IExcelExportStyler getExcelExportStyler() {
 		return excelExportStyler;
 	}
+	//update-begin---author:liusq  Date:20211217  for：[LOWCOD-2521]【autopoi】大数据导出方法【全局】----
+    /**
+     *创建单元格，返回最大高度和单元格数
+     * @param patriarch
+     * @param index
+     * @param t
+     * @param excelParams
+     * @param sheet
+     * @param workbook
+     * @param rowHeight 行高
+     * @param cellNum 格数
+     * @return
+     */
+	public int[] createCells(Drawing patriarch, int index, Object t,
+							 List<ExcelExportEntity> excelParams, Sheet sheet, Workbook workbook,
+							 short rowHeight, int cellNum) {
+		try {
+			ExcelExportEntity entity;
+			Row               row = sheet.getRow(index) == null ? sheet.createRow(index) : sheet.getRow(index);
+			if (rowHeight != -1) {
+				row.setHeight(rowHeight);
+			}
+			int maxHeight = 1, listMaxHeight = 1;
+			// 合并需要合并的单元格
+			int margeCellNum = cellNum;
+			int indexKey     = 0;
+			if (excelParams != null && !excelParams.isEmpty()) {
+				indexKey = createIndexCell(row, index, excelParams.get(0));
+			}
+			cellNum += indexKey;
+			for (int k = indexKey, paramSize = excelParams.size(); k < paramSize; k++) {
+				entity = excelParams.get(k);
+				//不论数据是否为空都应该把该列的数据跳过去
+				if (entity.getList() != null) {
+					Collection<?> list          = getListCellValue(entity, t);
+					int           tmpListHeight = 0;
+					if (list != null && list.size() > 0) {
+						int tempCellNum = 0;
+						for (Object obj : list) {
+							int[] temp = createCells(patriarch, index + tmpListHeight, obj, entity.getList(), sheet, workbook, rowHeight, cellNum);
+							tempCellNum = temp[1];
+							tmpListHeight += temp[0];
+						}
+						cellNum = tempCellNum;
+						listMaxHeight = Math.max(listMaxHeight, tmpListHeight);
+					} else {
+						cellNum = cellNum + getListCellSize(entity.getList());
+					}
+				} else {
+					Object value = getCellValue(entity, t);
+					if (entity.getType() == 1) {
+						createStringCell(row, cellNum++, value == null ? "" : value.toString(),
+								index % 2 == 0 ? getStyles(false, entity) : getStyles(true, entity),
+								entity);
 
+					} else if (entity.getType() == 4) {
+						createNumericCell(row, cellNum++, value == null ? "" : value.toString(),
+								index % 2 == 0 ? getStyles(false, entity) : getStyles(true, entity),
+								entity);
+					} else {
+						createImageCell(patriarch, entity, row, cellNum++,
+								value == null ? "" : value.toString(), t);
+					}
+					//update-begin-author:liusq---date:20220728--for: 新增isHyperlink属性 ---
+					if (entity.isHyperlink()) {
+						row.getCell(cellNum - 1)
+								.setHyperlink(dataHanlder.getHyperlink(
+										row.getSheet().getWorkbook().getCreationHelper(), t,
+										entity.getName(), value));
+					}
+					//update-end-author:liusq---date:20220728--for: 新增isHyperlink属性 ---
+				}
+			}
+			maxHeight += listMaxHeight - 1;
+			if (indexKey == 1 && excelParams.get(1).isNeedMerge()) {
+				excelParams.get(0).setNeedMerge(true);
+			}
+			for (int k = indexKey, paramSize = excelParams.size(); k < paramSize; k++) {
+				entity = excelParams.get(k);
+				if (entity.getList() != null) {
+					margeCellNum += entity.getList().size();
+				} else if (entity.isNeedMerge() && maxHeight > 1) {
+					for (int i = index + 1; i < index + maxHeight; i++) {
+						if (sheet.getRow(i) == null) {
+							sheet.createRow(i);
+						}
+						sheet.getRow(i).createCell(margeCellNum);
+						sheet.getRow(i).getCell(margeCellNum).setCellStyle(getStyles(false, entity));
+					}
+					PoiMergeCellUtil.addMergedRegion(sheet, index, index + maxHeight - 1, margeCellNum, margeCellNum);
+					margeCellNum++;
+				}
+			}
+			return new int[]{maxHeight, cellNum};
+		} catch (Exception e) {
+			LOGGER.error("excel cell export error ,data is :{}", ReflectionToStringBuilder.toString(t));
+			LOGGER.error(e.getMessage(), e);
+			throw new ExcelExportException(ExcelExportEnum.EXPORT_ERROR, e);
+		}
+	}
+
+	/**
+	 * 获取集合的宽度
+	 *
+	 * @param list
+	 * @return
+	 */
+	protected int getListCellSize(List<ExcelExportEntity> list) {
+		int cellSize = 0;
+		for (ExcelExportEntity ee : list) {
+			if (ee.getList() != null) {
+				cellSize += getListCellSize(ee.getList());
+			} else {
+				cellSize++;
+			}
+		}
+		return cellSize;
+	}
+	//update-end---author:liusq  Date:20211217  for：[LOWCOD-2521]【autopoi】大数据导出方法【全局】----
 }

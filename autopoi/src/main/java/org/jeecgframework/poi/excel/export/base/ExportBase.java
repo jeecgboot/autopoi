@@ -20,6 +20,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import com.google.common.collect.Lists;
@@ -32,6 +35,7 @@ import org.jeecgframework.poi.excel.annotation.ExcelEntity;
 import org.jeecgframework.poi.excel.entity.ExportParams;
 import org.jeecgframework.poi.excel.entity.params.ExcelExportEntity;
 import org.jeecgframework.poi.handler.inter.IExcelDataHandler;
+import org.jeecgframework.poi.handler.inter.IExcelDictHandler;
 import org.jeecgframework.poi.util.PoiPublicUtil;
 
 /**
@@ -43,6 +47,13 @@ import org.jeecgframework.poi.util.PoiPublicUtil;
 public class ExportBase {
 
 	protected IExcelDataHandler dataHanlder;
+
+	//update-begin-author:liusq---date:20220527--for: 增加列循环功能时中用到 ---
+	protected IExcelDictHandler dictHandler;
+	//update-end-author:liusq---date:20220527--for: be 增加列循环功能时中用到---
+
+
+
 
 	protected List<String> needHanlderList;
 
@@ -82,7 +93,17 @@ public class ExportBase {
 			temp = format.parse(value.toString());
 		} else if (value instanceof Date) {
 			temp = (Date) value;
+		//update-begin-author:taoyan date:2022-5-17 for: mybatis-plus升级 时间字段变成了jdk8的LocalDateTime，导致格式化失败
+		} else if (value instanceof LocalDateTime) {
+			LocalDateTime ldt = (LocalDateTime) value;
+			DateTimeFormatter format = DateTimeFormatter.ofPattern(entity.getFormat());
+			return format.format(ldt);
+		} else if (value instanceof LocalDate) {
+			LocalDate ld = (LocalDate) value;
+			DateTimeFormatter format = DateTimeFormatter.ofPattern(entity.getFormat());
+			return format.format(ld);
 		}
+		//update-end-author:taoyan date:2022-5-17 for: mybatis-plus升级 时间字段变成了jdk8的LocalDateTime，导致格式化失败
 		if (temp != null) {
 			SimpleDateFormat format = new SimpleDateFormat(entity.getFormat());
 			value = format.format(temp);
@@ -200,6 +221,9 @@ public class ExportBase {
 		}
 		//update-end-author:taoyan date:2020319 for:Excel注解的numFormat方法似乎未实现 #970
 
+		if (StringUtils.isNotEmpty(entity.getDict()) && dictHandler != null) {
+			value = dictHandler.toName(entity.getDict(), obj, entity.getName(), value);
+		}
 		if (StringUtils.isNotEmpty(entity.getFormat())) {
 			value = formatValue(value, entity);
 		}
@@ -274,6 +298,7 @@ public class ExportBase {
 		excelEntity.setMergeVertical(excel.mergeVertical());
 		excelEntity.setMergeRely(excel.mergeRely());
 		excelEntity.setReplace(excel.replace());
+		excelEntity.setHyperlink(excel.isHyperlink());
 		if(StringUtils.isNotEmpty(excel.dicCode())){
 			AutoPoiDictServiceI jeecgDictService = null;
 			try {
@@ -397,10 +422,13 @@ public class ExportBase {
 			//update-begin-author:liusq date：20210127 for:字符串截取修改
 			temp = getValueArr(str);
 			//update-end-author:liusq date：20210127 for:字符串截取修改
-			if (value.equals(temp[1])) {
+
+			//update-begin---author:scott   Date:20211220  for：[issues/I4MBB3]@Excel dicText字段的值有下划线时，导入功能不能正确解析---
+			if (value.equals(temp[1]) || value.replace("_","---").equals(temp[1])) {
 				value = temp[0];
 				break;
 			}
+			//update-end---author:scott   Date:20211220  for：[issues/I4MBB3]@Excel dicText字段的值有下划线时，导入功能不能正确解析---
 		}
 		return value;
 	}
@@ -423,10 +451,13 @@ public class ExportBase {
 					//update-begin-author:liusq date：20210127 for:字符串截取修改
 					temp = getValueArr(str);
 					//update-end-author:liusq date：20210127 for:字符串截取修改
-					if (radio.equals(temp[1])) {
+
+					//update-begin---author:scott   Date:20211220  for：[issues/I4MBB3]@Excel dicText字段的值有下划线时，导入功能不能正确解析---
+					if (radio.equals(temp[1]) || radio.replace("_","---").equals(temp[1])) {
 						result = result.concat(temp[0])+",";
 						break;
 					}
+					//update-end---author:scott   Date:20211220  for：[issues/I4MBB3]@Excel dicText字段的值有下划线时，导入功能不能正确解析---
 				}
 			}
 			if(result.equals("")){
@@ -501,6 +532,12 @@ public class ExportBase {
 		Collections.sort(excelParams);
 	}
 
+	/**
+	 * 字典文本中含多个下划线横岗，取最后一个（解决空值情况）
+	 *
+	 * @param val
+	 * @return
+	 */
 	public String[] getValueArr(String val) {
 		int i = val.lastIndexOf("_");//最后一个分隔符的位置
 		String[] c=new String[2];

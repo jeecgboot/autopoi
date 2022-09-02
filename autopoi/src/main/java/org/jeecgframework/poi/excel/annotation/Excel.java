@@ -189,4 +189,14 @@ public @interface Excel {
 	 * @return
 	 */
 	public boolean isColumnHidden() default  false;
+	/**
+	 * 固定的某一列,解决不好解析的问题
+	 * @return
+	 */
+	public int fixedIndex() default -1;
+	/**
+	 * 这个是不是超链接,如果是需要实现接口返回对象
+	 * @return
+	 */
+	public boolean isHyperlink() default false;
 }

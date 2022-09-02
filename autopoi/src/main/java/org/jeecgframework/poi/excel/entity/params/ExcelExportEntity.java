@@ -120,6 +120,7 @@ public class ExcelExportEntity extends ExcelBaseEntity implements Comparable<Exc
 		super.name = name;
 		this.key = key;
 		this.colspan = colspan;
+		this.needMerge = colspan;
 	}
 
 	public ExcelExportEntity(String name, Object key, int width) {

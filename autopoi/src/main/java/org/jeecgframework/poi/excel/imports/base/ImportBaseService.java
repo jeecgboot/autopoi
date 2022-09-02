@@ -74,6 +74,10 @@ public class ImportBaseService {
 		excelEntity.setSuffix(excel.suffix());
 		excelEntity.setNumFormat(excel.numFormat());
 		excelEntity.setGroupName(excel.groupName());
+		//update-begin-author:liusq date:20220310 for:[issues/I4PU45]@excel里面新增属性fixedIndex
+		excelEntity.setFixedIndex(excel.fixedIndex());
+		//update-end-author:liusq date:20220310 for:[issues/I4PU45]@excel里面新增属性fixedIndex
+
 		//update-begin-author:taoYan date:20180202 for:TASK #2067 【bug excel 问题】excel导入字典文本翻译问题
 		excelEntity.setMultiReplace(excel.multiReplace());
 		if(StringUtils.isNotEmpty(excel.dicCode())){
@@ -97,8 +101,13 @@ public class ImportBaseService {
 			newMethods.add(excelEntity.getMethod());
 			excelEntity.setMethods(newMethods);
 		}
-		temp.put(excelEntity.getName(), excelEntity);
-
+		//update-begin-author:liusq date:20220310 for:[issues/I4PU45]@excel里面新增属性fixedIndex
+		if (excelEntity.getFixedIndex() != -1) {
+			temp.put("FIXED_" + excelEntity.getFixedIndex(), excelEntity);
+		} else {
+			temp.put(excelEntity.getName(), excelEntity);
+		}
+		//update-end-author:liusq date:20220310 for:[issues/I4PU45]@excel里面新增属性fixedIndex
 	}
 
 	/**

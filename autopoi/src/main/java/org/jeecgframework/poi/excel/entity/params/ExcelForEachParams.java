@@ -1,6 +1,7 @@
 package org.jeecgframework.poi.excel.entity.params;
 
 import java.io.Serializable;
+import java.util.Stack;
 
 import org.apache.poi.ss.usermodel.CellStyle;
 
@@ -19,6 +20,10 @@ public class ExcelForEachParams implements Serializable {
      * key
      */
     private String            name;
+    /**
+     * key
+     */
+    private Stack<String> tempName;
     /**
      * 模板的cellStyle
      */
@@ -39,6 +44,10 @@ public class ExcelForEachParams implements Serializable {
      * 行合并
      */
     private int               rowspan          = 1;
+    /**
+     * 行合并
+     */
+    private              boolean       collectCell;
 
     public ExcelForEachParams() {
 
@@ -98,4 +107,19 @@ public class ExcelForEachParams implements Serializable {
         this.rowspan = rowspan;
     }
 
+    public boolean isCollectCell() {
+        return collectCell;
+    }
+
+    public void setCollectCell(boolean collectCell) {
+        this.collectCell = collectCell;
+    }
+
+    public Stack<String> getTempName() {
+        return tempName;
+    }
+
+    public void setTempName(Stack<String> tempName) {
+        this.tempName = tempName;
+    }
 }

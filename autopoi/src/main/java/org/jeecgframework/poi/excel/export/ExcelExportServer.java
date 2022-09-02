@@ -16,12 +16,7 @@
 package org.jeecgframework.poi.excel.export;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
@@ -35,6 +30,7 @@ import org.jeecgframework.poi.excel.export.base.ExcelExportBase;
 import org.jeecgframework.poi.excel.export.styler.IExcelExportStyler;
 import org.jeecgframework.poi.exception.excel.ExcelExportException;
 import org.jeecgframework.poi.exception.excel.enums.ExcelExportEnum;
+import org.jeecgframework.poi.util.PoiExcelGraphDataUtil;
 import org.jeecgframework.poi.util.PoiPublicUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,13 +48,17 @@ public class ExcelExportServer extends ExcelExportBase {
 	// 最大行数,超过自动多Sheet
 	private int MAX_NUM = 60000;
 
-	private int createHeaderAndTitle(ExportParams entity, Sheet sheet, Workbook workbook, List<ExcelExportEntity> excelParams) {
+	protected int createHeaderAndTitle(ExportParams entity, Sheet sheet, Workbook workbook, List<ExcelExportEntity> excelParams) {
 		int rows = 0, feildWidth = getFieldWidth(excelParams);
 		if (entity.getTitle() != null) {
 			rows += createHeaderRow(entity, sheet, workbook, feildWidth);
 		}
 		rows += createTitleRow(entity, sheet, workbook, rows, excelParams);
-		sheet.createFreezePane(0, rows, 0, rows);
+		//update-begin---author:liusq  Date:20211217  for：[LOWCOD-2521]【autopoi】大数据导出方法【全局】----
+		if (entity.isFixedTitle()) {
+			sheet.createFreezePane(0, rows, 0, rows);
+		}
+		//update-begin---author:liusq  Date:20211217  for：[LOWCOD-2521]【autopoi】大数据导出方法【全局】----
 		return rows;
 	}
 
@@ -129,7 +129,10 @@ public class ExcelExportServer extends ExcelExportBase {
 		try {
 			dataHanlder = entity.getDataHanlder();
 			if (dataHanlder != null) {
-				needHanlderList = Arrays.asList(dataHanlder.getNeedHandlerFields());
+				String[] needHandlerFields = dataHanlder.getNeedHandlerFields();
+				if(needHandlerFields!=null && needHandlerFields.length>0){
+					needHanlderList = Arrays.asList(dataHanlder.getNeedHandlerFields());
+				}
 			}
 			// 创建表格样式
 			setExcelExportStyler((IExcelExportStyler) entity.getStyle().getConstructor(Workbook.class).newInstance(workbook));
@@ -364,7 +367,7 @@ public class ExcelExportServer extends ExcelExportBase {
 		return 1;
 	}
 
-	private ExcelExportEntity indexExcelEntity(ExportParams entity) {
+	protected ExcelExportEntity indexExcelEntity(ExportParams entity) {
 		ExcelExportEntity exportEntity = new ExcelExportEntity();
 		exportEntity.setOrderNum(0);
 		exportEntity.setName(entity.getIndexName());
@@ -372,5 +375,78 @@ public class ExcelExportServer extends ExcelExportBase {
 		exportEntity.setFormat(PoiBaseConstants.IS_ADD_INDEX);
 		return exportEntity;
 	}
+   //update-begin---author:liusq  Date:20211217  for：[LOWCOD-2521]【autopoi】大数据导出方法【全局】----
+	/**
+	 * 添加数据到sheet
+	 * @param workbook
+	 * @param entity 导出参数
+	 * @param entityList
+	 * @param dataSet 导出数据
+	 * @param sheet
+	 * @date 2022年1月4号
+	 */
+	protected void insertDataToSheet(Workbook workbook, ExportParams entity,
+									 List<ExcelExportEntity> entityList,Collection<? extends Map<?, ?>> dataSet,
+									 Sheet sheet) {
+		try {
+			dataHanlder = entity.getDataHanlder();
+			if (dataHanlder != null && dataHanlder.getNeedHandlerFields() != null) {
+				needHanlderList = Arrays.asList(dataHanlder.getNeedHandlerFields());
+			}
+			// 创建表格样式
+			setExcelExportStyler((IExcelExportStyler) entity.getStyle()
+					.getConstructor(Workbook.class).newInstance(workbook));
+			Drawing                 patriarch   = PoiExcelGraphDataUtil.getDrawingPatriarch(sheet);
+			List<ExcelExportEntity> excelParams = new ArrayList<ExcelExportEntity>();
+			if (entity.isAddIndex()) {
+				excelParams.add(indexExcelEntity(entity));
+			}
+			excelParams.addAll(entityList);
+			sortAllParams(excelParams);
+			int index = entity.isCreateHeadRows()
+					? createHeaderAndTitle(entity, sheet, workbook, excelParams) : 0;
+			int titleHeight = index;
+			setCellWith(excelParams, sheet);
+			setColumnHidden(excelParams, sheet);
+			short rowHeight = entity.getHeight() != 0 ? entity.getHeight() : getRowHeight(excelParams);
+			setCurrentIndex(1);
+			Iterator<?>  its      = dataSet.iterator();
+			List<Object> tempList = new ArrayList<Object>();
+			while (its.hasNext()) {
+				Object t = its.next();
+				index += createCells(patriarch, index, t, excelParams, sheet, workbook, rowHeight, 0)[0];
+				tempList.add(t);
+				if (index >= MAX_NUM) {
+					break;
+				}
+			}
+			if (entity.getFreezeCol() != 0) {
+				sheet.createFreezePane(entity.getFreezeCol(), 0, entity.getFreezeCol(), 0);
+			}
 
+			mergeCells(sheet, excelParams, titleHeight);
+
+			its = dataSet.iterator();
+			for (int i = 0, le = tempList.size(); i < le; i++) {
+				its.next();
+				its.remove();
+			}
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("List data more than max ,data size is {}",
+						dataSet.size());
+			}
+			// 发现还有剩余list 继续循环创建Sheet
+			if (dataSet.size() > 0) {
+				createSheetForMap(workbook, entity, entityList, dataSet);
+			} else {
+				// 创建合计信息
+				addStatisticsRow(getExcelExportStyler().getStyles(true, null), sheet);
+			}
+
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage(), e);
+			throw new ExcelExportException(ExcelExportEnum.EXPORT_ERROR, e.getCause());
+		}
+	}
+   //update-end---author:liusq  Date:20211217  for：[LOWCOD-2521]【autopoi】大数据导出方法【全局】----
 }

@@ -27,8 +27,11 @@ import org.jeecgframework.poi.excel.entity.ExportParams;
 import org.jeecgframework.poi.excel.entity.TemplateExportParams;
 import org.jeecgframework.poi.excel.entity.enmus.ExcelType;
 import org.jeecgframework.poi.excel.entity.params.ExcelExportEntity;
+import org.jeecgframework.poi.excel.export.ExcelBatchExportServer;
 import org.jeecgframework.poi.excel.export.ExcelExportServer;
 import org.jeecgframework.poi.excel.export.template.ExcelExportOfTemplateUtil;
+import org.jeecgframework.poi.handler.inter.IExcelExportServer;
+import org.jeecgframework.poi.handler.inter.IWriter;
 
 /**
  * excel 导出工具类
@@ -38,7 +41,10 @@ import org.jeecgframework.poi.excel.export.template.ExcelExportOfTemplateUtil;
  * @date 2013-10-17
  */
 public final class ExcelExportUtil {
-
+	//update-begin---author:liusq  Date:20211217  for：[LOWCOD-2521]【autopoi】大数据导出方法【全局】----
+	//单sheet最大值
+	public static       int    USE_SXSSF_LIMIT = 100000;
+	//update-end---author:liusq  Date:20211217  for：[LOWCOD-2521]【autopoi】大数据导出方法【全局】----
 	private ExcelExportUtil() {
 	}
 
@@ -169,4 +175,67 @@ public final class ExcelExportUtil {
 		return new ExcelExportOfTemplateUtil().createExcleByTemplate(params, null, null, map);
 	}
 
+
+	//update-begin---author:liusq  Date:20211227 for：[LOWCOD-2521]大数据导出方法【全局】----
+	/**
+	 * 大数据量导出
+	 *
+	 * @param entity    表格标题属性
+	 * @param pojoClass Excel对象Class
+	 * @date 2022年1月4号
+	 * @return ExcelBatchExportServer 批处理服务
+	 */
+	public static IWriter<Workbook> exportBigExcel(ExportParams entity, Class<?> pojoClass) {
+		ExcelBatchExportServer batchServer = new ExcelBatchExportServer();
+		batchServer.init(entity, pojoClass);
+		return batchServer;
+	}
+
+	/**
+	 * 大数据量导出
+	 *
+	 * @param entity
+	 * @param excelParams
+	 * @date 2022年1月4号
+	 * @return ExcelBatchExportServer 批处理服务
+	 */
+	public static IWriter<Workbook> exportBigExcel(ExportParams entity, List<ExcelExportEntity> excelParams) {
+		ExcelBatchExportServer batchServer = new ExcelBatchExportServer();
+		batchServer.init(entity, excelParams);
+		return batchServer;
+	}
+
+	/**
+	 * 大数据量导出
+	 *
+	 * @param entity      导出参数属性
+	 * @param pojoClass   Excel对象Class
+	 * @param server      查询数据的接口
+	 * @param queryParams 查询数据的参数
+	 * @date 2022年1月4号
+	 * @return Workbook
+	 */
+	public static Workbook exportBigExcel(ExportParams entity, Class<?> pojoClass,
+										  IExcelExportServer server, Object queryParams) {
+		ExcelBatchExportServer batchServer = new ExcelBatchExportServer();
+		batchServer.init(entity, pojoClass);
+		return batchServer.exportBigExcel(server, queryParams);
+	}
+
+	/**
+	 * 大数据量导出
+	 * @param entity
+	 * @param excelParams
+	 * @param server      查询数据的接口
+	 * @param queryParams 查询数据的参数
+	 * @date 2022年1月4号
+	 * @return Workbook
+	 */
+	public static Workbook exportBigExcel(ExportParams entity, List<ExcelExportEntity> excelParams,
+										  IExcelExportServer server, Object queryParams) {
+		ExcelBatchExportServer batchServer = new ExcelBatchExportServer();
+		batchServer.init(entity, excelParams);
+		return batchServer.exportBigExcel(server, queryParams);
+	}
+	//update-end---author:liusq  Date:20211227 for：[LOWCOD-2521]大数据导出方法【全局】----
 }

@@ -16,7 +16,8 @@
 package org.jeecgframework.poi.handler.inter;
 
 import java.util.Map;
-
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Hyperlink;
 /**
  * Excel 导入导出 数据处理接口
  * 
@@ -73,5 +74,14 @@ public interface IExcelDataHandler {
 	 * @param value
 	 */
 	public void setMapValue(Map<String, Object> map, String originKey, Object value);
+	/**
+	 * 获取这个字段的 Hyperlink ,07版本需要,03版本不需要
+	 * @param creationHelper
+	 * @param obj
+	 * @param name
+	 * @param value
+	 * @return
+	 */
+	public Hyperlink getHyperlink(CreationHelper creationHelper, Object obj, String name, Object value);
 
 }
