@@ -42,7 +42,7 @@
 		<guava.version>29.0-jre</guava.version>
 		<commons-lang.version>3.10</commons-lang.version>
 		<slf4j.version>1.7.30</slf4j.version>
-		<spring.version>5.1.0.RELEASE</spring.version>
+		<spring.version>5.2.20.RELEASE</spring.version>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
