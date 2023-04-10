@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.poi.ss.usermodel.Sheet;
+import org.jeecgframework.poi.util.PoiCellUtil;
+import org.jeecgframework.poi.util.PoiMergeCellUtil;
 
 /**
  * 合并单元格帮助类
@@ -32,7 +34,7 @@ public class MergedRegionHelper {
 
 	/**
 	 * 根据合并输出内容,处理合并单元格事情
-	 * 
+	 *
 	 * @param formatAsString
 	 */
 	private void handerMergedString(String formatAsString) {
@@ -61,7 +63,7 @@ public class MergedRegionHelper {
 
 	/**
 	 * 是不是需要创建这个TD
-	 * 
+	 *
 	 * @param row
 	 * @param col
 	 * @return
@@ -72,7 +74,7 @@ public class MergedRegionHelper {
 
 	/**
 	 * 是不是合并区域
-	 * 
+	 *
 	 * @param row
 	 * @param col
 	 * @return
@@ -83,13 +85,51 @@ public class MergedRegionHelper {
 
 	/**
 	 * 获取合并区域
-	 * 
+	 *
 	 * @param row
 	 * @param col
 	 * @return
 	 */
 	public Integer[] getRowAndColSpan(int row, int col) {
 		return mergedCache.get(row + "_" + col);
+	}
+
+	/**
+	 * 插入之后还原之前的合并单元格
+	 *
+	 * @param rowIndex
+	 * @param size
+	 */
+	public void shiftRows(Sheet sheet, int rowIndex, int size, int shiftRows) {
+		Set<String> keys = new HashSet<String>();
+		keys.addAll(mergedCache.keySet());
+		for (String key : keys) {
+			String[] temp = key.split("_");
+			if (Integer.parseInt(temp[0]) >= rowIndex) {
+				Integer[] data   = mergedCache.get(key);
+				String    newKey = (Integer.parseInt(temp[0]) + size) + "_" + temp[1];
+				if (!mergedCache.containsKey(newKey)) {
+					mergedCache.put(newKey, mergedCache.get(key));
+					try {
+						// 还原合并单元格
+						if (!PoiCellUtil.isMergedRegion(sheet, Integer.parseInt(temp[0]) + size - 1, Integer.parseInt(temp[1]))) {
+							PoiMergeCellUtil.addMergedRegion(sheet,
+									Integer.parseInt(temp[0]) + size - 1, Integer.parseInt(temp[0]) + data[0] + size - 2,
+									Integer.parseInt(temp[1]), Integer.parseInt(temp[1]) + data[1] - 1
+							);
+						}
+					} catch (Exception e) {
+					}
+				}
+			}
+		}
+		//删除掉原始的缓存KEY
+		for (String key : keys) {
+			String[] temp = key.split("_");
+			if (Integer.parseInt(temp[0]) >= rowIndex + size && Integer.parseInt(temp[0]) <= rowIndex + size + shiftRows) {
+				mergedCache.remove(key);
+			}
+		}
 	}
 
 }

@@ -80,6 +80,11 @@ public class ImportParams extends ExcelBaseParams {
 	private List<String> ignoreHeaderList;
 
 	/**
+	 * 指定导入的sheetName
+	 */
+	private String sheetName;
+
+	/**
 	 * 图片列 集合
 	 */
 	private List<String> imageList;
@@ -170,6 +175,14 @@ public class ImportParams extends ExcelBaseParams {
 
 	public void setIgnoreHeaderList(List<String> ignoreHeaderList) {
 		this.ignoreHeaderList = ignoreHeaderList;
+	}
+
+	public String getSheetName() {
+		return sheetName;
+	}
+
+	public void setSheetName(String sheetName) {
+		this.sheetName = sheetName;
 	}
 
 	/**

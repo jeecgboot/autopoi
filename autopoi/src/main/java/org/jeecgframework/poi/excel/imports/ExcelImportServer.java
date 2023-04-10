@@ -453,11 +453,23 @@ public class ExcelImportServer extends ImportBaseService {
 		//end-------author:liusq------date:20210313-----for:-------多sheet导入改造点--------
 		createErrorCellStyle(book);
 		Map<String, PictureData> pictures;
+		// 获取指定的sheet名称
+		String sheetName = params.getSheetName();
 
 		//update-begin-author:liusq date:20220609 for:issues/I57UPC excel导入 ImportParams 中没有startSheetIndex参数
 		for (int i = params.getStartSheetIndex(); i < params.getStartSheetIndex()
 				+ params.getSheetNum(); i++) {
 		//update-end-author:liusq date:20220609 for:issues/I57UPC excel导入 ImportParams 中没有startSheetIndex参数
+
+			//update-begin-author:taoyan date:2023-3-4 for: 导入数据支持指定sheet名称
+			if(sheetName!=null && !"".equals(sheetName)){
+				Sheet tempSheet = book.getSheetAt(i);
+				if(!sheetName.equals(tempSheet.getSheetName())){
+					continue;
+				}
+			}
+			//update-end-author:taoyan date:2023-3-4 for: 导入数据支持指定sheet名称
+				
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug(" start to read excel by is ,startTime is {}", System.currentTimeMillis());
 			}

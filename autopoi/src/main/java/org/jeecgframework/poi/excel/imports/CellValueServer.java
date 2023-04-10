@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -82,8 +83,16 @@ public class CellValueServer {
 			result = cell.getBooleanCellValue();
 		} else if ( CellType.FORMULA == cell.getCellTypeEnum() && PoiPublicUtil.isNumber(xclass)) {
 			//如果单元格是表达式 且 字段是数字类型
-			result = cell.getNumericCellValue();
+			double cellValue = cell.getNumericCellValue();
+			//---author:liusq---date:20221102-----for: [issues/3369]Excel导入 带公式的时候精度丢失---
+			//setScale方法的第一个参数设置小数点保留位数，第二个参数设置进位方法、此处是四舍五入
+			BigDecimal bigDecimal= new BigDecimal(cellValue).setScale(4, RoundingMode.HALF_UP);
+           //stripTrailingZeros方法去除末尾的0，toPlainString避免输出科学计数法的字符串
+			result = bigDecimal.stripTrailingZeros().toPlainString();
+			//---author:liusq---date:20221102-----for:[issues/3369] Excel导入 带公式的时候精度丢失---
 		} else {
+			//设置单元格类型
+			cell.setCellType(CellType.STRING);
 			result = cell.getStringCellValue();
 		}
 		return result;

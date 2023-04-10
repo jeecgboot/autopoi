@@ -372,6 +372,10 @@ public final class ExcelExportOfTemplateUtil extends ExcelExportBase {
 			int lastRowNum = cell.getRow().getSheet().getLastRowNum();
 			int shiftRows  = lastRowNum - cell.getRowIndex() - rowspan;
 			cell.getRow().getSheet().shiftRows(cell.getRowIndex() + rowspan, lastRowNum, (datas.size() - 1) * rowspan, true, true);
+			//update-begin-author:liusq---date:20221103--for: [issues/4142]exlce模板导出如果模板中有多个合并单元格的循环表格，第二个表格读取错误 ---
+			mergedRegionHelper.shiftRows(cell.getSheet(), cell.getRowIndex() + rowspan, (datas.size() - 1) * rowspan, shiftRows);
+			PoiExcelTempUtil.reset(cell.getSheet(), cell.getRowIndex() + rowspan + (datas.size() - 1) * rowspan, cell.getRow().getSheet().getLastRowNum());
+			//update-end-author:liusq---date:20221103--for: [issues/4142]exlce模板导出如果模板中有多个合并单元格的循环表格，第二个表格读取错误 ---
 		}
 		while (its.hasNext()) {
 			Object t = its.next();
@@ -658,9 +662,11 @@ public final class ExcelExportOfTemplateUtil extends ExcelExportBase {
 				//如果合并单元格,就把这个单元格的样式和之前的保持一致
 				setMergedRegionStyle(row, ci, params);
 				//合并对应单元格
-				if ((params.getRowspan() != 1 || params.getColspan() != 1)
-						&& !mergedRegionHelper.isMergedRegion(row.getRowNum() + 1, ci)
-						&& PoiCellUtil.isMergedRegion(row.getSheet(), row.getRowNum(), ci)) {
+				//update-begin-author:liusq---date:20221103--for: [issues/4142]exlce模板导出如果模板中有多个合并单元格的循环表格，第二个表格读取错误 ---
+				boolean isNeedMerge = (params.getRowspan() != 1 || params.getColspan() != 1)
+						&& !mergedRegionHelper.isMergedRegion(row.getRowNum() + 1, ci);
+				//update-end-author:liusq---date:20221103--for: [issues/4142]exlce模板导出如果模板中有多个合并单元格的循环表格，第二个表格读取错误 ---
+				if (isNeedMerge) {
 					PoiMergeCellUtil.addMergedRegion(row.getSheet(), row.getRowNum(),
 							row.getRowNum() + params.getRowspan() - 1, ci,
 							ci + params.getColspan() - 1);

@@ -88,8 +88,10 @@ public class ExcelExportServer extends ExcelExportBase {
 		if (entity.getSecondTitle() != null) {
 			row = sheet.createRow(1);
 			row.setHeight(entity.getSecondTitleHeight());
-			CellStyle style = workbook.createCellStyle();
+			//update-begin-author:liusq date:20230407 for:[issue/4342]autopoi导出带副标题的数据表，副标题缺左边框
+			CellStyle style = getExcelExportStyler().getHeaderStyle(entity.getHeaderColor());
 			style.setAlignment(HorizontalAlignment.RIGHT);
+			//update-end-author:liusq date:20230407 for:[issue/4342]autopoi导出带副标题的数据表，副标题缺左边框
 			createStringCell(row, 0, entity.getSecondTitle(), style, null);
 			for (int i = 1; i <= feildWidth; i++) {
 				createStringCell(row, i, "", getExcelExportStyler().getHeaderStyle(entity.getHeaderColor()), null);
