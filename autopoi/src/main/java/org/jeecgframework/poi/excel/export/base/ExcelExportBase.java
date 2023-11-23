@@ -155,7 +155,9 @@ public abstract class ExcelExportBase extends ExportBase {
 				}
 				//update-begin-author:wangshuai date:20201116 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
 				try {
-				sheet.addMergedRegion(new CellRangeAddress(index, index + maxHeight - 1, cellNum, cellNum));
+					if (maxHeight > 1) {
+						sheet.addMergedRegion(new CellRangeAddress(index, index + maxHeight - 1, cellNum, cellNum));
+					}
 				}catch (IllegalArgumentException e){
 					LOGGER.error("合并单元格错误日志："+e.getMessage());
 					e.fillInStackTrace();
@@ -378,16 +380,16 @@ public abstract class ExcelExportBase extends ExportBase {
 
 	//update-begin--Author:xuelin  Date:20171018 for：TASK #2372 【excel】AutoPoi 导出类型，type增加数字类型--------------------
 	public void createNumericCell (Row row, int index, String text, CellStyle style, ExcelExportEntity entity) {
-		Cell cell = row.createCell(index);	
+		Cell cell = row.createCell(index);
+		if (style != null) {
+			cell.setCellStyle(style);
+		}
 		if(StringUtils.isEmpty(text)){
 			cell.setCellValue("");
 			cell.setCellType(CellType.BLANK);
 		}else{
 			cell.setCellValue(Double.parseDouble(text));
 			cell.setCellType(CellType.NUMERIC);
-		}
-		if (style != null) {
-			cell.setCellStyle(style);
 		}
 		addStatisticsData(index, text, entity);
 	}
