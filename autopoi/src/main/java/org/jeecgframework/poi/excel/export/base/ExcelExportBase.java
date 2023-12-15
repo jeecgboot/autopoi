@@ -84,6 +84,7 @@ public abstract class ExcelExportBase extends ExportBase {
 	public int createCells(Drawing patriarch, int index, Object t, List<ExcelExportEntity> excelParams, Sheet sheet, Workbook workbook, short rowHeight) throws Exception {
 		ExcelExportEntity entity;
 		Row row = sheet.createRow(index);
+		DataFormat df = workbook.createDataFormat();
 		row.setHeight(rowHeight);
 		int maxHeight = 1, cellNum = 0;
 		int indexKey = createIndexCell(row, index, excelParams.get(0));
@@ -126,7 +127,7 @@ public abstract class ExcelExportBase extends ExportBase {
 				if (entity.getType() == 1) {
 					createStringCell(row, cellNum++, value == null ? "" : value.toString(), index % 2 == 0 ? getStyles(false, entity) : getStyles(true, entity), entity);
 				} else if (entity.getType() == 4){
-					createNumericCell(row, cellNum++, value == null ? "" : value.toString(), index % 2 == 0 ? getStyles(false, entity) : getStyles(true, entity), entity);
+					createNumericCell(row, cellNum++, value == null ? "" : value.toString(), getNumberCellStyle(index, df, entity), entity);
 				} else {
 					createImageCell(patriarch, entity, row, cellNum++, value == null ? "" : value.toString(), t);
 				}
@@ -155,7 +156,9 @@ public abstract class ExcelExportBase extends ExportBase {
 				}
 				//update-begin-author:wangshuai date:20201116 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
 				try {
-				sheet.addMergedRegion(new CellRangeAddress(index, index + maxHeight - 1, cellNum, cellNum));
+					if (maxHeight > 1) {
+						sheet.addMergedRegion(new CellRangeAddress(index, index + maxHeight - 1, cellNum, cellNum));
+					}
 				}catch (IllegalArgumentException e){
 					LOGGER.error("合并单元格错误日志："+e.getMessage());
 					e.fillInStackTrace();
@@ -168,6 +171,21 @@ public abstract class ExcelExportBase extends ExportBase {
 
 	}
 
+	/**
+	 * 获取数值单元格样式
+	 * @param index
+	 * @param df
+	 * @param entity
+	 * @return
+	 */
+	private CellStyle getNumberCellStyle(int index,DataFormat df, ExcelExportEntity entity) {
+       //update-begin-author:liusq---date:2023-12-07--for: [issues/5538]导出表格设置了数字格式导出之后仍然是文本格式，并且无法进行计算
+		CellStyle cellStyle = index % 2 == 0 ? getStyles(false, entity) : getStyles(true, entity);
+		String numFormat = StringUtils.isNotBlank(entity.getNumFormat())? entity.getNumFormat():"0.00_ ";
+		cellStyle.setDataFormat(df.getFormat(numFormat));
+		return cellStyle;
+		//update-end-author:liusq---date:2023-12-07--for:[issues/5538]导出表格设置了数字格式导出之后仍然是文本格式，并且无法进行计算
+	}
 	/**
 	 * 通过https地址获取图片数据
 	 * @param imagePath
@@ -339,6 +357,7 @@ public abstract class ExcelExportBase extends ExportBase {
 	public void createListCells(Drawing patriarch, int index, int cellNum, Object obj, List<ExcelExportEntity> excelParams, Sheet sheet, Workbook workbook) throws Exception {
 		ExcelExportEntity entity;
 		Row row;
+		DataFormat df = workbook.createDataFormat();
 		if (sheet.getRow(index) == null) {
 			row = sheet.createRow(index);
 			row.setHeight(getRowHeight(excelParams));
@@ -360,7 +379,7 @@ public abstract class ExcelExportBase extends ExportBase {
 				}
 				//update-end-author:liusq---date:20220728--for: 新增isHyperlink属性 ---
 			} else if (entity.getType() == 4){
-				createNumericCell(row, cellNum++, value == null ? "" : value.toString(), index % 2 == 0 ? getStyles(false, entity) : getStyles(true, entity), entity);
+				createNumericCell(row, cellNum++, value == null ? "" : value.toString(), getNumberCellStyle(index, df, entity), entity);
 				//update-begin-author:liusq---date:20220728--for: 新增isHyperlink属性 ---
 				if (entity.isHyperlink()) {
 					row.getCell(cellNum - 1)
@@ -378,16 +397,16 @@ public abstract class ExcelExportBase extends ExportBase {
 
 	//update-begin--Author:xuelin  Date:20171018 for：TASK #2372 【excel】AutoPoi 导出类型，type增加数字类型--------------------
 	public void createNumericCell (Row row, int index, String text, CellStyle style, ExcelExportEntity entity) {
-		Cell cell = row.createCell(index);	
+		Cell cell = row.createCell(index);
+		if (style != null) {
+			cell.setCellStyle(style);
+		}
 		if(StringUtils.isEmpty(text)){
 			cell.setCellValue("");
 			cell.setCellType(CellType.BLANK);
 		}else{
 			cell.setCellValue(Double.parseDouble(text));
 			cell.setCellType(CellType.NUMERIC);
-		}
-		if (style != null) {
-			cell.setCellStyle(style);
 		}
 		addStatisticsData(index, text, entity);
 	}
@@ -645,6 +664,7 @@ public abstract class ExcelExportBase extends ExportBase {
 		try {
 			ExcelExportEntity entity;
 			Row               row = sheet.getRow(index) == null ? sheet.createRow(index) : sheet.getRow(index);
+			DataFormat        df = workbook.createDataFormat();
 			if (rowHeight != -1) {
 				row.setHeight(rowHeight);
 			}
@@ -683,7 +703,7 @@ public abstract class ExcelExportBase extends ExportBase {
 
 					} else if (entity.getType() == 4) {
 						createNumericCell(row, cellNum++, value == null ? "" : value.toString(),
-								index % 2 == 0 ? getStyles(false, entity) : getStyles(true, entity),
+								getNumberCellStyle(index, df, entity),
 								entity);
 					} else {
 						createImageCell(patriarch, entity, row, cellNum++,
