@@ -41,7 +41,7 @@ maven
 
 ```xml
 	<dependency>
-	 <groupId>org.jeecgframework</groupId>
+	 <groupId>org.jeecgframework.boot3</groupId>
 	 <artifactId>autopoi-web</artifactId>
 	 <version>1.4.7</version>
 	</dependency>

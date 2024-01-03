@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.jeecgframework</groupId>
+	<groupId>org.jeecgframework.boot3</groupId>
 	<artifactId>autopoi-parent</artifactId>
 
 	<version>1.4.7</version>
@@ -42,7 +42,7 @@
 		<guava.version>29.0-jre</guava.version>
 		<commons-lang.version>3.10</commons-lang.version>
 		<slf4j.version>1.7.30</slf4j.version>
-		<spring.version>5.1.0.RELEASE</spring.version>
+		<spring.version>6.0.13</spring.version>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
@@ -118,16 +118,16 @@
 		    </dependency>
 			<!--servlet -->
 			<dependency>
-				<groupId>javax.servlet</groupId>
-				<artifactId>servlet-api</artifactId>
-				<version>2.5</version>
+				<groupId>jakarta.servlet</groupId>
+				<artifactId>jakarta.servlet-api</artifactId>
+				<version>6.0.0</version>
 				<scope>provided</scope>
 				<optional>true</optional>
 			</dependency>
 			
 			<!-- 模块版本 -->
 			<dependency>
-				<groupId>org.jeecgframework</groupId>
+				<groupId>org.jeecgframework.boot3</groupId>
 				<artifactId>autopoi</artifactId>
 				<version>${autopoi.version}</version>
 			</dependency>
@@ -142,8 +142,8 @@
 					<plugin>
 						<artifactId>maven-compiler-plugin</artifactId>
 						<configuration>
-							<source>1.8</source>
-							<target>1.8</target>
+							<source>17</source>
+							<target>17</target>
 							<encoding>UTF-8</encoding>
 						</configuration>
 					</plugin>
@@ -151,7 +151,6 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-source-plugin</artifactId>
-						<version>2.2.1</version>
 						<executions>
 							<execution>
 								<phase>package</phase>
@@ -183,8 +182,8 @@
 					<plugin>
 						<artifactId>maven-compiler-plugin</artifactId>
 						<configuration>
-							<source>1.8</source>
-							<target>1.8</target>
+							<source>17</source>
+							<target>17</target>
 							<encoding>UTF-8</encoding>
 						</configuration>
 					</plugin>
@@ -192,7 +191,6 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-source-plugin</artifactId>
-						<version>2.2.1</version>
 						<executions>
 							<execution>
 								<phase>package</phase>
@@ -206,7 +204,6 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>2.9.1</version>
 						<executions>
 							<execution>
 								<phase>package</phase>
@@ -215,7 +212,7 @@
 								</goals>
 								<configuration>
 									<encoding>UTF-8</encoding>
-									<additionalparam>-Xdoclint:none</additionalparam>
+									<additionalJOption>-Xdoclint:none</additionalJOption>
 								</configuration>
 							</execution>
 						</executions>
@@ -239,7 +236,6 @@
 					<plugin>
 						<groupId>org.sonatype.plugins</groupId>
 						<artifactId>nexus-staging-maven-plugin</artifactId>
-						<version>1.6.7</version>
 						<extensions>true</extensions>
 						<configuration>
 							<serverId>oss</serverId>
@@ -265,20 +261,12 @@
 	<build>
 		<plugins>
 			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-					<encoding>UTF-8</encoding>
-				</configuration>
-			</plugin>
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.0.0-M5</version>
+				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<skipTests>true</skipTests>
+					<source>17</source>
+					<target>17</target>
+					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
 		</plugins>
