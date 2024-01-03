@@ -19,6 +19,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.lang.annotation.Inherited;
 
 /**
  * Excel 导出基本注释
@@ -28,6 +29,9 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
+//update-begin---author:chenrui ---date:20231221  for：[issue/#5248]加强继承扩展便利性------------
+@Inherited
+//update-end---author:chenrui ---date:20231221  for：[issue/#5248]加强继承扩展便利性------------
 public @interface Excel {
 
 	/**

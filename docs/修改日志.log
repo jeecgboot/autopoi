@@ -24,3 +24,8 @@ autopoi-framework\autopoi\src\main\java\org\jeecgframework\poi\excel\export\base
 org\jeecgframework\poi\excel\annotation\Excel.java
 org\jeecgframework\poi\excel\imports\ExcelImportServer.java
 ---author:scott ---date:2023-12-08  for：代码写法兼容改造---
+
+---author:chenrui---date:2024/1/3-----for:[issue/#5248]加强继承扩展便利性---
+autopoi/src/main/java/org/jeecgframework/poi/excel/annotation/Excel.java
+autopoi/src/main/java/org/jeecgframework/poi/excel/ExcelExportUtil.java
+---author:chenrui---date:2024/1/3-----for:[issue/#5248]加强继承扩展便利性---
