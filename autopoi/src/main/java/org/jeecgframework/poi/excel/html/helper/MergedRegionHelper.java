@@ -105,7 +105,9 @@ public class MergedRegionHelper {
 		keys.addAll(mergedCache.keySet());
 		for (String key : keys) {
 			String[] temp = key.split("_");
-			if (Integer.parseInt(temp[0]) >= rowIndex) {
+			//update-begin---author:chenrui ---date:20240102  for：[issue/5167]遍历单元格次行原本的合并缓存未正确删除导致最终输出合并样式有问题------------
+			if (Integer.parseInt(temp[0]) > rowIndex) {
+			//update-end---author:chenrui ---date:20240102  for：[issue/5167]遍历单元格次行原本的合并缓存未正确删除导致最终输出合并样式有问题------------
 				Integer[] data   = mergedCache.get(key);
 				String    newKey = (Integer.parseInt(temp[0]) + size) + "_" + temp[1];
 				if (!mergedCache.containsKey(newKey)) {
@@ -126,7 +128,9 @@ public class MergedRegionHelper {
 		//删除掉原始的缓存KEY
 		for (String key : keys) {
 			String[] temp = key.split("_");
-			if (Integer.parseInt(temp[0]) >= rowIndex + size && Integer.parseInt(temp[0]) <= rowIndex + size + shiftRows) {
+			//update-begin---author:chenrui ---date:20240102  for：[issue/5167]遍历单元格次行原本的合并缓存未正确删除导致最终输出合并样式有问题------------
+			if (Integer.parseInt(temp[0]) >= rowIndex && Integer.parseInt(temp[0]) <= rowIndex + size ) {
+			//update-end---author:chenrui ---date:20240102  for：[issue/5167]遍历单元格次行原本的合并缓存未正确删除导致最终输出合并样式有问题------------
 				mergedCache.remove(key);
 			}
 		}
