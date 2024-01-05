@@ -267,7 +267,7 @@ public class ExcelUtil {
      * @return
      */
     private static boolean isNumberString(String str){
-        String regex = "^[0-9]+\\.0+$";
+        String regex = "^[-0-9]+\\.0+$";
         Pattern pattern = Pattern.compile(regex);
         Matcher m = pattern.matcher(str);
         if (m.find()) {
