@@ -148,22 +148,46 @@ public class ExcelExportServer extends ExcelExportBase {
 
             //---update-begin-----autor:scott------date:20191016-------for:导出字段支持自定义--------
             //支持自定义导出字段
-            if (exportFields != null) {
-                List<Field> list = new ArrayList<Field>(Arrays.asList(fileds));
-                for (int i = 0; i < list.size(); i++) {
-                    if (!Arrays.asList(exportFields).contains(list.get(i).getName())) {
-                        list.remove(i);
-                        i--;
-                    }
-                }
-
-                if (list != null && list.size() > 0) {
-                    fileds = list.toArray(new Field[0]);
-                } else {
-                    fileds = null;
-                }
-            }
+//            if (exportFields != null) {
+//                List<Field> list = new ArrayList<Field>(Arrays.asList(fileds));
+//                for (int i = 0; i < list.size(); i++) {
+//                    if (!Arrays.asList(exportFields).contains(list.get(i).getName())) {
+//                        list.remove(i);
+//                        i--;
+//                    }
+//                }
+//
+//                if (list != null && list.size() > 0) {
+//                    fileds = list.toArray(new Field[0]);
+//                } else {
+//                    fileds = null;
+//                }
+//            }
             //---update-end-----autor:scott------date:20191016-------for:导出字段支持自定义--------
+            
+            
+            
+          //---update-begin-----autor:AnAloneJaver------date:20230906-------for:导出字段支持自定义顺序--------
+            //支持自定义导出字段
+			if (exportFields != null) {
+	            List<Field> list = new ArrayList<Field>(exportFields.length);
+	            List<Field> filedList = Arrays.asList(fileds);
+	        	for (int i = 0; i < exportFields.length; i++) {
+	        		for (Field field : filedList) {
+						if(field.getName().equals(exportFields[i])) {
+							list.add(field);
+							break;
+						}
+					}
+				}
+	            if (list != null && list.size() > 0) {
+	                fileds = list.toArray(new Field[0]);
+	            } else {
+	                fileds = null;
+	            }
+	        }
+            //---update-end-----autor:AnAloneJaver------date:20230906-------for:导出字段支持自定义顺序--------
+            
 
 			ExcelTarget etarget = pojoClass.getAnnotation(ExcelTarget.class);
 			String targetId = etarget == null ? null : etarget.value();
