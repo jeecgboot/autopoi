@@ -22,8 +22,8 @@ public class DaoChuTest {
         return new TemplateExportParams(basePath + name + ".xlsx");
     }
 
-    public static Workbook test() {
-        TemplateExportParams params = getTemplateParams("test");
+    public static Workbook test(String name) {
+        TemplateExportParams params = getTemplateParams(name);
         Map<String, Object> map = new HashMap<String, Object>();
         List<Map<String, Object>> listMap = new ArrayList<Map<String, Object>>();
         for (int i = 0; i < 3; i++) {
@@ -41,7 +41,9 @@ public class DaoChuTest {
     }
 
     public static void main(String[] args) throws IOException {
-        Workbook workbook = test();
+        String temName = "test";
+        String temNameNextM = "testNextMarge";
+        Workbook workbook = test(temNameNextM);
         File savefile = new File(basePath);
         if (!savefile.exists()) {
             savefile.mkdirs();

@@ -24,3 +24,9 @@ autopoi-framework\autopoi\src\main\java\org\jeecgframework\poi\excel\export\base
 org\jeecgframework\poi\excel\annotation\Excel.java
 org\jeecgframework\poi\excel\imports\ExcelImportServer.java
 ---author:scott ---date:2023-12-08  for：代码写法兼容改造---
+
+---author:chenrui---date:2024/1/2-----for:[issue/5167]遍历单元格次行原本的合并缓存未正确删除导致最终输出合并样式有问题---
+autopoi/src/main/java/org/jeecgframework/poi/excel/html/helper/MergedRegionHelper.java
+autopoi-web/src/test/java/DaoChuTest.java
+autopoi-web/src/test/resources/templates/testNextMarge.xlsx
+---author:chenrui---date:2024/1/2-----for:[issue/5167]遍历单元格次行原本的合并缓存未正确删除导致最终输出合并样式有问题---
