@@ -40,7 +40,9 @@ import org.jeecgframework.poi.handler.inter.IWriter;
  * @version 1.0
  * @date 2013-10-17
  */
-public final class ExcelExportUtil {
+//update-begin---author:chenrui ---date:20231221  for：[issue/#5248]加强继承扩展便利性(删除final)------------
+public class ExcelExportUtil {
+//update-end---author:chenrui ---date:20231221  for：[issue/#5248]加强继承扩展便利性(删除final)------------
 	//update-begin---author:liusq  Date:20211217  for：[LOWCOD-2521]【autopoi】大数据导出方法【全局】----
 	//单sheet最大值
 	public static       int    USE_SXSSF_LIMIT = 100000;

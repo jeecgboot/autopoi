@@ -22,11 +22,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.imageio.ImageIO;
 
@@ -92,7 +88,7 @@ public final class PoiPublicUtil {
 		Method setMethod;
 		try {
 			if (clazz.equals(Map.class)) {
-				return new HashMap<String, Object>();
+				return new LinkedHashMap<String, Object>();
 			}
 			obj = clazz.newInstance();
 			Field[] fields = getClassFields(clazz);
