@@ -1,0 +1,37 @@
+-- author: liusq---date:20230407---for: [issue/4342]autopoi导出带副标题的数据表，副标题缺左边框
+autopoi\src\main\java\org\jeecgframework\poi\excel\export\ExcelExportServer.java
+-- author: liusq---date:20230407---for: [issue/4342]autopoi导出带副标题的数据表，副标题缺左边框
+
+-- author: liusq---date:20230410---for: [issue/4415]autopoi-web 导入图片字段时无法指定保存路径
+autopoi\src\main\java\org\jeecgframework\poi\excel\imports\ExcelImportServer.java
+autopoi\src\main\java\org\jeecgframework\poi\excel\imports\base\ImportFileServiceI.java
+autopoi\src\main\java\org\jeecgframework\poi\excel\annotation\Excel.java
+-- author: liusq---date:20230410---for: [issue/4415]autopoi-web 导入图片字段时无法指定保存路径
+
+---author:scott ---date:2023-12-05  for：【jeecg-boot/issues/5538】导出表格设置了数字格式导出之后仍然是文本格式，并且无法进行计算 #5538-
+org\jeecgframework\poi\excel\export\base\ExcelExportBase.java
+---author:scott ---date::2023-12-05  for：【jeecg-boot/issues/5538】导出表格设置了数字格式导出之后仍然是文本格式，并且无法进行计算 #5538--
+
+---author:scott ---date::2023-12-05  for：【jeecg-boot/issues/5528】POI导出一对多只有一条数据时，疯狂打印错误日志 #5528
+org\jeecgframework\poi\excel\export\base\ExcelExportBase.java
+---author:scott ---date::2023-12-05  for：【jeecg-boot/issues/5528】POI导出一对多只有一条数据时，疯狂打印错误日志 #5528
+
+---author:liusq ---date::2023-12-07  for：[issues/5538]导出表格设置了数字格式导出之后仍然是文本格式，并且无法进行计算
+autopoi-framework\autopoi\src\main\java\org\jeecgframework\poi\excel\export\base\ExcelExportBase.java
+---author:liusq ---date::2023-12-07  for：[issues/5538]导出表格设置了数字格式导出之后仍然是文本格式，并且无法进行计算
+
+---author:scott ---date:2023-12-08  for：代码写法兼容改造---
+org\jeecgframework\poi\excel\annotation\Excel.java
+org\jeecgframework\poi\excel\imports\ExcelImportServer.java
+---author:scott ---date:2023-12-08  for：代码写法兼容改造---
+
+---author:chenrui---date:2024/1/2-----for:[issue/5167]遍历单元格次行原本的合并缓存未正确删除导致最终输出合并样式有问题---
+autopoi/src/main/java/org/jeecgframework/poi/excel/html/helper/MergedRegionHelper.java
+autopoi-web/src/test/java/DaoChuTest.java
+autopoi-web/src/test/resources/templates/testNextMarge.xlsx
+---author:chenrui---date:2024/1/2-----for:[issue/5167]遍历单元格次行原本的合并缓存未正确删除导致最终输出合并样式有问题---
+
+---author:chenrui---date:2024/1/3-----for:[issue/#5248]加强继承扩展便利性---
+autopoi/src/main/java/org/jeecgframework/poi/excel/annotation/Excel.java
+autopoi/src/main/java/org/jeecgframework/poi/excel/ExcelExportUtil.java
+---author:chenrui---date:2024/1/3-----for:[issue/#5248]加强继承扩展便利性---

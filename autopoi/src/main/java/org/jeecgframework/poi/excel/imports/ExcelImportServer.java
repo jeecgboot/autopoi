@@ -47,6 +47,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Excel 导入服务
@@ -64,6 +66,8 @@ public class ExcelImportServer extends ImportBaseService {
 	private VerifyHandlerServer verifyHandlerServer;
 
 	private boolean verfiyFail = false;
+	//仅允许字母数字字符的正则表达式
+	private static final Pattern lettersAndNumbersPattern = Pattern.compile("^[a-zA-Z0-9]+$") ;
 	/**
 	 * 异常数据styler
 	 */
@@ -584,7 +588,22 @@ public class ExcelImportServer extends ImportBaseService {
 				System.err.println(e.getMessage());
 			}
 			if(importFileService!=null){
-				String dbPath = importFileService.doUpload(data);
+				//update-beign-author:liusq date:20230411 for:【issue/4415】autopoi-web 导入图片字段时无法指定保存路径
+				String saveUrl = excelParams.get(titleString).getSaveUrl();
+				String dbPath;
+				if(StringUtils.isNotBlank(saveUrl)){
+					LOGGER.debug("图片保存路径saveUrl = "+saveUrl);
+					Matcher matcher = lettersAndNumbersPattern.matcher(saveUrl);
+					if(!matcher.matches()){
+						LOGGER.warn("图片保存路径格式错误，只能设置字母和数字的组合!");
+						dbPath = importFileService.doUpload(data);
+					}else{
+						dbPath = importFileService.doUpload(data,saveUrl);
+					}
+				}else{
+					dbPath = importFileService.doUpload(data);
+				}
+				//update-end-author:liusq date:20230411 for:【issue/4415】autopoi-web 导入图片字段时无法指定保存路径
 				setValues(excelParams.get(titleString), object, dbPath);
 			}
 		}
