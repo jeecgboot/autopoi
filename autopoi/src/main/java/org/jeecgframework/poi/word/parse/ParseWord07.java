@@ -120,6 +120,8 @@ public class ParseWord07 {
         if (CollUtil.isEmpty(wordTable.getHeaders()) && CollUtil.isEmpty(wordTable.getData())) {
             return;
         }
+        //先删除占位符
+        paragraph.removeRun(0);
         //获取光标
         XmlCursor cursor = paragraph.getCTP().newCursor();
         //插入表格
