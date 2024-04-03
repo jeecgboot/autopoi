@@ -100,7 +100,9 @@ public class ExcelImportServer extends ImportBaseService {
 			if (param.getExcelParams().containsKey(titleString)) {
 				if (param.getExcelParams().get(titleString).getType() == 2) {
 					picId = row.getRowNum() + "_" + i;
-					saveImage(object, picId, param.getExcelParams(), titleString, pictures, params);
+                    //update-begin---author:chenrui ---date:20240402  for：[issue/#6025/#6040]子表图片导入报错------------
+					saveImage(entity, picId, param.getExcelParams(), titleString, pictures, params);
+                    //update-end---author:chenrui ---date:20240402  for：[issue/#6025/#6040]子表图片导入报错------------
 				} else {
 					saveFieldValue(params, entity, cell, param.getExcelParams(), titleString, row);
 				}

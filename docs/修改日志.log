@@ -35,3 +35,7 @@ autopoi-web/src/test/resources/templates/testNextMarge.xlsx
 autopoi/src/main/java/org/jeecgframework/poi/excel/annotation/Excel.java
 autopoi/src/main/java/org/jeecgframework/poi/excel/ExcelExportUtil.java
 ---author:chenrui---date:2024/1/3-----for:[issue/#5248]加强继承扩展便利性---
+
+---author:chenrui---date:2024/4/3-----for:[issue/#6025/#6040]子表图片导入报错---
+autopoi/src/main/java/org/jeecgframework/poi/excel/imports/ExcelImportServer.java
+---author:chenrui---date:2024/4/3-----for:[issue/#6025/#6040]子表图片导入报错---
