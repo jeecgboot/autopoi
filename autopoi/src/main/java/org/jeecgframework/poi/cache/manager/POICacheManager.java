@@ -61,4 +61,27 @@ public final class POICacheManager {
 		return null;
 	}
 
+	//update-begin---author:chenrui ---date:20240403  for：[issue/#5933]增加清除缓存方法------------
+    /**
+     * 清除所有缓存
+     *
+     * @author chenrui
+     * @date 2024/4/3 11:46
+     */
+    public static void cleanAll() {
+        loadingCache.invalidateAll();
+    }
+
+    /**
+     * 清除缓存
+     *
+     * @param id 缓存key
+     * @author chenrui
+     * @date 2024/4/3 11:46
+     */
+    public static void clean(String id) {
+        loadingCache.invalidate(id);
+    }
+	//update-end---author:chenrui ---date:20240403  for：[issue/#5933]增加清除缓存方法------------
+
 }
