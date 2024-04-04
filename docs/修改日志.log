@@ -36,7 +36,6 @@ autopoi/src/main/java/org/jeecgframework/poi/excel/annotation/Excel.java
 autopoi/src/main/java/org/jeecgframework/poi/excel/ExcelExportUtil.java
 ---author:chenrui---date:2024/1/3-----for:[issue/#5248]加强继承扩展便利性---
 
-
 ---author:chenrui---date:2024/3/8-----for:[QQYUN-8394]Excel导入时空行校验问题---
 autopoi/src/main/java/org/jeecgframework/poi/excel/imports/ExcelImportServer.java
 ---author:chenrui---date:2024/3/8-----for:[QQYUN-8394]Excel导入时空行校验问题---
@@ -45,3 +44,6 @@ autopoi/src/main/java/org/jeecgframework/poi/excel/imports/ExcelImportServer.jav
 autopoi/src/main/java/org/jeecgframework/poi/cache/manager/POICacheManager.java
 ---author:chenrui---date:2024/4/3-----for:[issue/#5933]增加清除缓存方法---
 
+---author:chenrui---date:2024/4/3-----for:生成代码后子表图片无法导出(流)---
+autopoi/src/main/java/org/jeecgframework/poi/excel/export/base/ExportBase.java
+---author:chenrui---date:2024/4/3-----for:生成代码后子表图片无法导出(流)---
