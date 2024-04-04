@@ -47,3 +47,7 @@ autopoi/src/main/java/org/jeecgframework/poi/cache/manager/POICacheManager.java
 ---author:chenrui---date:2024/4/3-----for:生成代码后子表图片无法导出(流)---
 autopoi/src/main/java/org/jeecgframework/poi/excel/export/base/ExportBase.java
 ---author:chenrui---date:2024/4/3-----for:生成代码后子表图片无法导出(流)---
+
+---author:chenrui---date:2024/4/3-----for:[issue/#6025/#6040]子表图片导入报错---
+autopoi/src/main/java/org/jeecgframework/poi/excel/imports/ExcelImportServer.java
+---author:chenrui---date:2024/4/3-----for:[issue/#6025/#6040]子表图片导入报错---
