@@ -504,6 +504,9 @@ public class ExportBase {
 			}
 			if (entity.getList() != null) {
 				Collections.sort(entity.getList());
+				//update-begin---author:chenrui ---date:20240402  for：生成代码后子表图片无法导出(流)------------
+				this.reConfigExcelExportParams(entity.getList(), exportParams);
+				//update-end---author:chenrui ---date:20240402  for：生成代码后子表图片无法导出(流)------------
 			}
 			String groupName = entity.getGroupName();
 			if(StringUtils.isNotEmpty(groupName)){
