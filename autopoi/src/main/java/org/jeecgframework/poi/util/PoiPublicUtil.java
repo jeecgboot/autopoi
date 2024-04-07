@@ -24,14 +24,15 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import javax.imageio.ImageIO;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
-import cn.hutool.json.JSONArray;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.XML;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
@@ -56,6 +57,12 @@ import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTMarker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.ClassUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * AutoPoi 的公共基础类
@@ -306,7 +313,7 @@ public final class PoiPublicUtil {
 	 * @date 2024/4/2 20:25
 	 */
     public static Map<String, PictureData> getCellImages(Sheet sheet, ByteArrayOutputStream isCopy,Workbook book) {
-        // 获取所有嵌入图片的单元格 date:2024/4/2
+        // 获取所有嵌入图片的单元格的内容 date:2024/4/2
         Map<String, CellImage> cellImageMap = new HashMap<>();
         Iterator<Row> rows = sheet.rowIterator();
         while (rows.hasNext()) {
@@ -314,148 +321,116 @@ public final class PoiPublicUtil {
             Iterator<Cell> cells = row.cellIterator();
             while (cells.hasNext()) {
                 Cell cell = cells.next();
-                String cellVal = cell.getStringCellValue();
-                if (null != cellVal && cellVal.startsWith("=DISPIMG")) {
-                    int start = cellVal.indexOf("\"");
-                    int end = cellVal.lastIndexOf("\"");
-                    if (start != -1 && end != -1) {
-                        String imgId = cellVal.substring(start + 1, end);
-                        CellImage cellImage = new CellImage();
-                        cellImage.setImgId(imgId);
-                        cellImage.setCellStr(cellVal);
-                        cellImageMap.put(row.getRowNum() + "_" + cell.getColumnIndex(), cellImage);
-                    }
-                }
+				CellType cellType = cell.getCellType();
+				if(cellType.equals(CellType.FORMULA)) {
+					CellType resultType = cell.getCachedFormulaResultType();
+					if(!resultType.equals(CellType.STRING)){
+						continue;
+					}
+					String cellVal = cell.getStringCellValue();
+					if (null != cellVal && cellVal.startsWith("=DISPIMG")) {
+						int start = cellVal.indexOf("\"");
+						int end = cellVal.lastIndexOf("\"");
+						if (start != -1 && end != -1) {
+							String imgId = cellVal.substring(start + 1, end);
+							CellImage cellImage = new CellImage();
+							cellImage.setImgId(imgId);
+							cellImage.setCellStr(cellVal);
+							cellImageMap.put(row.getRowNum() + "_" + cell.getColumnIndex(), cellImage);
+						}
+					}
+				}
             }
         }
 
         try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(isCopy.toByteArray()));
 			 ZipInputStream fzis = new ZipInputStream(new ByteArrayInputStream(isCopy.toByteArray()))) {
-            ZipEntry entry;
+			//update-begin---author:chenrui ---date:20240407  for：[QQYUN-8898]不依赖hutool,xml解析改为dom------------
+			DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+			ZipEntry entry;
+			// 获取嵌入单元格图片的rid
             while ((entry = zis.getNextEntry()) != null) {
 				try {
                     final String fileName = entry.getName();
                     if (Objects.equals(fileName, "xl/cellimages.xml")) {
                         String content = IOUtils.toString(zis, StandardCharsets.UTF_8);
-                        JSONObject js = XML.toJSONObject(content);
-                        if (Objects.isNull(js)) {
-
-                            continue;
-                        }
-                        JSONObject cellImages = js.getJSONObject("etc:cellImages");
-                        if (Objects.isNull(cellImages)) {
-                            continue;
-                        }
-						JSONArray cellImage = null;
-						try {
-							cellImage = cellImages.getJSONArray("etc:cellImage");
-						}catch (Exception ignored){}
-                        if (Objects.isNull(cellImage)) {
-                            JSONObject cellImageObj = cellImages.getJSONObject("etc:cellImage");
-                            if (Objects.nonNull(cellImageObj)) {
-                                cellImage = new JSONArray();
-                                cellImage.add(cellImageObj);
-                            }
-                        }
-                        if (Objects.isNull(cellImage)) {
-                            continue;
-                        }
-                        for (int i = 0; i < cellImage.size(); i++) {
-                            JSONObject imageItem = cellImage.getJSONObject(i);
-                            if (Objects.isNull(imageItem)) {
-                                continue;
-                            }
-                            JSONObject pic = imageItem.getJSONObject("xdr:pic");
-                            if (Objects.isNull(pic)) {
-                                continue;
-                            }
-                            JSONObject nvPicPr = pic.getJSONObject("xdr:nvPicPr");
-                            if (Objects.isNull(nvPicPr)) {
-                                continue;
-                            }
-                            JSONObject cNvPr = nvPicPr.getJSONObject("xdr:cNvPr");
-                            if (Objects.isNull(cNvPr)) {
-                                continue;
-                            }
-                            String name = cNvPr.getStr("name");
-                            if (StringUtils.isNotEmpty(name)) {
-                                CellImage tempCellimage = cellImageMap.values().stream().filter(item -> Objects.equals(item.getImgId(), name)).findFirst().orElse(null);
-                                if (Objects.nonNull(tempCellimage)) {
-                                    JSONObject blipFill = pic.getJSONObject("xdr:blipFill");
-                                    if (Objects.isNull(blipFill)) {
-                                        continue;
-                                    }
-                                    JSONObject blip = blipFill.getJSONObject("a:blip");
-                                    if (Objects.isNull(blip)) {
-                                        continue;
-                                    }
-                                    String embed = blip.getStr("r:embed");
-                                    tempCellimage.setRId(embed);
-                                }
-                            }
-                        }
+						Document document = documentBuilder.parse(new InputSource(new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8))));
+						NodeList cellImages = document.getElementsByTagName("etc:cellImage");
+						if (Objects.isNull(cellImages)) {
+							continue;
+						}
+						for (int i = 0; i < cellImages.getLength(); i++) {
+							Node cellImageNode = cellImages.item(i);
+							NodeList cNvPr = ((Element) cellImageNode).getElementsByTagName("xdr:cNvPr");
+							if(cNvPr.getLength()<1){
+								continue;
+							}
+							Node cNvPrNode = cNvPr.item(0);
+							String name = ((Element) cNvPrNode).getAttribute("name");
+							if (StringUtils.isNotEmpty(name)) {
+								CellImage tempCellimage = cellImageMap.values().stream().filter(item -> Objects.equals(item.getImgId(), name)).findFirst().orElse(null);
+								if (Objects.nonNull(tempCellimage)) {
+									NodeList blips = ((Element) cellImageNode).getElementsByTagName("a:blip");
+									if(blips.getLength()<1){
+										continue;
+									}
+									Node blip = blips.item(0);
+									String embed =((Element) blip).getAttribute("r:embed");
+									if(embed.isEmpty()){
+										continue;
+									}
+									tempCellimage.setRId(embed);
+								}
+							}
+						}
                     }
+                } catch (SAXException e) {
+                    throw new RuntimeException(e);
                 } finally {
                     zis.closeEntry();
                 }
             }
+			// 获取嵌入单元格图片的存放位置
             while ((entry = fzis.getNextEntry()) != null) {
                 try {
                     final String fileName = entry.getName();
                     if (Objects.equals(fileName, "xl/_rels/cellimages.xml.rels")) {
                         String content = IOUtils.toString(fzis, StandardCharsets.UTF_8);
-                        JSONObject js = XML.toJSONObject(content);
-                        JSONObject relationships = js.getJSONObject("Relationships");
+
+						Document document = documentBuilder.parse(new InputSource(new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8))));
+						NodeList relationships = document.getElementsByTagName("Relationship");
                         if (Objects.isNull(relationships)) {
                             continue;
                         }
-                        JSONArray relationship = null;
-                        try {
-                            relationship = relationships.getJSONArray("Relationship");
-                        } catch (Exception ignored) {
-                        }
-                        if (Objects.isNull(relationship)) {
-                            try {
-                                JSONObject relationshipObj = relationships.getJSONObject("Relationship");
-                                if (Objects.nonNull(relationshipObj)) {
-                                    relationship = new JSONArray();
-                                    relationship.add(relationshipObj);
-                                }
-                            } catch (Exception ignored) {
-                            }
-                        }
-                        if (Objects.isNull(relationship)) {
-                            continue;
-                        }
-                        for (int i = 0; i < relationship.size(); i++) {
-                            JSONObject relaItem = relationship.getJSONObject(i);
-                            if (Objects.isNull(relaItem)) {
-                                continue;
-                            }
-                            String id = relaItem.getStr("Id");
-                            String target = "/xl/" + relaItem.getStr("Target");
-                            if (StringUtils.isNotEmpty(id)) {
-                                CellImage cellImage = cellImageMap.values().stream().filter(item -> Objects.equals(item.getRId(), id)).findFirst().orElse(null);
-                                if (Objects.nonNull(cellImage)) {
-                                    cellImage.setImgName(target);
-                                }
-                            }
-                        }
+						for (int i = 0; i < relationships.getLength(); i++) {
+							Node relationshipNode = relationships.item(i);
+							if(relationshipNode instanceof Element){
+								Element relationshipEl = (Element) relationshipNode;
+								String id = relationshipEl.getAttribute("Id");
+								String target = "/xl/" + relationshipEl.getAttribute("Target");
+								if (StringUtils.isNotEmpty(id)) {
+									List<CellImage> cellImages = cellImageMap.values().stream().filter(item -> Objects.equals(item.getRId(), id)).collect(Collectors.toList());
+									cellImages.stream().filter(Objects::nonNull).forEach(cellImage -> cellImage.setImgName(target));
+								}
+							}
+						}
                     }
+                } catch (SAXException e) {
+                    throw new RuntimeException(e);
                 } finally {
                     fzis.closeEntry();
                 }
             }
+			// 获取嵌入单元格图片的图片数据
             List<XSSFPictureData> allPictures = (List<XSSFPictureData>) book.getAllPictures();
             for (XSSFPictureData pictureData : allPictures) {
                 PackagePartName partName = pictureData.getPackagePart().getPartName();
                 URI uri = partName.getURI();
-                CellImage cellImage = cellImageMap.values().stream().filter(i -> Objects.equals(i.getImgName(), uri.toString())).findFirst().orElse(null);
-                if (Objects.nonNull(cellImage)) {
-                    cellImage.setPictureData(pictureData);
-                }
+                List<CellImage> cellImages = cellImageMap.values().stream().filter(i -> Objects.equals(i.getImgName(), uri.toString())).collect(Collectors.toList());
+				cellImages.stream().filter(Objects::nonNull).forEach(cellImage -> cellImage.setPictureData(pictureData));
             }
-		} catch (IOException e) {
+			//update-end---author:chenrui ---date:20240407  for：[QQYUN-8898]不依赖hutool,xml解析改为dom------------
+		} catch (IOException | ParserConfigurationException e) {
 			throw new RuntimeException(e);
 		}
 
