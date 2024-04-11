@@ -15,12 +15,10 @@
  */
 package org.jeecgframework.poi.excel.imports;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.poifs.filesystem.FileMagic;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.formula.functions.T;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -436,9 +434,15 @@ public class ExcelImportServer extends ImportBaseService {
 		List<T> result = new ArrayList<T>();
 		Workbook book = null;
 		boolean isXSSFWorkbook = false;
-		if (!(inputstream.markSupported())) {
-			inputstream = new PushbackInputStream(inputstream, 8);
-		}
+		//update-begin---author:chenrui ---date:20240403  for：[issue/#5987]嵌入单元格图片无法导入------------
+		// 复制输入流,防止在读取嵌入图片时流为空
+        ByteArrayOutputStream inCopy = new ByteArrayOutputStream();
+        IOUtils.copy(inputstream, inCopy);
+        inputstream = new ByteArrayInputStream(inCopy.toByteArray());
+        if (!(inputstream.markSupported())) {
+            inputstream = new PushbackInputStream(inputstream, 8);
+        }
+		//update-end---author:chenrui ---date:20240403  for：[issue/#5987]嵌入单元格图片无法导入------------
 		//begin-------author:liusq------date:20210129-----for:-------poi3升级到4兼容改造工作【重要敏感修改点】--------
 		//------poi4.x begin----
 //		FileMagic fm = FileMagic.valueOf(FileMagic.prepareToCheckMagic(inputstream));
@@ -487,6 +491,12 @@ public class ExcelImportServer extends ImportBaseService {
 			}
 			if (isXSSFWorkbook) {
 				pictures = PoiPublicUtil.getSheetPictrues07((XSSFSheet) book.getSheetAt(i), (XSSFWorkbook) book);
+				//update-begin---author:chenrui ---date:20240403  for：[issue/#5987]嵌入单元格图片无法导入------------
+                Map<String, PictureData> cellImages = PoiPublicUtil.getCellImages(book.getSheetAt(i), inCopy, book);
+                if (!cellImages.isEmpty()) {
+                    pictures.putAll(cellImages);
+                }
+				//update-end---author:chenrui ---date:20240403  for：[issue/#5987]嵌入单元格图片无法导入------------
 			} else {
 				pictures = PoiPublicUtil.getSheetPictrues03((HSSFSheet) book.getSheetAt(i), (HSSFWorkbook) book);
 			}

@@ -49,6 +49,13 @@
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
 
+		<!-- commons -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
+
+
 		<!--日志 -->
 		<!-- slf4j -->
 		<dependency>

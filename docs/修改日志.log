@@ -51,3 +51,16 @@ autopoi/src/main/java/org/jeecgframework/poi/excel/export/base/ExportBase.java
 ---author:chenrui---date:2024/4/3-----for:[issue/#6025/#6040]子表图片导入报错---
 autopoi/src/main/java/org/jeecgframework/poi/excel/imports/ExcelImportServer.java
 ---author:chenrui---date:2024/4/3-----for:[issue/#6025/#6040]子表图片导入报错---
+
+---author:chenrui---date:2024/4/3-----for:[issue/#5987]嵌入单元格图片无法导入---
+autopoi/src/main/java/org/jeecgframework/poi/excel/imports/ExcelImportServer.java
+autopoi/src/main/java/org/jeecgframework/poi/util/PoiPublicUtil.java
+autopoi/pom.xml
+pom.xml
+---author:chenrui---date:2024/4/3-----for:[issue/#5987]嵌入单元格图片无法导入---
+
+---author:chenrui---date:2024/4/7-----for:[QQYUN-8898]不依赖hutool,xml解析改为dom---
+pom.xml
+autopoi/pom.xml
+autopoi/src/main/java/org/jeecgframework/poi/util/PoiPublicUtil.java
+---author:chenrui---date:2024/4/7-----for:[QQYUN-8898]不依赖hutool,xml解析改为dom---
