@@ -64,3 +64,7 @@ pom.xml
 autopoi/pom.xml
 autopoi/src/main/java/org/jeecgframework/poi/util/PoiPublicUtil.java
 ---author:chenrui---date:2024/4/7-----for:[QQYUN-8898]不依赖hutool,xml解析改为dom---
+
+---author:chenrui---date:2024/4/24-----for:[QQYUN-9048]负数被识别成非数字---
+src/main/java/org/jeecgframework/poi/util/ExcelUtil.java
+---author:chenrui---date:2024/4/24-----for:[QQYUN-9048]负数被识别成非数字---
