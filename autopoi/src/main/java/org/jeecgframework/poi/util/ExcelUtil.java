@@ -267,7 +267,9 @@ public class ExcelUtil {
      * @return
      */
     private static boolean isNumberString(String str){
-        String regex = "^[0-9]+\\.0+$";
+        //update-begin---author:chenrui ---date:20240424  for：[QQYUN-9048]负数被识别成非数字------------
+        String regex = "^-?[0-9]+\\.0+$";
+        //update-end---author:chenrui ---date:20240424  for：[QQYUN-9048]负数被识别成非数字------------
         Pattern pattern = Pattern.compile(regex);
         Matcher m = pattern.matcher(str);
         if (m.find()) {
