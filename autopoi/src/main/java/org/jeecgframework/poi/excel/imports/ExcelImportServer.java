@@ -340,7 +340,11 @@ public class ExcelImportServer extends ImportBaseService {
 
 		//设置表头行数
 		if (ExcelUtil.isMergedRegion(sheet, headRow.getRowNum(), 0)) {
-			params.setHeadRows(2);
+			//update_begin-author:yysforget date:20240605 for：当参数设置中表头行数大于2是保留原有设置
+			if (params.getHeadRows() <= 1) {
+				params.setHeadRows(2);
+			}
+			//update-end-author:yysforget date:20240605 for：当参数设置中表头行数大于2是保留原有设置
 		}else{
 			params.setHeadRows(1);
 		}
