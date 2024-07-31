@@ -68,3 +68,17 @@ autopoi/src/main/java/org/jeecgframework/poi/util/PoiPublicUtil.java
 ---author:chenrui---date:2024/4/24-----for:[QQYUN-9048]负数被识别成非数字---
 src/main/java/org/jeecgframework/poi/util/ExcelUtil.java
 ---author:chenrui---date:2024/4/24-----for:[QQYUN-9048]负数被识别成非数字---
+
+---author:liusq---date:2024/7/30-----for:TV360X-1953 execl转html报错d != org.apache.poi.ss.usermodel.FillPatternType---
+src\main\java\org\jeecgframework\poi\excel\html\helper\StylerHelper.java
+src\test\resources\templates\专项支出用款申请书.xls
+src\test\java\ExcelToHtmlTest.java
+---author:liusq---date:2024/7/30-----for:TV360X-1953 execl转html报错d != org.apache.poi.ss.usermodel.FillPatternType---
+
+---author:liusq---date:2024/7/30-----for:TV360X-1292 对象的属性为LocalDate、LocalDateTIme类型对象兼容---
+autopoi\src\main\java\org\jeecgframework\poi\util\PoiPublicUtil.java
+autopoi\src\main\java\org\jeecgframework\poi\excel\imports\CellValueServer.java
+src\test\resources\templates\ExcelImportDateTest.xlsx
+src\test\java\TestDateEntity.java
+src\test\java\ImportExcelTest.java
+---author:liusq---date:2024/7/30-----for:TV360X-1292 对象的属性为LocalDate、LocalDateTIme类型对象兼容---

@@ -564,7 +564,13 @@ public final class PoiPublicUtil {
 		boolean isBaseClass = false;
 		if (fieldType.isArray()) {
 			isBaseClass = false;
-		} else if (fieldType.isPrimitive() || fieldType.getPackage() == null || fieldType.getPackage().getName().equals("java.lang") || fieldType.getPackage().getName().equals("java.math") || fieldType.getPackage().getName().equals("java.sql") || fieldType.getPackage().getName().equals("java.util")) {
+		} else if (fieldType.isPrimitive()
+				|| fieldType.getPackage() == null
+				|| fieldType.getPackage().getName().equals("java.lang")
+				|| fieldType.getPackage().getName().equals("java.math")
+				|| fieldType.getPackage().getName().equals("java.sql")
+				|| fieldType.getPackage().getName().equals("java.util")
+				|| fieldType.getPackage().getName().equals("java.time")) {
 			isBaseClass = true;
 		}
 		return isBaseClass;
