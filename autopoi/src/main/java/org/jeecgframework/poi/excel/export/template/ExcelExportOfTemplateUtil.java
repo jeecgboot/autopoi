@@ -167,6 +167,11 @@ public final class ExcelExportOfTemplateUtil extends ExcelExportBase {
 			// 创建表格样式
 			setExcelExportStyler((IExcelExportStyler) teplateParams.getStyle().getConstructor(Workbook.class).newInstance(wb));
 			// step 3. 解析模板
+			//update-begin---author:chenrui ---date:20240801  for：[issues/6925]xlsx模版导出图片------------
+			if (wb instanceof XSSFWorkbook) {
+				super.type = ExcelType.XSSF;
+			}
+			//update-end---author:chenrui ---date:20240801  for：[issues/6925]xlsx模版导出图片------------
 			for (int i = 0, le = params.isScanAllsheet() ? wb.getNumberOfSheets() : params.getSheetNum().length; i < le; i++) {
 				if (params.getSheetName() != null && params.getSheetName().length > i && StringUtils.isNotEmpty(params.getSheetName()[i])) {
 					wb.setSheetName(i, params.getSheetName()[i]);

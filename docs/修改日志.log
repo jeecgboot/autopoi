@@ -82,3 +82,7 @@ src\test\resources\templates\ExcelImportDateTest.xlsx
 src\test\java\TestDateEntity.java
 src\test\java\ImportExcelTest.java
 ---author:liusq---date:2024/7/30-----for:TV360X-1292 对象的属性为LocalDate、LocalDateTIme类型对象兼容---
+
+---author:chenrui---date:2024/8/1-----for:[issues/6925]xlsx模版导出图片---
+src/main/java/org/jeecgframework/poi/excel/export/template/ExcelExportOfTemplateUtil.java
+---author:chenrui---date:2024/8/1-----for:[issues/6925]xlsx模版导出图片---
