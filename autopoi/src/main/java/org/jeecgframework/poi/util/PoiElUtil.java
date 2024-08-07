@@ -63,8 +63,12 @@ public final class PoiElUtil {
 		String tempText = new String(text);
 		Object obj = innerEval(text, map);
 		// 如果没有被处理而且这个值找map中存在就处理这个值
-		if (tempText.equals(obj.toString()) && map.containsKey(tempText.split("\\.")[0])) {
-			return PoiPublicUtil.getParamsValue(tempText, map);
+		if (tempText.equals(obj.toString())) {
+			if (map.containsKey(tempText.split("\\.")[0])) {
+				return PoiPublicUtil.getParamsValue(text, map);
+			} else {
+				return "";
+			}
 		}
 		return obj;
 	}
