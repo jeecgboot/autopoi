@@ -687,7 +687,9 @@ public final class PoiPublicUtil {
 		String params = "";
 		while (currentText.indexOf("{{") != -1) {
 			params = currentText.substring(currentText.indexOf("{{") + 2, currentText.indexOf("}}"));
-			Object obj = getParamsValue(params.trim(), map);
+			//update-begin-author:liusq---date:2024-08-07--for: [issues/6925]autopoi通过word模板生成word时：三目、求长、常量、日期转换没起效果
+			Object obj = PoiElUtil.eval(params.trim(), map);
+			//update-end-author:liusq---date:2024-08-07--for: [issues/6925]autopoi通过word模板生成word时：三目、求长、常量、日期转换没起效果
 			// 判断图片或者是集合
 			// update-begin-author:taoyan date:20210914 for:autopoi模板导出，赋值的方法建议增加空判断或抛出异常说明。 /issues/3005
 			if(obj==null){
