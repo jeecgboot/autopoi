@@ -156,14 +156,20 @@ public final class ExcelExportOfTemplateUtil extends ExcelExportBase {
 
 	public Workbook createExcleByTemplate(TemplateExportParams params, Class<?> pojoClass, Collection<?> dataSet, Map<String, Object> map) {
 		// step 1. 判断模板的地址
-		if (params == null || map == null || StringUtils.isEmpty(params.getTemplateUrl())) {
+		if (params == null || map == null || (StringUtils.isEmpty(params.getTemplateUrl()) && params.getTemplateWb() == null)) {
 			throw new ExcelExportException(ExcelExportEnum.PARAMETER_ERROR);
 		}
 		Workbook wb = null;
 		// step 2. 判断模板的Excel类型,解析模板
 		try {
 			this.teplateParams = params;
-			wb = getCloneWorkBook();
+			//update-begin-author:liusq---date:2024-09-03--for: [issues/7048]TemplateExportParams类建议增加传入模板文件InputStream的方式
+			if (params.getTemplateWb() != null) {
+				wb = params.getTemplateWb();
+			} else {
+				wb = getCloneWorkBook();
+			}
+			//update-end-author:liusq---date:2024-09-03--for: [issues/7048]TemplateExportParams类建议增加传入模板文件InputStream的方式
 			// 创建表格样式
 			setExcelExportStyler((IExcelExportStyler) teplateParams.getStyle().getConstructor(Workbook.class).newInstance(wb));
 			// step 3. 解析模板

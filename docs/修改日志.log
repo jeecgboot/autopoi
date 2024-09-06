@@ -86,3 +86,13 @@ src\test\java\ImportExcelTest.java
 ---author:chenrui---date:2024/8/1-----for:[issues/6925]xlsx模版导出图片---
 src/main/java/org/jeecgframework/poi/excel/export/template/ExcelExportOfTemplateUtil.java
 ---author:chenrui---date:2024/8/1-----for:[issues/6925]xlsx模版导出图片---
+
+---author:liusq---date:2024/8/7-----for:[issues/6925]autopoi通过word模板生成word时：三目、求长、常量、日期转换没起效果---
+autopoi\src\main\java\org\jeecgframework\poi\util\PoiElUtil.java
+autopoi\src\main\java\org\jeecgframework\poi\util\PoiPublicUtil.java
+---author:liusq---date:2024/8/7-----for:[issues#6096]autopoi通过word模板生成word时：三目、求长、常量、日期转换没起效果---
+
+---author:liusq---date:2024/9/3-----for:[issues/7048]TemplateExportParams类建议增加传入模板文件InputStream的方式---
+autopoi\src\main\java\org\jeecgframework\poi\excel\export\template\ExcelExportOfTemplateUtil.java
+autopoi\src\main\java\org\jeecgframework\poi\excel\entity\TemplateExportParams.java
+---author:liusq---date:2024/9/3-----for:[issues/7048]TemplateExportParams类建议增加传入模板文件InputStream的方式---
