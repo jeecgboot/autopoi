@@ -223,6 +223,10 @@ public class ExcelImportServer extends ImportBaseService {
                     }
 					//update-begin---author:chenrui ---date:20240306  for：[QQYUN-8394]Excel导入时空行校验问题------------
 					int noneCellNum = 0;
+					// in case firstCellNum == -1 which will cause `Cell cell = row.getCell(i); ` throw exception: index should out of index
+					if(firstCellNum == -1) {
+						break;
+					}
 					for (int i = firstCellNum, le = lastCellNum; i < le; i++) {
 						Cell cell = row.getCell(i);
 						String titleString = (String) titlemap.get(i);
