@@ -29,15 +29,20 @@ import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
+import org.apache.xmlbeans.XmlCursor;
 import org.jeecgframework.poi.cache.WordCache;
 import org.jeecgframework.poi.util.PoiPublicUtil;
+import org.jeecgframework.poi.util.ReflectionUtil;
 import org.jeecgframework.poi.word.entity.MyXWPFDocument;
 import org.jeecgframework.poi.word.entity.WordImageEntity;
 import org.jeecgframework.poi.word.entity.params.ExcelListEntity;
+import org.jeecgframework.poi.word.entity.params.WordTable;
 import org.jeecgframework.poi.word.parse.excel.ExcelEntityParse;
 import org.jeecgframework.poi.word.parse.excel.ExcelMapParse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 /**
  * 解析07版的Word,替换文字,生成表格,生成图片
@@ -85,7 +90,9 @@ public class ParseWord07 {
 		if (obj instanceof WordImageEntity) {// 如果是图片就设置为图片
 			currentRun.setText("", 0);
 			addAnImage((WordImageEntity) obj, currentRun);
-		} else {
+		} else if (obj instanceof WordTable) {
+			insertTable(paragraph, obj);
+		}else {
 			currentText = obj.toString();
 			currentRun.setText(currentText, 0);
 		}
@@ -297,5 +304,62 @@ public class ParseWord07 {
 			}
 		}
 
+	}
+
+	/**
+	 * 插入表格
+	 *
+	 * @param paragraph 段落
+	 * @param obj       参数
+	 * @return void
+	 * @author Pursuer
+	 * @date 2023/4/23
+	 * @since 1.0
+	 **/
+	private void insertTable(XWPFParagraph paragraph, Object obj) {
+		//获取表格对象
+		WordTable wordTable = (WordTable) obj;
+		//判断表头和数据是否都为空
+		if (CollectionUtils.isEmpty(wordTable.getHeaders()) && CollectionUtils.isEmpty(wordTable.getData())) {
+			return;
+		}
+		//先删除占位符
+		paragraph.removeRun(0);
+		//获取光标
+		XmlCursor cursor = paragraph.getCTP().newCursor();
+		//插入表格
+		XWPFTable table = paragraph.getDocument().insertNewTbl(cursor);
+		//先删除设定好的行
+		table.removeRow(0);
+		//添加表头
+		Map<String, String> headers = wordTable.getHeaders();
+		//定义行索引
+		int rowIndex = 0;
+		if (!CollectionUtils.isEmpty(headers)) {
+			XWPFTableRow headerRow = table.insertNewTableRow(rowIndex++);
+			for (Map.Entry<String, String> entry : headers.entrySet()) {
+				headerRow.createCell().setText(entry.getValue());
+			}
+		}
+		//添加数据
+		List<?> dataList = wordTable.getData();
+		if (CollectionUtils.isEmpty(dataList)) {
+			return;
+		}
+		for (Object data : dataList) {
+			XWPFTableRow dataRow = table.insertNewTableRow(rowIndex++);
+			for (Map.Entry<String, String> entry : headers.entrySet()) {
+				String text = "";
+				try {
+					Object fieldValue = ReflectionUtil.getFieldValue(data, entry.getKey());
+					if(!ObjectUtils.isEmpty(fieldValue)){
+						text = fieldValue.toString();
+					}
+				}catch(Exception e){
+					LOGGER.warn(e.getMessage(), e);
+				}
+				dataRow.createCell().setText(text);
+			}
+		}
 	}
 }
