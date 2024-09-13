@@ -53,6 +53,7 @@ import org.jeecgframework.poi.excel.annotation.ExcelIgnore;
 import org.jeecgframework.poi.excel.entity.vo.PoiBaseConstants;
 import org.jeecgframework.poi.word.entity.WordImageEntity;
 import org.jeecgframework.poi.word.entity.params.ExcelListEntity;
+import org.jeecgframework.poi.word.entity.params.WordTable;
 import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTMarker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -696,7 +697,7 @@ public final class PoiPublicUtil {
 				obj = "";
 			}
 			// update-end-author:taoyan date:20210914 for:autopoi模板导出，赋值的方法建议增加空判断或抛出异常说明。/issues/3005
-			if (obj instanceof WordImageEntity || obj instanceof List || obj instanceof ExcelListEntity) {
+			if (obj instanceof WordImageEntity || obj instanceof List || obj instanceof ExcelListEntity || obj instanceof WordTable) {
 				return obj;
 			} else {
 				currentText = currentText.replace("{{" + params + "}}", obj.toString());

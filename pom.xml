@@ -44,6 +44,7 @@
 		<commons-io.version>2.11.0</commons-io.version>
 		<slf4j.version>1.7.30</slf4j.version>
 		<spring.version>5.1.0.RELEASE</spring.version>
+		<hutool.version>5.8.12</hutool.version>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
@@ -74,6 +75,12 @@
 				<groupId>org.apache.poi</groupId>
 				<artifactId>poi-scratchpad</artifactId>
 				<version>${poi.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>cn.hutool</groupId>
+				<artifactId>hutool-core</artifactId>
+				<version>${hutool.version}</version>
 			</dependency>
 
 			<!-- excel背景
