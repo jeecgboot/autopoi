@@ -103,3 +103,7 @@ autopoi\src\main\java\org\jeecgframework\poi\util\ReflectionUtil.java (+)
 autopoi\src\main\java\org\jeecgframework\poi\util\PoiPublicUtil.java
 autopoi\src\main\java\org\jeecgframework\poi\word\parse\ParseWord07.java
 ---author:liusq---date:2024/9/13-----for:[pull/105]Word动态插入表格---
+
+---author:liusq---date:2024/9/13-----for:[issues/7161]存在循环行导出会导致循环行后面的公式失效---
+autopoi\src\main\java\org\jeecgframework\poi\util\PoiExcelTempUtil.java
+---author:liusq---date:2024/9/13-----for:[issues/7161]存在循环行导出会导致循环行后面的公式失效---
