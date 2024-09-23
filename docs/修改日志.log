@@ -96,3 +96,14 @@ autopoi\src\main\java\org\jeecgframework\poi\util\PoiPublicUtil.java
 autopoi\src\main\java\org\jeecgframework\poi\excel\export\template\ExcelExportOfTemplateUtil.java
 autopoi\src\main\java\org\jeecgframework\poi\excel\entity\TemplateExportParams.java
 ---author:liusq---date:2024/9/3-----for:[issues/7048]TemplateExportParams类建议增加传入模板文件InputStream的方式---
+
+---author:liusq---date:2024/9/13-----for:[pull/105]Word动态插入表格---
+autopoi\src\main\java\org\jeecgframework\poi\word\entity\params\WordTable.java  (+)
+autopoi\src\main\java\org\jeecgframework\poi\util\ReflectionUtil.java (+)
+autopoi\src\main\java\org\jeecgframework\poi\util\PoiPublicUtil.java
+autopoi\src\main\java\org\jeecgframework\poi\word\parse\ParseWord07.java
+---author:liusq---date:2024/9/13-----for:[pull/105]Word动态插入表格---
+
+---author:liusq---date:2024/9/13-----for:[issues/7161]存在循环行导出会导致循环行后面的公式失效---
+autopoi\src\main\java\org\jeecgframework\poi\util\PoiExcelTempUtil.java
+---author:liusq---date:2024/9/13-----for:[issues/7161]存在循环行导出会导致循环行后面的公式失效---
