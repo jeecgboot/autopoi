@@ -63,8 +63,12 @@ public final class PoiElUtil {
 		String tempText = new String(text);
 		Object obj = innerEval(text, map);
 		// 如果没有被处理而且这个值找map中存在就处理这个值
-		if (tempText.equals(obj.toString()) && map.containsKey(tempText.split("\\.")[0])) {
-			return PoiPublicUtil.getParamsValue(tempText, map);
+		if (tempText.equals(obj.toString())) {
+			if (map.containsKey(tempText.split("\\.")[0])) {
+				return PoiPublicUtil.getParamsValue(text, map);
+			} else {
+				return "";
+			}
 		}
 		return obj;
 	}
@@ -245,17 +249,58 @@ public final class PoiElUtil {
 	 * @throws Exception
 	 */
 	private static Object trinocular(String text, Map<String, Object> map) throws Exception {
-		// 把多个空格变成一个空格
+		//update-begin-author:liusq---date:2024-08-07--for: [issues/6925]autopoi通过word模板生成word时：三目、求长、常量、日期转换没起效果
+		//把多个空格变成一个空格
 		text = text.replaceAll("\\s{1,}", " ").trim();
 		String testText = text.substring(0, text.indexOf("?"));
 		text = text.substring(text.indexOf("?") + 1, text.length()).trim();
 		text = innerEval(text, map).toString();
-		String[] keys = text.split(":");
-		Object first = eval(keys[0].trim(), map);
-		Object second = eval(keys[1].trim(), map);
+		String[] keys  = text.split(":");
+		Object   first = null, second = null;
+		if (keys.length > 2) {
+			if (keys[0].trim().contains("?")) {
+				String trinocular = keys[0];
+				for (int i = 1; i < keys.length - 1; i++) {
+					trinocular += ":" + keys[i];
+				}
+				first = evalNoParse(trinocular, map);
+				second = evalNoParse(keys[keys.length - 1].trim(), map);
+			} else {
+				first = evalNoParse(keys[0].trim(), map);
+				String trinocular = keys[1];
+				for (int i = 2; i < keys.length; i++) {
+					trinocular += ":" + keys[i];
+				}
+				second = evalNoParse(trinocular, map);
+			}
+		} else {
+			first = evalNoParse(keys[0].trim(), map);
+			second = evalNoParse(keys[1].trim(), map);
+		}
 		return isTrue(testText.split(" "), map) ? first : second;
+		//update-end-author:liusq---date:2024-08-07--for: [issues/6925]autopoi通过word模板生成word时：三目、求长、常量、日期转换没起效果
 	}
-
+	/**
+	 * 解析字符串,支持 le,fd,fn,!if,三目  找不到返回原值
+	 *
+	 * @param text
+	 * @param map
+	 * @return
+	 * @throws Exception
+	 */
+	public static Object evalNoParse(String text, Map<String, Object> map) throws Exception {
+		String tempText = new String(text);
+		Object obj      = innerEval(text, map);
+		//如果没有被处理而且这个值找map中存在就处理这个值,找不到就返回空字符串
+		if (tempText.equals(obj.toString())) {
+			if (map.containsKey(tempText.split("\\.")[0])) {
+				return PoiPublicUtil.getParamsValue(tempText, map);
+			} else {
+				return obj;
+			}
+		}
+		return obj;
+	}
 	/**
 	 * 解析字符串, 不支持 le,fd,fn,!if,三目 ,获取是集合的字段前缀
 	 *
