@@ -202,7 +202,9 @@ public class StylerHelper {
 
 		public void colorStyles(CellStyle style, Formatter out) {
 			HSSFCellStyle cs = (HSSFCellStyle) style;
-			out.format("  /* fill pattern = %d */%n", cs.getFillPattern());
+			if (cs.getFillPattern() != FillPatternType.NO_FILL) {
+				out.format("  /* fill pattern = %s */%n", cs.getFillPattern());
+			}
 			styleColor(out, "background-color", cs.getFillForegroundColor());
 			styleColor(out, "color", colors.getColor(cs.getFont(wb).getColor()));
 		}

@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.jeecgframework.boot3</groupId>
 		<artifactId>autopoi-parent</artifactId>
-		<version>1.4.7</version>
+		<version>1.4.11</version>
 	</parent>
 	<artifactId>autopoi</artifactId>
 	<dependencies>
@@ -48,6 +48,13 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
+
+		<!-- commons -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
+
 
 		<!--日志 -->
 		<!-- slf4j -->

@@ -35,6 +35,7 @@ import java.math.RoundingMode;
 import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -66,7 +67,10 @@ public class CellValueServer {
 		}
 		Object result = null;
 		// 日期格式比较特殊,和cell格式不一致
-		if ("class java.util.Date".equals(xclass) || ("class java.sql.Time").equals(xclass)) {
+		if ("class java.util.Date".equals(xclass)
+				|| ("class java.sql.Time").equals(xclass)
+				|| ("class java.time.LocalDate").equals(xclass)
+				|| ("class java.time.LocalDateTime").equals(xclass)) {
 			if ( CellType.NUMERIC == cell.getCellTypeEnum()) {
 				// 日期格式
 				result = cell.getDateCellValue();
@@ -76,6 +80,10 @@ public class CellValueServer {
 			}
 			if (("class java.sql.Time").equals(xclass)) {
 				result = new Time(((Date) result).getTime());
+			}else if (("class java.time.LocalDate").equals(xclass)) {
+				result = ((Date) result).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+			} else if (("class java.time.LocalDateTime").equals(xclass)) {
+				result = ((Date) result).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
 			}
 		} else if ( CellType.NUMERIC == cell.getCellTypeEnum()) {
 			result = cell.getNumericCellValue();

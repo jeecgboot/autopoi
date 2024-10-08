@@ -16,16 +16,24 @@
 package org.jeecgframework.poi.util;
 
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import javax.imageio.ImageIO;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
 import org.apache.poi.hssf.usermodel.HSSFPicture;
@@ -34,13 +42,9 @@ import org.apache.poi.hssf.usermodel.HSSFShape;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ooxml.POIXMLDocumentPart;
-import org.apache.poi.ss.usermodel.PictureData;
-import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
-import org.apache.poi.xssf.usermodel.XSSFDrawing;
-import org.apache.poi.xssf.usermodel.XSSFPicture;
-import org.apache.poi.xssf.usermodel.XSSFShape;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.openxml4j.opc.PackagePartName;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.*;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.jeecgframework.poi.excel.annotation.Excel;
 import org.jeecgframework.poi.excel.annotation.ExcelCollection;
@@ -53,6 +57,12 @@ import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTMarker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.ClassUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * AutoPoi 的公共基础类
@@ -291,6 +301,219 @@ public final class PoiPublicUtil {
 		return sheetIndexPicMap;
 	}
 
+	/**
+	 *
+	 * 获取嵌入图片 <br/>
+	 * 支持excel2007+版本.
+	 * @param sheet
+	 * @param isCopy
+	 * @param book
+	 * @return
+	 * @author chenrui
+	 * @date 2024/4/2 20:25
+	 */
+    public static Map<String, PictureData> getCellImages(Sheet sheet, ByteArrayOutputStream isCopy,Workbook book) {
+        // 获取所有嵌入图片的单元格的内容 date:2024/4/2
+        Map<String, CellImage> cellImageMap = new HashMap<>();
+        Iterator<Row> rows = sheet.rowIterator();
+        while (rows.hasNext()) {
+            Row row = rows.next();
+            Iterator<Cell> cells = row.cellIterator();
+            while (cells.hasNext()) {
+                Cell cell = cells.next();
+				CellType cellType = cell.getCellType();
+				if(cellType.equals(CellType.FORMULA)) {
+					CellType resultType = cell.getCachedFormulaResultType();
+					if(!resultType.equals(CellType.STRING)){
+						continue;
+					}
+					String cellVal = cell.getStringCellValue();
+					if (null != cellVal && cellVal.startsWith("=DISPIMG")) {
+						int start = cellVal.indexOf("\"");
+						int end = cellVal.lastIndexOf("\"");
+						if (start != -1 && end != -1) {
+							String imgId = cellVal.substring(start + 1, end);
+							CellImage cellImage = new CellImage();
+							cellImage.setImgId(imgId);
+							cellImage.setCellStr(cellVal);
+							cellImageMap.put(row.getRowNum() + "_" + cell.getColumnIndex(), cellImage);
+						}
+					}
+				}
+            }
+        }
+
+        try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(isCopy.toByteArray()));
+			 ZipInputStream fzis = new ZipInputStream(new ByteArrayInputStream(isCopy.toByteArray()))) {
+			//update-begin---author:chenrui ---date:20240407  for：[QQYUN-8898]不依赖hutool,xml解析改为dom------------
+			DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+			ZipEntry entry;
+			// 获取嵌入单元格图片的rid
+            while ((entry = zis.getNextEntry()) != null) {
+				try {
+                    final String fileName = entry.getName();
+                    if (Objects.equals(fileName, "xl/cellimages.xml")) {
+                        String content = IOUtils.toString(zis, StandardCharsets.UTF_8);
+						Document document = documentBuilder.parse(new InputSource(new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8))));
+						NodeList cellImages = document.getElementsByTagName("etc:cellImage");
+						if (Objects.isNull(cellImages)) {
+							continue;
+						}
+						for (int i = 0; i < cellImages.getLength(); i++) {
+							Node cellImageNode = cellImages.item(i);
+							NodeList cNvPr = ((Element) cellImageNode).getElementsByTagName("xdr:cNvPr");
+							if(cNvPr.getLength()<1){
+								continue;
+							}
+							Node cNvPrNode = cNvPr.item(0);
+							String name = ((Element) cNvPrNode).getAttribute("name");
+							if (StringUtils.isNotEmpty(name)) {
+								CellImage tempCellimage = cellImageMap.values().stream().filter(item -> Objects.equals(item.getImgId(), name)).findFirst().orElse(null);
+								if (Objects.nonNull(tempCellimage)) {
+									NodeList blips = ((Element) cellImageNode).getElementsByTagName("a:blip");
+									if(blips.getLength()<1){
+										continue;
+									}
+									Node blip = blips.item(0);
+									String embed =((Element) blip).getAttribute("r:embed");
+									if(embed.isEmpty()){
+										continue;
+									}
+									tempCellimage.setRId(embed);
+								}
+							}
+						}
+                    }
+                } catch (SAXException e) {
+                    throw new RuntimeException(e);
+                } finally {
+                    zis.closeEntry();
+                }
+            }
+			// 获取嵌入单元格图片的存放位置
+            while ((entry = fzis.getNextEntry()) != null) {
+                try {
+                    final String fileName = entry.getName();
+                    if (Objects.equals(fileName, "xl/_rels/cellimages.xml.rels")) {
+                        String content = IOUtils.toString(fzis, StandardCharsets.UTF_8);
+
+						Document document = documentBuilder.parse(new InputSource(new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8))));
+						NodeList relationships = document.getElementsByTagName("Relationship");
+                        if (Objects.isNull(relationships)) {
+                            continue;
+                        }
+						for (int i = 0; i < relationships.getLength(); i++) {
+							Node relationshipNode = relationships.item(i);
+							if(relationshipNode instanceof Element){
+								Element relationshipEl = (Element) relationshipNode;
+								String id = relationshipEl.getAttribute("Id");
+								String target = "/xl/" + relationshipEl.getAttribute("Target");
+								if (StringUtils.isNotEmpty(id)) {
+									List<CellImage> cellImages = cellImageMap.values().stream().filter(item -> Objects.equals(item.getRId(), id)).collect(Collectors.toList());
+									cellImages.stream().filter(Objects::nonNull).forEach(cellImage -> cellImage.setImgName(target));
+								}
+							}
+						}
+                    }
+                } catch (SAXException e) {
+                    throw new RuntimeException(e);
+                } finally {
+                    fzis.closeEntry();
+                }
+            }
+			// 获取嵌入单元格图片的图片数据
+            List<XSSFPictureData> allPictures = (List<XSSFPictureData>) book.getAllPictures();
+            for (XSSFPictureData pictureData : allPictures) {
+                PackagePartName partName = pictureData.getPackagePart().getPartName();
+                URI uri = partName.getURI();
+                List<CellImage> cellImages = cellImageMap.values().stream().filter(i -> Objects.equals(i.getImgName(), uri.toString())).collect(Collectors.toList());
+				cellImages.stream().filter(Objects::nonNull).forEach(cellImage -> cellImage.setPictureData(pictureData));
+            }
+			//update-end---author:chenrui ---date:20240407  for：[QQYUN-8898]不依赖hutool,xml解析改为dom------------
+		} catch (IOException | ParserConfigurationException e) {
+			throw new RuntimeException(e);
+		}
+
+        Map<String, PictureData> resp = new HashMap<>();
+        if (!cellImageMap.isEmpty()) {
+            cellImageMap.forEach((key, cellImage) -> {
+                resp.put(key, cellImage.getPictureData());
+            });
+        }
+        return resp;
+    }
+
+
+	/**
+	 * 嵌入单元格图片对象
+	 *
+	 * @author chenrui
+	 * @date 2024/4/3 18:27
+	 */
+    static class CellImage {
+		/**
+		 * 图片id
+		 */
+        private String imgId;
+		/**
+		 * 单元格内容
+		 */
+        private String cellStr;
+		/**
+		 * RId
+		 */
+        private String rId;
+		/**
+		 * 图片名称
+		 */
+        private String imgName;
+		/**
+		 * 图片对象
+		 */
+        private XSSFPictureData pictureData;
+
+        public String getImgId() {
+            return imgId;
+        }
+
+        public void setImgId(String imgId) {
+            this.imgId = imgId;
+        }
+
+        public String getCellStr() {
+            return cellStr;
+        }
+
+        public void setCellStr(String cellStr) {
+            this.cellStr = cellStr;
+        }
+
+        public String getRId() {
+            return rId;
+        }
+
+        public void setRId(String rId) {
+            this.rId = rId;
+        }
+
+        public String getImgName() {
+            return imgName;
+        }
+
+        public void setImgName(String imgName) {
+            this.imgName = imgName;
+        }
+
+        public XSSFPictureData getPictureData() {
+            return pictureData;
+        }
+
+        public void setPictureData(XSSFPictureData pictureData) {
+            this.pictureData = pictureData;
+        }
+
+    }
+
 	public static String getWebRootPath(String filePath) {
 		try {
 			String path = null;
@@ -341,7 +564,13 @@ public final class PoiPublicUtil {
 		boolean isBaseClass = false;
 		if (fieldType.isArray()) {
 			isBaseClass = false;
-		} else if (fieldType.isPrimitive() || fieldType.getPackage() == null || fieldType.getPackage().getName().equals("java.lang") || fieldType.getPackage().getName().equals("java.math") || fieldType.getPackage().getName().equals("java.sql") || fieldType.getPackage().getName().equals("java.util")) {
+		} else if (fieldType.isPrimitive()
+				|| fieldType.getPackage() == null
+				|| fieldType.getPackage().getName().equals("java.lang")
+				|| fieldType.getPackage().getName().equals("java.math")
+				|| fieldType.getPackage().getName().equals("java.sql")
+				|| fieldType.getPackage().getName().equals("java.util")
+				|| fieldType.getPackage().getName().equals("java.time")) {
 			isBaseClass = true;
 		}
 		return isBaseClass;
@@ -458,7 +687,9 @@ public final class PoiPublicUtil {
 		String params = "";
 		while (currentText.indexOf("{{") != -1) {
 			params = currentText.substring(currentText.indexOf("{{") + 2, currentText.indexOf("}}"));
-			Object obj = getParamsValue(params.trim(), map);
+			//update-begin-author:liusq---date:2024-08-07--for: [issues/6925]autopoi通过word模板生成word时：三目、求长、常量、日期转换没起效果
+			Object obj = PoiElUtil.eval(params.trim(), map);
+			//update-end-author:liusq---date:2024-08-07--for: [issues/6925]autopoi通过word模板生成word时：三目、求长、常量、日期转换没起效果
 			// 判断图片或者是集合
 			// update-begin-author:taoyan date:20210914 for:autopoi模板导出，赋值的方法建议增加空判断或抛出异常说明。 /issues/3005
 			if(obj==null){

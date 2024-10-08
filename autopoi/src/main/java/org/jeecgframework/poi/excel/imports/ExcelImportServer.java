@@ -15,12 +15,10 @@
  */
 package org.jeecgframework.poi.excel.imports;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.poifs.filesystem.FileMagic;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.formula.functions.T;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -100,7 +98,9 @@ public class ExcelImportServer extends ImportBaseService {
 			if (param.getExcelParams().containsKey(titleString)) {
 				if (param.getExcelParams().get(titleString).getType() == 2) {
 					picId = row.getRowNum() + "_" + i;
-					saveImage(object, picId, param.getExcelParams(), titleString, pictures, params);
+                    //update-begin---author:chenrui ---date:20240402  for：[issue/#6025/#6040]子表图片导入报错------------
+					saveImage(entity, picId, param.getExcelParams(), titleString, pictures, params);
+                    //update-end---author:chenrui ---date:20240402  for：[issue/#6025/#6040]子表图片导入报错------------
 				} else {
 					saveFieldValue(params, entity, cell, param.getExcelParams(), titleString, row);
 				}
@@ -221,6 +221,8 @@ public class ExcelImportServer extends ImportBaseService {
                     if(lastCellNum<maxColumnIndex+1){
                         lastCellNum = maxColumnIndex+1;
                     }
+					//update-begin---author:chenrui ---date:20240306  for：[QQYUN-8394]Excel导入时空行校验问题------------
+					int noneCellNum = 0;
 					for (int i = firstCellNum, le = lastCellNum; i < le; i++) {
 						Cell cell = row.getCell(i);
 						String titleString = (String) titlemap.get(i);
@@ -239,7 +241,10 @@ public class ExcelImportServer extends ImportBaseService {
 										}
 									}
 								}else{
-									saveFieldValue(params, object, cell, excelParams, titleString, row);
+									Object value = saveFieldValue(params, object, cell, excelParams, titleString, row);
+									if(null == value){
+										noneCellNum++;
+									}
 								}
                         //update-end-author:taoyan date:20200303 for:导入图片
 							}
@@ -250,7 +255,8 @@ public class ExcelImportServer extends ImportBaseService {
 						addListContinue(object, param, row, titlemap, targetId, pictures, params);
 					}
 					//update-begin-author:taoyan date:20210526 for:autopoi导入excel 如果单元格被设置边框，即使没有内容也会被当做是一条数据导入 #2484
-					if(isNotNullObject(pojoClass, object)){
+                    if (isNotNullObject(pojoClass, object) && noneCellNum < (lastCellNum - firstCellNum)) {
+					//update-end---author:chenrui ---date:20240306  for：[QQYUN-8394]Excel导入时空行校验问题------------
 						collection.add(object);
 					}
 					//update-end-author:taoyan date:20210526 for:autopoi导入excel 如果单元格被设置边框，即使没有内容也会被当做是一条数据导入 #2484
@@ -428,9 +434,15 @@ public class ExcelImportServer extends ImportBaseService {
 		List<T> result = new ArrayList<T>();
 		Workbook book = null;
 		boolean isXSSFWorkbook = false;
-		if (!(inputstream.markSupported())) {
-			inputstream = new PushbackInputStream(inputstream, 8);
-		}
+		//update-begin---author:chenrui ---date:20240403  for：[issue/#5987]嵌入单元格图片无法导入------------
+		// 复制输入流,防止在读取嵌入图片时流为空
+        ByteArrayOutputStream inCopy = new ByteArrayOutputStream();
+        IOUtils.copy(inputstream, inCopy);
+        inputstream = new ByteArrayInputStream(inCopy.toByteArray());
+        if (!(inputstream.markSupported())) {
+            inputstream = new PushbackInputStream(inputstream, 8);
+        }
+		//update-end---author:chenrui ---date:20240403  for：[issue/#5987]嵌入单元格图片无法导入------------
 		//begin-------author:liusq------date:20210129-----for:-------poi3升级到4兼容改造工作【重要敏感修改点】--------
 		//------poi4.x begin----
 //		FileMagic fm = FileMagic.valueOf(FileMagic.prepareToCheckMagic(inputstream));
@@ -479,6 +491,12 @@ public class ExcelImportServer extends ImportBaseService {
 			}
 			if (isXSSFWorkbook) {
 				pictures = PoiPublicUtil.getSheetPictrues07((XSSFSheet) book.getSheetAt(i), (XSSFWorkbook) book);
+				//update-begin---author:chenrui ---date:20240403  for：[issue/#5987]嵌入单元格图片无法导入------------
+                Map<String, PictureData> cellImages = PoiPublicUtil.getCellImages(book.getSheetAt(i), inCopy, book);
+                if (!cellImages.isEmpty()) {
+                    pictures.putAll(cellImages);
+                }
+				//update-end---author:chenrui ---date:20240403  for：[issue/#5987]嵌入单元格图片无法导入------------
 			} else {
 				pictures = PoiPublicUtil.getSheetPictrues03((HSSFSheet) book.getSheetAt(i), (HSSFWorkbook) book);
 			}
@@ -524,8 +542,9 @@ public class ExcelImportServer extends ImportBaseService {
 	 * @param titleString
 	 * @param row
 	 * @throws Exception
+	 * @return
 	 */
-	private void saveFieldValue(ImportParams params, Object object, Cell cell, Map<String, ExcelImportEntity> excelParams, String titleString, Row row) throws Exception {
+	private Object saveFieldValue(ImportParams params, Object object, Cell cell, Map<String, ExcelImportEntity> excelParams, String titleString, Row row) throws Exception {
 		Object value = cellValueServer.getValue(params.getDataHanlder(), object, cell, excelParams, titleString);
 		if (object instanceof Map) {
 			if (params.getDataHanlder() != null) {
@@ -545,6 +564,7 @@ public class ExcelImportServer extends ImportBaseService {
 				throw new ExcelImportException(ExcelImportEnum.VERIFY_ERROR);
 			}
 		}
+		return value;
 	}
 
 	/**
