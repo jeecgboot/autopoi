@@ -16,6 +16,7 @@
 package org.jeecgframework.poi.excel.entity.params;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -78,6 +79,17 @@ public class ExcelBaseEntity {
 	private boolean     hyperlink;
 
 	private List<Method> methods;
+
+	private HashMap<String,String> replaceMap;
+
+
+	public HashMap<String, String> getReplaceMap() {
+		return replaceMap;
+	}
+
+	public void setReplaceMap(HashMap<String, String> replaceMap) {
+		this.replaceMap = replaceMap;
+	}
 
 	public String getDatabaseFormat() {
 		return databaseFormat;
