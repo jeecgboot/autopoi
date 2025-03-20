@@ -96,3 +96,7 @@ autopoi\src\main\java\org\jeecgframework\poi\util\PoiPublicUtil.java
 autopoi\src\main\java\org\jeecgframework\poi\excel\export\template\ExcelExportOfTemplateUtil.java
 autopoi\src\main\java\org\jeecgframework\poi\excel\entity\TemplateExportParams.java
 ---author:liusq---date:2024/9/3-----for:[issues/7048]TemplateExportParams类建议增加传入模板文件InputStream的方式---
+
+---author:chenrui---date:2025/3/20-----for:[issues/7947]autopoi导入 报错Cell index must be >= 0  ---
+src/main/java/org/jeecgframework/poi/excel/imports/ExcelImportServer.java
+---author:chenrui---date:2025/3/20-----for:[issues/7947]autopoi导入 报错Cell index must be >= 0  ---
