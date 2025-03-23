@@ -217,6 +217,11 @@ public class ExcelImportServer extends ImportBaseService {
 				    if(firstCellNum>minColumnIndex){
                         firstCellNum = minColumnIndex;
                     }
+					//update-begin---author:chenrui ---date:20250320  for：[issues/7947]autopoi导入 报错Cell index must be >= 0 ------------
+					if (firstCellNum < 0) {
+						firstCellNum = 0;
+					}
+					//update-end---author:chenrui ---date:20250320  for：[issues/7947]autopoi导入 报错Cell index must be >= 0 ------------
                     int lastCellNum = row.getLastCellNum();
                     if(lastCellNum<maxColumnIndex+1){
                         lastCellNum = maxColumnIndex+1;
