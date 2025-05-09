@@ -87,7 +87,9 @@ public class ImportBaseService {
 			} catch (Exception e) {
 			}
 			if(jeecgDictService!=null){
-				 String[] dictReplace = jeecgDictService.queryDict(excel.dictTable(), excel.dicCode(), excel.dicText());
+				//update-begin---author:chenrui ---date:20250331  for：[issues/7736]@Excel 不支持分布式下表字典跨库查询 #7736------------
+				 String[] dictReplace = jeecgDictService.queryDict(excel.dictTable(), excel.dicCode(), excel.dicText(), excel.ds());
+				 //update-end---author:chenrui ---date:20250331  for：[issues/7736]@Excel 不支持分布式下表字典跨库查询 #7736------------
 				 if(excelEntity.getReplace()!=null && dictReplace!=null && dictReplace.length!=0){
 					 excelEntity.setReplace(dictReplace);
 				 }
