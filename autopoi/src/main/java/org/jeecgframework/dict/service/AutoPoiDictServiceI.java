@@ -15,9 +15,10 @@ public interface AutoPoiDictServiceI{
  	 * @param dicTable
  	 * @param dicCode
  	 * @param dicText
+	 * @param dataSource for [issues/7736]@Excel 不支持分布式下表字典跨库查询 #7736
  	 * @return 
  	 * 返回类型： List<DictEntity>
  	 */
- 	public String[] queryDict(String dicTable,String dicCode, String dicText);
+ 	public String[] queryDict(String dicTable,String dicCode, String dicText, String dataSource) throws Exception;
 
 }

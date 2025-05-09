@@ -156,6 +156,15 @@ public @interface Excel {
 	 * 返回类型： String
 	 */
 	public String dicText() default "";
+
+	/**
+	 * 方法描述:  数据源
+	 * for [issues/7736]@Excel 不支持分布式下表字典跨库查询 #7736
+	 * 作    者： chenrui
+	 * 日    期： 2025-03-31 19:01:18
+	 * @return String
+	 */
+	public String ds() default "";
 	
 	/**
 	 * 导入数据是否需要转化  

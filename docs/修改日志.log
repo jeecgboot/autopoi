@@ -100,3 +100,11 @@ autopoi\src\main\java\org\jeecgframework\poi\excel\entity\TemplateExportParams.j
 ---author:chenrui---date:2025/3/20-----for:[issues/7947]autopoi导入 报错Cell index must be >= 0  ---
 src/main/java/org/jeecgframework/poi/excel/imports/ExcelImportServer.java
 ---author:chenrui---date:2025/3/20-----for:[issues/7947]autopoi导入 报错Cell index must be >= 0  ---
+
+---author:chenrui---date:2025/5/9-----for:[issues/7736]@Excel 不支持分布式下表字典跨库查询 #7736---
+src/main/java/org/jeecgframework/dict/service/AutoPoiDictServiceI.java
+src/main/java/org/jeecgframework/poi/excel/annotation/Excel.java
+src/main/java/org/jeecgframework/poi/excel/ExcelImportCheckUtil.java
+src/main/java/org/jeecgframework/poi/excel/export/base/ExportBase.java
+src/main/java/org/jeecgframework/poi/excel/imports/base/ImportBaseService.java
+---author:chenrui---date:2025/5/9-----for:[issues/7736]@Excel 不支持分布式下表字典跨库查询 #7736---
