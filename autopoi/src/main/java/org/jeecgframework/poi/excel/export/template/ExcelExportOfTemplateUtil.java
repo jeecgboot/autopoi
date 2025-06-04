@@ -18,6 +18,7 @@ package org.jeecgframework.poi.excel.export.template;
 import java.lang.reflect.Field;
 import java.util.*;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
 import org.apache.poi.ss.usermodel.*;
@@ -322,7 +323,10 @@ public final class ExcelExportOfTemplateUtil extends ExcelExportBase {
 			while (oldString.indexOf(START_STR) != -1) {
 				params = oldString.substring(oldString.indexOf(START_STR) + 2, oldString.indexOf(END_STR));
 
-				oldString = oldString.replace(START_STR + params + END_STR, eval(params, map).toString());
+				//update-begin-author:liusq---date:2025-06-04--for: [issues/8230] autopoi使用模板导出时,如果传入的map中存在值为null时会导致异常出错，导出失败
+				oldString = oldString.replace(START_STR + params + END_STR, ObjectUtils.isNotEmpty(eval(params, map))?eval(params, map).toString():"");
+				//update-end-author:liusq---date:2025-06-04--for:[issues/8230] autopoi使用模板导出时,如果传入的map中存在值为null时会导致异常出错，导出失败
+
 			}
 			// 如何是数值 类型,就按照数值类型进行设置
 			if (isNumber && StringUtils.isNotBlank(oldString)) {

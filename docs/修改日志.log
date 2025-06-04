@@ -100,3 +100,11 @@ autopoi\src\main\java\org\jeecgframework\poi\excel\entity\TemplateExportParams.j
 ---author:chenrui---date:2025/3/20-----for:[issues/7947]autopoi导入 报错Cell index must be >= 0  ---
 src/main/java/org/jeecgframework/poi/excel/imports/ExcelImportServer.java
 ---author:chenrui---date:2025/3/20-----for:[issues/7947]autopoi导入 报错Cell index must be >= 0  ---
+
+---author:liusq---date:2025/6/04-----for:[issues/8230] autopoi使用模板导出时,如果传入的map中存在值为null时会导致异常出错，导出失败---
+autopoi\src\main\java\org\jeecgframework\poi\excel\export\template\ExcelExportOfTemplateUtil.java
+---author:liusq---date:2024/6/04-----for:[issues/8230] autopoi使用模板导出时,如果传入的map中存在值为null时会导致异常出错，导出失败---
+
+---author:liusq---date:2024/6/04-----for:[issues/8148] autopoi使用模板导出时,如果在循环列后存在公式单元格,导出来后该单元格未空，公式没了---
+autopoi\src\main\java\org\jeecgframework\poi\util\PoiExcelTempUtil.java
+---author:liusq---date:2024/6/04-----for:[issues/8148] autopoi使用模板导出时,如果在循环列后存在公式单元格,导出来后该单元格未空，公式没了--
