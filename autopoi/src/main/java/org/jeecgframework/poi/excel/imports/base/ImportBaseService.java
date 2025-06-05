@@ -32,6 +32,7 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.jeecgframework.core.util.ApplicationContextUtil;
+import org.jeecgframework.dict.service.AutoPoiDictMapServiceI;
 import org.jeecgframework.dict.service.AutoPoiDictServiceI;
 import org.jeecgframework.poi.excel.annotation.Excel;
 import org.jeecgframework.poi.excel.annotation.ExcelCollection;
@@ -81,16 +82,16 @@ public class ImportBaseService {
 		//update-begin-author:taoYan date:20180202 for:TASK #2067 【bug excel 问题】excel导入字典文本翻译问题
 		excelEntity.setMultiReplace(excel.multiReplace());
 		if(StringUtils.isNotEmpty(excel.dicCode())){
-			AutoPoiDictServiceI jeecgDictService = null;
+			AutoPoiDictMapServiceI jeecgDictService = null;
 			try {
-				jeecgDictService = ApplicationContextUtil.getContext().getBean(AutoPoiDictServiceI.class);
+				jeecgDictService = ApplicationContextUtil.getContext().getBean(AutoPoiDictMapServiceI.class);
 			} catch (Exception e) {
 			}
 			if(jeecgDictService!=null){
-				 String[] dictReplace = jeecgDictService.queryDict(excel.dictTable(), excel.dicCode(), excel.dicText());
-				 if(excelEntity.getReplace()!=null && dictReplace!=null && dictReplace.length!=0){
-					 excelEntity.setReplace(dictReplace);
-				 }
+				HashMap<String,String> dictReplace = jeecgDictService.queryDict(excel.dictTable(), excel.dicCode(), excel.dicText(),false);
+				if(dictReplace!=null && !dictReplace.isEmpty()){
+					excelEntity.setReplaceMap(dictReplace);
+				}
 			}
 		}
 		//update-end-author:taoYan date:20180202 for:TASK #2067 【bug excel 问题】excel导入字典文本翻译问题
