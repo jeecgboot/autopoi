@@ -100,3 +100,8 @@ autopoi\src\main\java\org\jeecgframework\poi\excel\entity\TemplateExportParams.j
 ---author:chenrui---date:2025/3/20-----for:[issues/7947]autopoi导入 报错Cell index must be >= 0  ---
 src/main/java/org/jeecgframework/poi/excel/imports/ExcelImportServer.java
 ---author:chenrui---date:2025/3/20-----for:[issues/7947]autopoi导入 报错Cell index must be >= 0  ---
+
+---author:chenrui---date:2025/6/4-----for:[issues/8248]AutoPOI导出的单元格格式建议加一个常规类型 #8248---
+src/main/java/org/jeecgframework/poi/excel/annotation/Excel.java
+src/main/java/org/jeecgframework/poi/excel/export/base/ExcelExportBase.java
+---author:chenrui---date:2025/6/4-----for:[issues/8248]AutoPOI导出的单元格格式建议加一个常规类型 #8248---

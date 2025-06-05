@@ -23,7 +23,6 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
-import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.entity.enmus.ExcelType;
 import org.jeecgframework.poi.excel.entity.params.ExcelExportEntity;
 import org.jeecgframework.poi.excel.entity.vo.PoiBaseConstants;
@@ -43,7 +42,6 @@ import javax.net.ssl.TrustManager;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -68,6 +66,18 @@ public abstract class ExcelExportBase extends ExportBase {
 	private Map<Integer, Double> statistics = new HashMap<Integer, Double>();
 
 	private static final DecimalFormat DOUBLE_FORMAT = new DecimalFormat("######0.00");
+
+	/**
+	 * 常规格式的内置格式标识符
+	 *  for [issues/8248]AutoPOI导出的单元格格式建议加一个常规类型 #8248
+	 */
+	private static final short GENERAL_FORMAT = (short)BuiltinFormats.getBuiltinFormat("General");
+
+	/**
+	 * 单元格样式缓存
+	 * for [issues/8248]AutoPOI导出的单元格格式建议加一个常规类型 #8248
+	 */
+	private final Map<String, CellStyle> cellStyleMap = new HashMap<>();
 
 	//update-begin-author:liusq---date:20220527--for: 修改成protected，列循环时继承类需要用到 ---
 	protected IExcelExportStyler excelExportStyler;
@@ -128,6 +138,10 @@ public abstract class ExcelExportBase extends ExportBase {
 					createStringCell(row, cellNum++, value == null ? "" : value.toString(), index % 2 == 0 ? getStyles(false, entity) : getStyles(true, entity), entity);
 				} else if (entity.getType() == 4){
 					createNumericCell(row, cellNum++, value == null ? "" : value.toString(), getNumberCellStyle(index, df, entity), entity);
+				} else if (entity.getType() == 0) {
+					//update-begin---author:chenrui ---date:20250604  for：[issues/8248]AutoPOI导出的单元格格式建议加一个常规类型 #8248------------
+					createStringCell(row, cellNum++, value == null ? "" : value.toString(), getGeneralCellStyle(index, workbook,entity), entity);
+					//update-end---author:chenrui ---date:20250604  for：[issues/8248]AutoPOI导出的单元格格式建议加一个常规类型 #8248------------
 				} else {
 					createImageCell(patriarch, entity, row, cellNum++, value == null ? "" : value.toString(), t);
 				}
@@ -186,6 +200,30 @@ public abstract class ExcelExportBase extends ExportBase {
 		return cellStyle;
 		//update-end-author:liusq---date:2023-12-07--for:[issues/5538]导出表格设置了数字格式导出之后仍然是文本格式，并且无法进行计算
 	}
+
+	/**
+	 * 获取常规单元格样式
+	 * for [issues/8248]AutoPOI导出的单元格格式建议加一个常规类型 #8248
+	 * @param index
+	 * @param workbook
+	 * @param entity
+	 * @return
+	 * @author chenrui
+	 * @date 2025/6/4 17:40
+	 */
+	private CellStyle getGeneralCellStyle(int index, Workbook workbook, ExcelExportEntity entity) {
+		String cellStyleKey = index % 2 == 0 ? "twoGeneral" : "oneGeneral";
+		if (this.cellStyleMap.containsKey(cellStyleKey)) {
+			return this.cellStyleMap.get(cellStyleKey);
+		}
+		CellStyle cellStyle = index % 2 == 0 ? getStyles(false, entity) : getStyles(true, entity);
+		CellStyle newStyle = workbook.createCellStyle();
+		newStyle.cloneStyleFrom(cellStyle);
+		newStyle.setDataFormat(GENERAL_FORMAT);
+		this.cellStyleMap.put(cellStyleKey, newStyle);
+		return newStyle;
+	}
+
 	/**
 	 * 通过https地址获取图片数据
 	 * @param imagePath
@@ -388,7 +426,17 @@ public abstract class ExcelExportBase extends ExportBase {
 									value));
 				}
 				//update-end-author:liusq---date:20220728--for: 新增isHyperlink属性 ---
-			}  else{
+			} else if (entity.getType() == 0) {
+				//update-begin---author:chenrui ---date:20250604  for：[issues/8248]AutoPOI导出的单元格格式建议加一个常规类型 #8248------------
+				createStringCell(row, cellNum++, value == null ? "" : value.toString(), getGeneralCellStyle(index, workbook, entity), entity);
+				if (entity.isHyperlink()) {
+					row.getCell(cellNum - 1)
+							.setHyperlink(dataHanlder.getHyperlink(
+									row.getSheet().getWorkbook().getCreationHelper(), obj, entity.getName(),
+									value));
+				}
+				//update-end---author:chenrui ---date:20250604  for：[issues/8248]AutoPOI导出的单元格格式建议加一个常规类型 #8248------------
+			} else{
 				createImageCell(patriarch, entity, row, cellNum++, value == null ? "" : value.toString(), obj);
 			}
 			//update-end--Author:xuelin  Date:20171018 for：TASK #2372 【excel】AutoPoi 导出类型，type增加数字类型--------------------
@@ -705,6 +753,11 @@ public abstract class ExcelExportBase extends ExportBase {
 						createNumericCell(row, cellNum++, value == null ? "" : value.toString(),
 								getNumberCellStyle(index, df, entity),
 								entity);
+					} else if (entity.getType() == 0) {
+						//update-begin---author:chenrui ---date:20250604  for：[issues/8248]AutoPOI导出的单元格格式建议加一个常规类型 #8248------------
+						createStringCell(row, cellNum++, value == null ? "" : value.toString(),
+								getGeneralCellStyle(index, workbook, entity), entity);
+						//update-end---author:chenrui ---date:20250604  for：[issues/8248]AutoPOI导出的单元格格式建议加一个常规类型 #8248------------
 					} else {
 						createImageCell(patriarch, entity, row, cellNum++,
 								value == null ? "" : value.toString(), t);
