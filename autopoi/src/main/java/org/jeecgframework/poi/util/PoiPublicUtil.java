@@ -671,7 +671,9 @@ public final class PoiPublicUtil {
 			return getValueDoWhile(object, paramsArr, 0);
 		}
 		if (object instanceof Map) {
-			return ((Map) object).get(params);
+			return Optional.of((Map) object)
+					.map(map -> map.get(params))
+					.orElse("");
 		}
 		return getMethod(params, object.getClass()).invoke(object, new Object[] {});
 	}
