@@ -51,6 +51,7 @@ public class PoiExcelTempUtil {
                             break;
                         case STRING:
                             cell.setCellValue((String) map.get("value"));
+                            break;
                         case FORMULA:
                             cell.setCellFormula((String) map.get("value"));
                             break;
@@ -58,6 +59,7 @@ public class PoiExcelTempUtil {
                             break;
                         case BOOLEAN:
                             cell.setCellValue((boolean) map.get("value"));
+                            break;
                         case ERROR:
                             break;
                     }
