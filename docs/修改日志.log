@@ -109,6 +109,12 @@ autopoi\src\main\java\org\jeecgframework\poi\excel\export\template\ExcelExportOf
 autopoi\src\main\java\org\jeecgframework\poi\util\PoiExcelTempUtil.java
 ---author:liusq---date:2024/6/04-----for:[issues/8148] autopoi使用模板导出时,如果在循环列后存在公式单元格,导出来后该单元格未空，公式没了--
 
+---author:chenrui---date:2025/6/4-----for:[issues/8248]AutoPOI导出的单元格格式建议加一个常规类型 #8248---
+src/main/java/org/jeecgframework/poi/excel/annotation/Excel.java
+src/main/java/org/jeecgframework/poi/excel/export/base/ExcelExportBase.java
+---author:chenrui---date:2025/6/4-----for:[issues/8248]AutoPOI导出的单元格格式建议加一个常规类型 #8248---
+
+
 ---author:liusq---date:2024/6/24-----for:[issues/8489] autopoi模板导出虽然公式单元格没问题了，但是正常的字符串单元格出错了 #8489--
 autopoi\src\main\java\org\jeecgframework\poi\util\PoiExcelTempUtil.java
 ---author:liusq---date:2024/6/24-----for:[issues/8489] autopoi模板导出虽然公式单元格没问题了，但是正常的字符串单元格出错了 #8489--
