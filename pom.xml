@@ -51,29 +51,29 @@
 			<dependency>
 				<groupId>org.apache.poi</groupId>
 				<artifactId>poi</artifactId>
-				<version>${poi.version}</version>
+				<version>4.1.2</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.poi</groupId>
 				<artifactId>poi-ooxml</artifactId>
-				<version>${poi.version}</version>
+				<version>4.1.2</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.poi</groupId>
 				<artifactId>poi-ooxml-schemas</artifactId>
-				<version>${poi.version}</version>
+				<version>4.1.2</version>
 			</dependency>
 			<!-- sax 读取时候用到的 -->
 			<dependency>
 				<groupId>xerces</groupId>
 				<artifactId>xercesImpl</artifactId>
-				<version>${xerces.version}</version>
+				<version>2.12.2</version>
 				<optional>true</optional>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.poi</groupId>
 				<artifactId>poi-scratchpad</artifactId>
-				<version>${poi.version}</version>
+				<version>5.2.5</version>
 			</dependency>
 
 			<!-- excel背景
@@ -87,20 +87,20 @@
 			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
-				<version>${guava.version}</version>
+				<version>32.0.1-jre</version>
 			</dependency>
 
 			<!-- commons -->
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-lang3</artifactId>
-				<version>${commons-lang.version}</version>
+				<version>3.10</version>
 			</dependency>
 
 			<dependency>
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
-				<version>${commons-io.version}</version>
+				<version>2.14.0</version>
 			</dependency>
 
 			<!--日志 -->
@@ -108,7 +108,7 @@
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-api</artifactId>
-				<version>${slf4j.version}</version>
+				<version>1.7.30</version>
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
@@ -121,7 +121,7 @@
 			<dependency>
 		      <groupId>org.springframework</groupId>
 		      <artifactId>spring-webmvc</artifactId>
-		      <version>${spring.version}</version>
+		      <version>5.3.39</version>
 		      <optional>true</optional>
 		    </dependency>
 			<!--servlet -->
@@ -137,7 +137,7 @@
 			<dependency>
 				<groupId>org.jeecgframework</groupId>
 				<artifactId>autopoi</artifactId>
-				<version>${autopoi.version}</version>
+				<version>1.4.12</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
