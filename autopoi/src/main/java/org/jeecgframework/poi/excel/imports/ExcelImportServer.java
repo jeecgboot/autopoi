@@ -192,9 +192,12 @@ public class ExcelImportServer extends ImportBaseService {
         Integer minColumnIndex = Collections.min(columnIndexSet);
 		Row row = null;
 		//跳过表头和标题行
-		for (int j = 0; j < params.getTitleRows() + params.getHeadRows(); j++) {
-			row = rows.next();
-		}
+		//update-begin---author:chenrui ---date:20250715  for：[issues/3943]导入excel时，标题区域的空行会导致下方列表数据被吞------------
+		int skipRowNum = params.getTitleRows() + params.getHeadRows();
+        do {
+            row = rows.next();
+        } while (row.getRowNum() != skipRowNum - 1);
+		//update-end---author:chenrui ---date:20250715  for：[issues/3943]导入excel时，标题区域的空行会导致下方列表数据被吞------------
 		Object object = null;
 		String picId;
 		while (rows.hasNext() && (row == null || sheet.getLastRowNum() - row.getRowNum() > params.getLastOfInvalidRow())) {
