@@ -4,9 +4,11 @@
 	<parent>
 		<groupId>org.jeecgframework</groupId>
 		<artifactId>autopoi-parent</artifactId>
-		<version>1.4.13</version>
+		<version>1.4.14</version>
 	</parent>
 	<artifactId>autopoi</artifactId>
+	<name>autopoi</name>
+	
 	<dependencies>
 		<!-- poi -->
 		<dependency>
