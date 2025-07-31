@@ -4,7 +4,7 @@
 	<groupId>org.jeecgframework.boot3</groupId>
 	<artifactId>autopoi-parent</artifactId>
 
-	<version>1.4.12</version>
+	<version>1.4.14</version>
 	<packaging>pom</packaging>
 
 	<name>autopoi-parent</name>
@@ -36,7 +36,7 @@
     </developers>
 
 	<properties>
-		<autopoi.version>1.4.12</autopoi.version>
+		<autopoi.version>1.4.14</autopoi.version>
 		<poi.version>4.1.2</poi.version>
 		<xerces.version>2.9.1</xerces.version>
 		<guava.version>29.0-jre</guava.version>
@@ -241,43 +241,33 @@
 						</executions>
 					</plugin>
 					<!--Nexus Staging Maven插件是将组件部署到OSS并将其发布到Central Repository的推荐方法-->
-					<plugin>
-						<groupId>org.sonatype.plugins</groupId>
-						<artifactId>nexus-staging-maven-plugin</artifactId>
-						<extensions>true</extensions>
-						<configuration>
-							<serverId>oss</serverId>
-							<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-							<autoReleaseAfterClose>true</autoReleaseAfterClose>
-						</configuration>
-					</plugin>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.7.0</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <!-- 注意：这类必须要和Maven配置环境中的server id对应上 -->
+                            <publishingServerId>oss</publishingServerId>
+                        </configuration>
+                    </plugin>
 				</plugins>
 			</build>
-			<distributionManagement>
-				<snapshotRepository>
-					<id>oss</id>
-					<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-				</snapshotRepository>
-				<repository>
-					<id>oss</id>
-					<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-				</repository>
-			</distributionManagement>
 		</profile>
 	</profiles>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>17</source>
-					<target>17</target>
-					<encoding>UTF-8</encoding>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>17</source>
+                    <target>17</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

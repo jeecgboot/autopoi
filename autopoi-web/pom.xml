@@ -5,9 +5,10 @@
 	<parent>
 		<groupId>org.jeecgframework.boot3</groupId>
 		<artifactId>autopoi-parent</artifactId>
-		<version>1.4.12</version>
+		<version>1.4.14</version>
 	</parent>
 	<artifactId>autopoi-web</artifactId>
+	<name>autopoi-web</name>
 	<dependencies>
 		<!-- autopoi -->
 		<dependency>
