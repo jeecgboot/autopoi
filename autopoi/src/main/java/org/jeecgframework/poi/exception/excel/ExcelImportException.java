@@ -40,6 +40,7 @@ public class ExcelImportException extends RuntimeException {
 
 	public ExcelImportException(ExcelImportEnum type, Throwable cause) {
 		super(type.getMsg(), cause);
+		this.type = type;
 	}
 
 	public ExcelImportException(String message) {
