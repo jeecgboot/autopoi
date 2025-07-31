@@ -118,3 +118,7 @@ src/main/java/org/jeecgframework/poi/excel/export/base/ExcelExportBase.java
 ---author:liusq---date:2024/6/24-----for:[issues/8489] autopoi模板导出虽然公式单元格没问题了，但是正常的字符串单元格出错了 #8489--
 autopoi\src\main\java\org\jeecgframework\poi\util\PoiExcelTempUtil.java
 ---author:liusq---date:2024/6/24-----for:[issues/8489] autopoi模板导出虽然公式单元格没问题了，但是正常的字符串单元格出错了 #8489--
+
+---author:chenrui---date:2025/7/16-----for:[issues/3943]导入excel时，标题区域的空行会导致下方列表数据被吞---
+src/main/java/org/jeecgframework/poi/excel/imports/ExcelImportServer.java
+---author:chenrui---date:2025/7/16-----for:[issues/3943]导入excel时，标题区域的空行会导致下方列表数据被吞---
