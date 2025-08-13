@@ -40,4 +40,19 @@ public interface NormalExcelConstants extends BasePOIConstants {
 	 */
 	public final static String EXPORT_FIELDS = "exportFields";
 
+
+	/**
+	 * 自定义导出服务
+	 * for [issues/8652]excel导出大数据问题 #8652
+	 */
+	public final static String EXPORT_SERVER = "excelExportServer";
+
+
+
+	/**
+	 * 查询参数
+	 * for [issues/8652]excel导出大数据问题 #8652
+	 */
+	public final static String QUERY_PARAMS = "queryParams";
+
 }
