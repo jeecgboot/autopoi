@@ -4,7 +4,7 @@
 	<groupId>org.jeecgframework</groupId>
 	<artifactId>autopoi-parent</artifactId>
 
-	<version>1.4.16</version>
+	<version>1.4.17</version>
 	<packaging>pom</packaging>
 
 	<name>autopoi-parent</name>
@@ -36,7 +36,7 @@
     </developers>
 
 	<properties>
-		<autopoi.version>1.4.16</autopoi.version>
+		<autopoi.version>1.4.17</autopoi.version>
 		<poi.version>4.1.2</poi.version>
 		<xerces.version>2.9.1</xerces.version>
 		<guava.version>29.0-jre</guava.version>
