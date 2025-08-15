@@ -33,6 +33,7 @@
 		<dependency>
 			<groupId>xerces</groupId>
 			<artifactId>xercesImpl</artifactId>
+			<optional>true</optional>
 		</dependency>
 		<!-- Word 时候用到 -->
 		<dependency>
