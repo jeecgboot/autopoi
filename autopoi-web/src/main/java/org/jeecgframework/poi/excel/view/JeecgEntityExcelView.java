@@ -29,6 +29,7 @@ import org.jeecgframework.poi.excel.ExcelExportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
 import org.jeecgframework.poi.excel.export.ExcelExportServer;
+import org.jeecgframework.poi.handler.inter.IExcelExportServer;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -65,6 +66,13 @@ public class JeecgEntityExcelView extends MiniAbstractExcelView {
 			for (int i = 1; i < list.size(); i++) {
 				new ExcelExportServer().createSheet(workbook, (ExportParams) list.get(i).get(NormalExcelConstants.PARAMS), (Class<?>) list.get(i).get(NormalExcelConstants.CLASS), (Collection<?>) list.get(i).get(NormalExcelConstants.DATA_LIST),exportFields);
 			}
+		} else if(model.containsKey(NormalExcelConstants.EXPORT_SERVER)){
+			//update-begin---author:chenrui ---date:20250812  for：[issues/8652]excel导出大数据问题 #8652------------
+			workbook = ExcelExportUtil.exportBigExcel((ExportParams) model.get(NormalExcelConstants.PARAMS),
+					(Class<?>) model.get(NormalExcelConstants.CLASS),
+					(IExcelExportServer) model.get(NormalExcelConstants.EXPORT_SERVER),
+					model.get(NormalExcelConstants.QUERY_PARAMS));
+			//update-end---author:chenrui ---date:20250812  for：[issues/8652]excel导出大数据问题 #8652------------
 		} else {
 			workbook = ExcelExportUtil.exportExcel((ExportParams) model.get(NormalExcelConstants.PARAMS), (Class<?>) model.get(NormalExcelConstants.CLASS), (Collection<?>) model.get(NormalExcelConstants.DATA_LIST),exportFields);
 		}

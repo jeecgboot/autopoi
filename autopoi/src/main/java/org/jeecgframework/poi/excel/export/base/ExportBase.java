@@ -202,6 +202,11 @@ public class ExportBase {
 	 */
 	public Object getCellValue(ExcelExportEntity entity, Object obj) throws Exception {
 		Object value;
+		//update-begin---author:chenrui ---date:20250819  for：[issues/8699]AutoPoi在使用@ExcelEntity当设置show=true并且该项为null时报错------------
+		if(null == obj){
+			return "";
+		}
+		//update-end---author:chenrui ---date:20250819  for：[issues/8699]AutoPoi在使用@ExcelEntity当设置show=true并且该项为null时报错------------
 		if (obj instanceof Map) {
 			value = ((Map<?, ?>) obj).get(entity.getKey());
 		} else {
