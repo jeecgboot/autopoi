@@ -122,3 +122,7 @@ autopoi\src\main\java\org\jeecgframework\poi\util\PoiExcelTempUtil.java
 ---author:chenrui---date:2025/7/16-----for:[issues/3943]导入excel时，标题区域的空行会导致下方列表数据被吞---
 src/main/java/org/jeecgframework/poi/excel/imports/ExcelImportServer.java
 ---author:chenrui---date:2025/7/16-----for:[issues/3943]导入excel时，标题区域的空行会导致下方列表数据被吞---
+
+---author:chenrui---date:2025/8/19-----for:[issues/8699]AutoPoi在使用@ExcelEntity当设置show=true并且该项为null时报错---
+src/main/java/org/jeecgframework/poi/excel/export/base/ExportBase.java
+---author:chenrui---date:2025/8/19-----for:[issues/8699]AutoPoi在使用@ExcelEntity当设置show=true并且该项为null时报错---
