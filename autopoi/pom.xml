@@ -74,5 +74,11 @@
 			<optional>true</optional>
 		</dependency>
 
+		<!--hutool-->
+		<dependency>
+			<groupId>cn.hutool</groupId>
+			<artifactId>hutool-core</artifactId>
+		</dependency>
+
 	</dependencies>
 </project>
