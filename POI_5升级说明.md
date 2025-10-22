@@ -80,12 +80,57 @@ import jakarta.servlet.http.HttpServletResponse;
 ### 1. 模块重命名
 - `autopoi-web` → `autopoi-spring-boot-2-starter`
 
-### 2. 不兼容的 API（已废弃）
+### 2. 依赖变更
+
+#### ❌ 已删除的依赖
+**`poi-ooxml-schemas` 依赖已移除**
+
+```xml
+<!-- ❌ POI 4.x 需要显式引入 -->
+<dependency>
+    <groupId>org.apache.poi</groupId>
+    <artifactId>poi-ooxml-schemas</artifactId>
+    <version>1.4</version>
+</dependency>
+```
+
+**删除原因：**
+1. **POI 5.x 架构改进** - 从 POI 5.0 开始，`poi-ooxml` 依赖已经内置了必要的 schema 定义
+2. **依赖简化** - POI 5.x 使用了更轻量的 `poi-ooxml-lite` 替代方案，减少了包体积
+3. **避免冲突** - 旧版本的 `poi-ooxml-schemas` 包体积达 15MB+，容易与其他依赖冲突
+4. **自动传递** - `poi-ooxml` 5.x 会自动引入所需的 schema 类，无需手动添加
+
+**迁移操作：**
+- ✅ 直接删除 `poi-ooxml-schemas` 依赖即可
+- ✅ 只保留 `poi` 和 `poi-ooxml` 依赖
+- ✅ 无需任何代码修改
+
+```xml
+<!-- ✅ POI 5.x 只需这两个依赖 -->
+<dependency>
+    <groupId>org.apache.poi</groupId>
+    <artifactId>poi</artifactId>
+    <version>5.4.1</version>
+</dependency>
+<dependency>
+    <groupId>org.apache.poi</groupId>
+    <artifactId>poi-ooxml</artifactId>
+    <version>5.4.1</version>
+</dependency>
+```
+
+**验证方法：**
+```bash
+# 检查依赖树，确认没有 poi-ooxml-schemas
+mvn dependency:tree | grep poi
+```
+
+### 3. 不兼容的 API（已废弃）
 - ❌ **图表生成功能暂不可用**（`ExcelChartBuildService`）
   - 原因：POI 5.x 的图表 API 完全重构
   - 影响：如果使用了图表生成功能，需要暂时移除或使用其他方案
 
-### 3. API 变更（内部已适配，无需修改代码）
+### 4. API 变更（内部已适配，无需修改代码）
 以下变更已在内部处理，用户代码无需修改：
 - `cell.getCellTypeEnum()` → `cell.getCellType()`
 - `HSSFDateUtil` → `DateUtil`
