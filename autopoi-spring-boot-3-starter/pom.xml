@@ -1,0 +1,44 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.jeecgframework</groupId>
+		<artifactId>autopoi-parent</artifactId>
+		<version>2.0.0</version>
+	</parent>
+	<artifactId>autopoi-spring-boot-3-starter</artifactId>
+	<name>autopoi-spring-boot-3-starter</name>
+	<dependencies>
+		<!-- autopoi -->
+		<dependency>
+			<groupId>org.jeecgframework</groupId>
+			<artifactId>autopoi</artifactId>
+			<version>${autopoi.version}</version>
+		</dependency>
+
+	<!-- commons-io: Required by Apache POI 5.x -->
+	<dependency>
+		<groupId>commons-io</groupId>
+		<artifactId>commons-io</artifactId>
+	</dependency>
+
+	<!--spring 6.x for Spring Boot 3.x -->
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-webmvc</artifactId>
+		<version>6.2.1</version>
+		<optional>true</optional>
+	</dependency>
+
+	<!-- Jakarta Servlet (Spring Boot 3.x uses Jakarta EE) -->
+	<dependency>
+		<groupId>jakarta.servlet</groupId>
+		<artifactId>jakarta.servlet-api</artifactId>
+		<version>6.1.0</version>
+		<scope>provided</scope>
+		<optional>true</optional>
+	</dependency>
+
+</dependencies>
+</project>

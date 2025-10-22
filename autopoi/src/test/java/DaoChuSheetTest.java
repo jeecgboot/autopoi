@@ -1,8 +1,8 @@
 import org.apache.poi.ss.usermodel.Workbook;
 import org.jeecgframework.poi.excel.ExcelExportUtil;
 import org.jeecgframework.poi.excel.entity.ExportParams;
-import org.jeecgframework.poi.excel.entity.TemplateExportParams;
 import org.jeecgframework.poi.excel.entity.enmus.ExcelType;
+import vo.TestEntity;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -18,7 +18,7 @@ import java.util.Map;
  * @date: 2020年09月16日 11:46
  */
 public class DaoChuSheetTest {
-    private static final String basePath = "G:\\needtodeplay\\autopoi-framework-sy-4.0\\autopoi-web\\src\\test\\resources\\templates\\";
+    private static final String generatePath = "D:/excel/";
 
     public static ExportParams getExportParams(String name) {
         return  new ExportParams(name,name,ExcelType.XSSF);
@@ -34,7 +34,7 @@ public class DaoChuSheetTest {
         for(int i=0;i<3;i++){
             Map<String, Object> map = new HashMap<String, Object>();
             map.put("title", getExportParams("测试"+i));//表格Title
-            map.put("entity",TestEntity.class);//表格对应实体
+            map.put("entity", TestEntity.class);//表格对应实体
             List<TestEntity> ls=new ArrayList<TestEntity> ();
             for(int j=0;j<10;j++){
                 TestEntity testEntity = new TestEntity();
@@ -58,11 +58,11 @@ public class DaoChuSheetTest {
 
     public static void main(String[] args) throws IOException {
         Workbook workbook = test();
-        File savefile = new File(basePath);
+        File savefile = new File(generatePath);
         if (!savefile.exists()) {
             savefile.mkdirs();
         }
-        FileOutputStream fos = new FileOutputStream(basePath + "testSheet.xlsx");
+        FileOutputStream fos = new FileOutputStream(generatePath + "testSheet.xlsx");
         workbook.write(fos);
         fos.close();
     }

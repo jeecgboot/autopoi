@@ -1,0 +1,42 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.jeecgframework</groupId>
+		<artifactId>autopoi-parent</artifactId>
+		<version>2.0.0</version>
+	</parent>
+	<artifactId>autopoi-spring-boot-2-starter</artifactId>
+	<name>autopoi-spring-boot-2-starter</name>
+	<dependencies>
+		<!-- autopoi -->
+		<dependency>
+			<groupId>org.jeecgframework</groupId>
+			<artifactId>autopoi</artifactId>
+			<version>${autopoi.version}</version>
+		</dependency>
+
+	<!-- commons-io: Required by Apache POI 5.x -->
+	<dependency>
+		<groupId>commons-io</groupId>
+		<artifactId>commons-io</artifactId>
+	</dependency>
+
+	<!--spring -->
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-webmvc</artifactId>
+		<optional>true</optional>
+	</dependency>
+
+	<!-- servlet -->
+	<dependency>
+		<groupId>javax.servlet</groupId>
+		<artifactId>servlet-api</artifactId>
+		<scope>provided</scope>
+		<optional>true</optional>
+	</dependency>
+
+</dependencies>
+</project>

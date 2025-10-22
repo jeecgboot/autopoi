@@ -16,10 +16,9 @@ import java.util.Map;
  * @date: 2020年09月16日 11:46
  */
 public class DaoChuTest {
-    private static final String basePath = "G:\\needtodeplay\\autopoi-framework-sy-4.0\\autopoi-web\\src\\test\\resources\\templates\\";
-
+    private static final String TEMPLATE_PATH = System.getProperty("user.dir") + File.separator + "autopoi" + File.separator + "src" + File.separator + "test" + File.separator + "resources" + File.separator + "templates" + File.separator;
     public static TemplateExportParams getTemplateParams(String name) {
-        return new TemplateExportParams(basePath + name + ".xlsx");
+        return new TemplateExportParams(TEMPLATE_PATH + name + ".xlsx");
     }
 
     public static Workbook test(String name) {
@@ -44,11 +43,11 @@ public class DaoChuTest {
         String temName = "test";
         String temNameNextM = "testNextMarge";
         Workbook workbook = test(temNameNextM);
-        File savefile = new File(basePath);
+        File savefile = new File(TEMPLATE_PATH);
         if (!savefile.exists()) {
             savefile.mkdirs();
         }
-        FileOutputStream fos = new FileOutputStream(basePath + "testNew.xlsx");
+        FileOutputStream fos = new FileOutputStream("D:/excel/testNew.xlsx");
         workbook.write(fos);
         fos.close();
     }

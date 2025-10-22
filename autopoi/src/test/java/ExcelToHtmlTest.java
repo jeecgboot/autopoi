@@ -8,13 +8,13 @@ import java.io.FileWriter;
 
 public class ExcelToHtmlTest {
 
-    private static final String basePath = "D:\\idea_project_2023\\autopoi_lsq\\autopoi-web\\src\\test\\resources\\templates\\";
+    private static final String TEMPLATE_PATH = System.getProperty("user.dir") + File.separator + "autopoi" + File.separator + "src" + File.separator + "test" + File.separator + "resources" + File.separator + "templates" + File.separator;
 
     public static void main(String[] args) throws Exception {
-        File file = new File(basePath + "专项支出用款申请书.xls");
+        File file = new File(TEMPLATE_PATH + "专项支出用款申请书.xls");
         Workbook wb = new HSSFWorkbook(new FileInputStream(file));
         String     html = ExcelToHtmlUtil.toTableHtml(wb);
-        FileWriter fw   = new FileWriter("D:/home/excel/专项支出用款申请书.html");
+        FileWriter fw   = new FileWriter("D:/excel/专项支出用款申请书.html");
         fw.write(html);
         fw.close();
     }

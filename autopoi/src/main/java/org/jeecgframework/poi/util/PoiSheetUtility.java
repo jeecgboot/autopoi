@@ -75,10 +75,10 @@ public class PoiSheetUtility extends Object {
 	 */
 	private static void cloneCell(Cell cNew, Cell cOld) {
 		cNew.setCellComment(cOld.getCellComment());
-		cNew.setCellStyle(cOld.getCellStyle());
+	cNew.setCellStyle(cOld.getCellStyle());
 
-		switch (cNew.getCellTypeEnum()) {
-		case BOOLEAN: {
+	switch (cNew.getCellType()) {
+	case BOOLEAN: {
 			cNew.setCellValue(cOld.getBooleanCellValue());
 			break;
 		}

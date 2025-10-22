@@ -71,7 +71,7 @@ public class CellValueServer {
 				|| ("class java.sql.Time").equals(xclass)
 				|| ("class java.time.LocalDate").equals(xclass)
 				|| ("class java.time.LocalDateTime").equals(xclass)) {
-			if ( CellType.NUMERIC == cell.getCellTypeEnum()) {
+			if ( CellType.NUMERIC == cell.getCellType()) {
 				// 日期格式
 				result = cell.getDateCellValue();
 			} else {
@@ -83,13 +83,13 @@ public class CellValueServer {
 			}else if (("class java.time.LocalDate").equals(xclass)) {
 				result = ((Date) result).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 			} else if (("class java.time.LocalDateTime").equals(xclass)) {
-				result = ((Date) result).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-			}
-		} else if ( CellType.NUMERIC == cell.getCellTypeEnum()) {
-			result = cell.getNumericCellValue();
-		} else if ( CellType.BOOLEAN == cell.getCellTypeEnum()) {
+			result = ((Date) result).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+		}
+	} else if ( CellType.NUMERIC == cell.getCellType()) {
+		result = cell.getNumericCellValue();
+	} else if ( CellType.BOOLEAN == cell.getCellType()) {
 			result = cell.getBooleanCellValue();
-		} else if ( CellType.FORMULA == cell.getCellTypeEnum() && PoiPublicUtil.isNumber(xclass)) {
+		} else if ( CellType.FORMULA == cell.getCellType() && PoiPublicUtil.isNumber(xclass)) {
 			//如果单元格是表达式 且 字段是数字类型
 			double cellValue = cell.getNumericCellValue();
 			//---author:liusq---date:20221102-----for: [issues/3369]Excel导入 带公式的时候精度丢失---

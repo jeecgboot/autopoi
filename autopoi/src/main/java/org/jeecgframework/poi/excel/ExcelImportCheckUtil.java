@@ -256,7 +256,7 @@ public class ExcelImportCheckUtil {
             return null;
         }
         Object obj = null;
-        switch (cell.getCellTypeEnum()) {
+        switch (cell.getCellType()) {
             case STRING:
                 obj = cell.getStringCellValue();
                 break;

@@ -284,7 +284,7 @@ public final class ExcelExportOfTemplateUtil extends ExcelExportBase {
 			}
 			for (int i = row.getFirstCellNum(); i < row.getLastCellNum(); i++) {
 				cell = row.getCell(i);
-				if (row.getCell(i) != null && (cell.getCellTypeEnum() == CellType.STRING || cell.getCellTypeEnum() == CellType.NUMERIC)) {
+				if (row.getCell(i) != null && (cell.getCellType() == CellType.STRING || cell.getCellType() == CellType.NUMERIC)) {
 					cell.setCellType(CellType.STRING);
 					String text = cell.getStringCellValue();
 					if (text.contains(IF_DELETE)) {
@@ -305,8 +305,8 @@ public final class ExcelExportOfTemplateUtil extends ExcelExportBase {
 	 * @param map
 	 */
 	private void setValueForCellByMap(Cell cell, Map<String, Object> map) throws Exception {
-        CellType cellType = cell.getCellTypeEnum();
-        if (cellType != CellType.STRING && cellType != CellType.NUMERIC) {
+       CellType cellType = cell.getCellType();
+       if (cellType != CellType.STRING && cellType != CellType.NUMERIC) {
 			return;
 		}
 		String oldString;

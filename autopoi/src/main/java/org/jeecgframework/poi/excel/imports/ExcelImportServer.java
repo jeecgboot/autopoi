@@ -124,9 +124,9 @@ public class ExcelImportServer extends ImportBaseService {
 		if(cell==null){
 			return null;
 		}
-		Object obj = null;
-		switch (cell.getCellTypeEnum()) {
-		case STRING:
+	Object obj = null;
+	switch (cell.getCellType()) {
+	case STRING:
 			obj = cell.getStringCellValue();
 			break;
 		case BOOLEAN:

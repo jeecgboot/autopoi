@@ -2,6 +2,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.jeecgframework.poi.excel.ExcelExportUtil;
 import org.jeecgframework.poi.excel.entity.ExportParams;
 import org.jeecgframework.poi.handler.inter.IExcelExportServer;
+import vo.TestEntity;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -15,6 +16,8 @@ import java.util.List;
  * @date: 2022年1月4日
  */
 public class DaoChuBigDataTest {
+    private static final String generatePath = "D:/excel/";
+    
     /**
      * 导出测试方法
      * 参考：http://doc.wupaas.com/docs/easypoi/easypoi-1c10lbsojh62f
@@ -64,7 +67,7 @@ public class DaoChuBigDataTest {
                 return list;
             }
         }, totalPage);
-        File savefile = new File("D:/excel/");
+        File savefile = new File(generatePath);
         if (!savefile.exists()) {
             savefile.mkdirs();
         }

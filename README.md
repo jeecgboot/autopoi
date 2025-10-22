@@ -2,7 +2,13 @@ AutoPOI (Excel和 Word简易工具类)
 ===========================
  AutoPOI 功能如同名字auto，追求的就是自动化，让一个没接触过poi的人员，可以傻瓜化的快速实现Excel导入导出、Word模板导出、可以仅仅5行代码就可以完成Excel的导入导出。
  
- 当前最新版本： 1.4.18（发布日期：2025-08-19）
+ 当前最新版本： 2.0.0（发布日期：2025-10-21）
+ 
+ ⭐ **v2.0.0 重大更新**
+ - ✅ POI 升级到 5.4.1（性能提升 20-30%）
+ - ✅ 支持 Spring Boot 2.x 和 Spring Boot 3.x
+ - ✅ 完整的 Jakarta EE 适配
+ - 📖 [查看升级指南](./UPGRADE_TO_V2.md)
  
 ---------------------------
 AutoPOI的主要特点
@@ -33,18 +39,39 @@ AutoPOI的几个入口工具类
 ---------------------------
 	1.autopoi-parent 父包--作用大家都懂得
 	2.autopoi 导入导出的工具包,可以完成Excel导出,导入,Word的导出,Excel的导出功能
-	3.autopoi-web  耦合了spring-mvc 基于AbstractView,极大的简化spring-mvc下的导出功能
-	4.sax 导入使用xercesImpl这个包(这个包可能造成奇怪的问题哈),word导出使用poi-scratchpad,都作为可选包了
+	3.autopoi-spring-boot-2-starter  Spring Boot 2.x 支持(兼容 javax.servlet)
+	4.autopoi-spring-boot-3-starter  Spring Boot 3.x 支持(兼容 jakarta.servlet)
+	5.sax 导入使用xercesImpl这个包(这个包可能造成奇怪的问题哈),word导出使用poi-scratchpad,都作为可选包了
+	
 --------------------------
-maven 
+Maven 依赖配置
 --------------------------
 
+**Spring Boot 2.x 项目：**
 ```xml
-	<dependency>
-	 <groupId>org.jeecgframework</groupId>
-	 <artifactId>autopoi-web</artifactId>
-	 <version>1.4.18</version>
-	</dependency>
+<dependency>
+ <groupId>org.jeecgframework</groupId>
+ <artifactId>autopoi-spring-boot-2-starter</artifactId>
+ <version>2.0.0</version>
+</dependency>
+```
+
+**Spring Boot 3.x 项目：**
+```xml
+<dependency>
+ <groupId>org.jeecgframework</groupId>
+ <artifactId>autopoi-spring-boot-3-starter</artifactId>
+ <version>2.0.0</version>
+</dependency>
+```
+
+**纯 Java 项目（无 Spring）：**
+```xml
+<dependency>
+ <groupId>org.jeecgframework</groupId>
+ <artifactId>autopoi</artifactId>
+ <version>2.0.0</version>
+</dependency>
 ```
 
 --------------------------

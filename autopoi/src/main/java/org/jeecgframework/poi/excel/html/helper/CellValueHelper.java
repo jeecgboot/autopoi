@@ -48,7 +48,7 @@ public class CellValueHelper {
 	 * @param wb
 	 */
 	private void cacheFontInfo(Workbook wb) {
-		for (short i = 0, le = wb.getNumberOfFonts(); i < le; i++) {
+		for (int i = 0, le = wb.getNumberOfFonts(); i < le; i++) {
 			Font font = wb.getFontAt(i);
 			fontCache.put(font.getBold() + "_" + font.getItalic() + "_" + font.getFontName() + "_" + font.getFontHeightInPoints() + "_" + font.getColor(), font.getIndex() + "");
 		}
@@ -56,10 +56,10 @@ public class CellValueHelper {
 	}
 
 	public String getHtmlValue(Cell cell) {
-		if (CellType.BOOLEAN == cell.getCellTypeEnum() || CellType.NUMERIC == cell.getCellTypeEnum()) {
+		if (CellType.BOOLEAN == cell.getCellType() || CellType.NUMERIC == cell.getCellType()) {
 			cell.setCellType( CellType.STRING);
 			return cell.getStringCellValue();
-		} else if ( CellType.STRING == cell.getCellTypeEnum()) {
+		} else if ( CellType.STRING == cell.getCellType()) {
 			if (cell.getRichStringCellValue().numFormattingRuns() == 0) {
 				return XmlEscapers.xmlContentEscaper().escape(cell.getStringCellValue());
 			} else if (is07) {

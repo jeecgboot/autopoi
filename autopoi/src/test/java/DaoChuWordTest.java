@@ -12,7 +12,7 @@ import java.util.*;
  * @date: 2020年09月16日 11:46
  */
 public class DaoChuWordTest {
-    private static final String basePath = "G:\\needtodeplay\\autopoi-framework-sy-4.0\\autopoi-web\\src\\test\\resources\\templates\\";
+    private static final String TEMPLATE_PATH = System.getProperty("user.dir") + File.separator + "autopoi" + File.separator + "src" + File.separator + "test" + File.separator + "resources" + File.separator + "templates" + File.separator;
 
     public static void main(String[] args) throws Exception {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -45,12 +45,12 @@ public class DaoChuWordTest {
         map.put("now", curTime);
 
         //单列
-        XWPFDocument document = WordExportUtil.exportWord07(basePath + "纳税信息.docx", map);
-        File savefile = new File("D:\\poi");
+        XWPFDocument document = WordExportUtil.exportWord07(TEMPLATE_PATH + "纳税信息.docx", map);
+        File savefile = new File("D:\\excel");
         if (!savefile.exists()) {
             savefile.mkdirs();
         }
-        FileOutputStream fos = new FileOutputStream(basePath + "纳税信息new.docx");
+        FileOutputStream fos = new FileOutputStream( "D:\\excel\\纳税信息new.docx");
         document.write(fos);
         fos.close();
     }

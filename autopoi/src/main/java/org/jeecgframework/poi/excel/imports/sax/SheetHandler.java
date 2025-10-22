@@ -19,9 +19,8 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.poi.hssf.usermodel.HSSFDateUtil;
-import org.apache.poi.xssf.model.SharedStringsTable;
-import org.apache.poi.xssf.usermodel.XSSFRichTextString;
+import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.xssf.model.SharedStrings;
 import org.jeecgframework.poi.excel.entity.enmus.CellValueType;
 import org.jeecgframework.poi.excel.entity.sax.SaxReadCellEntity;
 import org.jeecgframework.poi.excel.imports.sax.parse.ISaxRowRead;
@@ -39,7 +38,7 @@ import com.google.common.collect.Lists;
  */
 public class SheetHandler extends DefaultHandler {
 
-	private SharedStringsTable sst;
+	private SharedStrings sst;
 	private String lastContents;
 
 	// 当前行
@@ -54,7 +53,7 @@ public class SheetHandler extends DefaultHandler {
 	// 存储行记录的容器
 	private List<SaxReadCellEntity> rowlist = Lists.newArrayList();
 
-	public SheetHandler(SharedStringsTable sst, ISaxRowRead rowRead) {
+	public SheetHandler(SharedStrings sst, ISaxRowRead rowRead) {
 		this.sst = sst;
 		this.read = rowRead;
 	}
@@ -92,7 +91,7 @@ public class SheetHandler extends DefaultHandler {
 		if (CellValueType.String.equals(type)) {
 			try {
 				int idx = Integer.parseInt(lastContents);
-				lastContents = new XSSFRichTextString(sst.getEntryAt(idx)).toString();
+				lastContents = sst.getItemAt(idx).toString();
 			} catch (Exception e) {
 
 			}
@@ -109,7 +108,7 @@ public class SheetHandler extends DefaultHandler {
 			String value = lastContents.trim();
 			value = value.equals("") ? " " : value;
 			if (CellValueType.Date.equals(type)) {
-				Date date = HSSFDateUtil.getJavaDate(Double.valueOf(value));
+				Date date = DateUtil.getJavaDate(Double.valueOf(value));
 				rowlist.add(curCol, new SaxReadCellEntity(CellValueType.Date, date));
 			} else if (CellValueType.Number.equals(type)) {
 				BigDecimal bd = new BigDecimal(value);

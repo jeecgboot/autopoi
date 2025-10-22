@@ -223,19 +223,19 @@ public class ExcelUtil {
             return "";
         }
 
-        if(cell.getCellTypeEnum() == CellType.STRING){
+        if(cell.getCellType() == CellType.STRING){
 
             return cell.getStringCellValue();
 
-        }else if(cell.getCellTypeEnum() == CellType.BOOLEAN){
+        }else if(cell.getCellType() == CellType.BOOLEAN){
 
             return String.valueOf(cell.getBooleanCellValue());
 
-        }else if(cell.getCellTypeEnum() ==  CellType.FORMULA){
+        }else if(cell.getCellType() ==  CellType.FORMULA){
 
             return cell.getCellFormula() ;
 
-        }else if(cell.getCellTypeEnum() == CellType.NUMERIC){
+        }else if(cell.getCellType() == CellType.NUMERIC){
 
             return String.valueOf(cell.getNumericCellValue());
 
@@ -302,7 +302,7 @@ public class ExcelUtil {
                 while (cells.hasNext()) {
                     Cell cell = cells.next();
                     System.out.println("Cell #" + cell.getColumnIndex());
-                    switch (cell.getCellTypeEnum()) {   //根据cell中的类型来输出数据
+                    switch (cell.getCellType()) {   //根据cell中的类型来输出数据
                         case NUMERIC:
                             System.out.println(cell.getNumericCellValue());
                             break;
@@ -316,7 +316,7 @@ public class ExcelUtil {
                             System.out.println(cell.getCellFormula());
                             break;
                         default:
-                            System.out.println("unsuported sell type======="+cell.getCellTypeEnum());
+                            System.out.println("unsuported sell type======="+cell.getCellType());
                             break;
                     }
                 }

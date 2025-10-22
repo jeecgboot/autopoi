@@ -7,21 +7,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Chart;
 import org.apache.poi.ss.usermodel.ClientAnchor;
 import org.apache.poi.ss.usermodel.Drawing;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.charts.AxisCrosses;
-import org.apache.poi.ss.usermodel.charts.AxisPosition;
-import org.apache.poi.ss.usermodel.charts.ChartAxis;
-import org.apache.poi.ss.usermodel.charts.ChartDataSource;
-import org.apache.poi.ss.usermodel.charts.ChartLegend;
-import org.apache.poi.ss.usermodel.charts.DataSources;
-import org.apache.poi.ss.usermodel.charts.LegendPosition;
-import org.apache.poi.ss.usermodel.charts.LineChartData;
-import org.apache.poi.ss.usermodel.charts.ScatterChartData;
-import org.apache.poi.ss.usermodel.charts.ValueAxis;
+// POI 5.x Chart API 已重构，以下导入暂时注释
+// import org.apache.poi.ss.usermodel.Chart;
+// import org.apache.poi.ss.usermodel.charts.AxisCrosses;
+// import org.apache.poi.ss.usermodel.charts.AxisPosition;
+// import org.apache.poi.ss.usermodel.charts.ChartAxis;
+// import org.apache.poi.ss.usermodel.charts.ChartDataSource;
+// import org.apache.poi.ss.usermodel.charts.ChartLegend;
+// import org.apache.poi.ss.usermodel.charts.DataSources;
+// import org.apache.poi.ss.usermodel.charts.LegendPosition;
+// import org.apache.poi.ss.usermodel.charts.LineChartData;
+// import org.apache.poi.ss.usermodel.charts.ScatterChartData;
+// import org.apache.poi.ss.usermodel.charts.ValueAxis;
 import org.apache.poi.ss.util.CellRangeAddress;
 
 import org.jeecgframework.poi.excel.graph.constant.ExcelGraphElementType;
@@ -33,10 +34,13 @@ import org.jeecgframework.poi.util.PoiCellUtil;
 import org.jeecgframework.poi.util.PoiExcelGraphDataUtil;
 
 /**
- * @Description
+ * @Description Excel图表功能
  * @author liusq
  * @data 2022年1月4号
+ * @deprecated Chart API 在 POI 5.x 中已被完全重构，此类暂时不支持 POI 5.x
+ * 如需使用图表功能，请降级到 POI 4.x 或等待后续版本适配
  */
+@Deprecated
 public class ExcelChartBuildService
 {
 	/**
@@ -45,27 +49,12 @@ public class ExcelChartBuildService
 	 * @param graphList
 	 * @param build 通过实时数据行来重新计算图形定义
 	 * @param append
+	 * @deprecated Chart API 在 POI 5.x 中已被完全重构，暂不支持
 	 */
+	@Deprecated
 	public static void createExcelChart(Workbook workbook, List<ExcelGraph> graphList, Boolean build, Boolean append)
 	{
-		if(workbook!=null&&graphList!=null){
-			//设定默认第一个sheet为数据项
-			Sheet dataSouce=workbook.getSheetAt(0);
-			if(dataSouce!=null){
-				buildTitle(dataSouce,graphList);
-				
-				if(build){
-					PoiExcelGraphDataUtil.buildGraphData(dataSouce, graphList);
-				}
-				if(append){
-					buildExcelChart(dataSouce, dataSouce, graphList);
-				}else{
-					Sheet sheet=workbook.createSheet("图形界面");
-					buildExcelChart(dataSouce, sheet, graphList);
-				}
-			}
-			
-		}
+		throw new UnsupportedOperationException("Chart API 在 POI 5.x 中已被完全重构，此功能暂不支持。请降级到 POI 4.x 或等待后续版本适配。");
 	}
 	
 	/**
@@ -74,8 +63,12 @@ public class ExcelChartBuildService
 	 * @param anchor
 	 * @param dataSourceSheet
 	 * @param graph
+	 * @deprecated Chart API 在 POI 5.x 中已被完全重构，暂不支持
 	 */
+	@Deprecated
 	private static void buildExcelChart(Drawing drawing,ClientAnchor anchor,Sheet dataSourceSheet,ExcelGraph graph){
+		throw new UnsupportedOperationException("Chart API 在 POI 5.x 中已被完全重构，此功能暂不支持。");
+		/* POI 5.x Chart API 已重构，以下代码暂时注释
 		Chart chart = null;
 		// TODO  图表没有成功
 		//drawing.createChart(anchor);
@@ -114,6 +107,7 @@ public class ExcelChartBuildService
 			buildScatterChartData(data, categoryChart, chartValueList,graph.getTitle());
 			chart.plot(data, bottomAxis, leftAxis);
 		} 
+		*/
 	}
 	
 	
@@ -206,8 +200,12 @@ public class ExcelChartBuildService
 	 * @param categoryChart
 	 * @param chartValueList
 	 * @param title
+	 * @deprecated Chart API 在 POI 5.x 中已被完全重构，暂不支持
 	 */
-	private static void buildLineChartData(LineChartData data,ChartDataSource categoryChart,List<ChartDataSource<Number>> chartValueList,List<String> title){
+	@Deprecated
+	private static void buildLineChartData(Object data, Object categoryChart, List chartValueList, List<String> title){
+		throw new UnsupportedOperationException("Chart API 在 POI 5.x 中已被完全重构，此功能暂不支持。");
+		/* POI 5.x Chart API 已重构，以下代码暂时注释
 		if(chartValueList.size()==title.size())
 		{
 			int len=title.size();
@@ -228,6 +226,7 @@ public class ExcelChartBuildService
 				}
 			}
 		}
+		*/
 	}
 	
 	/**
@@ -236,8 +235,12 @@ public class ExcelChartBuildService
 	 * @param categoryChart
 	 * @param chartValueList
 	 * @param title
+	 * @deprecated Chart API 在 POI 5.x 中已被完全重构，暂不支持
 	 */
-	private static void buildScatterChartData(ScatterChartData data,ChartDataSource categoryChart,List<ChartDataSource<Number>> chartValueList,List<String> title){
+	@Deprecated
+	private static void buildScatterChartData(Object data, Object categoryChart, List chartValueList, List<String> title){
+		throw new UnsupportedOperationException("Chart API 在 POI 5.x 中已被完全重构，此功能暂不支持。");
+		/* POI 5.x Chart API 已重构，以下代码暂时注释
 		if(chartValueList.size()==title.size())
 		{
 			int len=title.size();
@@ -257,6 +260,7 @@ public class ExcelChartBuildService
 				}
 			}
 		}
+		*/
 	}
 	
 	
