@@ -249,6 +249,11 @@
 
 	<build>
 		<plugins>
+			<!-- 
+			  注意：父 POM 的 packaging=pom，不会编译任何代码
+			  此配置仅供子模块继承使用（如果子模块没有自定义配置）
+			  实际上各子模块都有自己的 <release> 参数，会覆盖这里的配置
+			-->
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.1</version>
