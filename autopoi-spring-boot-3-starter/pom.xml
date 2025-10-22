@@ -16,29 +16,29 @@
 			<artifactId>autopoi</artifactId>
 			<version>${autopoi.version}</version>
 		</dependency>
-
-	<!-- commons-io: Required by Apache POI 5.x -->
-	<dependency>
-		<groupId>commons-io</groupId>
-		<artifactId>commons-io</artifactId>
-	</dependency>
-
-	<!--spring 6.x for Spring Boot 3.x -->
-	<dependency>
-		<groupId>org.springframework</groupId>
-		<artifactId>spring-webmvc</artifactId>
-		<version>6.2.1</version>
-		<optional>true</optional>
-	</dependency>
-
-	<!-- Jakarta Servlet (Spring Boot 3.x uses Jakarta EE) -->
-	<dependency>
-		<groupId>jakarta.servlet</groupId>
-		<artifactId>jakarta.servlet-api</artifactId>
-		<version>6.1.0</version>
-		<scope>provided</scope>
-		<optional>true</optional>
-	</dependency>
+	
+		<!-- commons-io: Required by Apache POI 5.x -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
+	
+		<!--spring 6.x for Spring Boot 3.x -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>6.2.1</version>
+			<optional>true</optional>
+		</dependency>
+	
+		<!-- Jakarta Servlet (Spring Boot 3.x uses Jakarta EE) -->
+		<dependency>
+			<groupId>jakarta.servlet</groupId>
+			<artifactId>jakarta.servlet-api</artifactId>
+			<version>6.1.0</version>
+			<scope>provided</scope>
+			<optional>true</optional>
+		</dependency>
 
 </dependencies>
 </project>
