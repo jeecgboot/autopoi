@@ -210,7 +210,7 @@ public class ExcelExportServer extends ExcelExportBase {
 
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
-			throw new ExcelExportException(ExcelExportEnum.EXPORT_ERROR, e.getCause());
+			throw new ExcelExportException(ExcelExportEnum.EXPORT_ERROR, e);
 		}
 	}
 
@@ -281,7 +281,8 @@ public class ExcelExportServer extends ExcelExportBase {
 
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
-			throw new ExcelExportException(ExcelExportEnum.EXPORT_ERROR, e.getCause());
+			e.printStackTrace(); // 添加打印完整堆栈信息
+			throw new ExcelExportException(ExcelExportEnum.EXPORT_ERROR, e);
 		}
 	}
 
@@ -447,7 +448,8 @@ public class ExcelExportServer extends ExcelExportBase {
 
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
-			throw new ExcelExportException(ExcelExportEnum.EXPORT_ERROR, e.getCause());
+			e.printStackTrace(); // 添加打印完整堆栈信息
+			throw new ExcelExportException(ExcelExportEnum.EXPORT_ERROR, e);
 		}
 	}
    //update-end---author:liusq  Date:20211217  for：[LOWCOD-2521]【autopoi】大数据导出方法【全局】----

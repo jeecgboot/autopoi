@@ -26,59 +26,47 @@ public class Poi541ComprehensiveTest {
     @Test
     public void testMultiHeaderExport() throws Exception {
         System.out.println("=== 测试多表头导出 ===");
-        
-        // 准备数据
-        List<Map<String, Object>> dataList = new ArrayList<>();
+
+        List<Map<String, Object>> dataList = new ArrayList<Map<String, Object>>();
         Map<String, Object> map1 = new HashMap<>();
         map1.put("name", "小明");
-        map1.put("age", "21");
-        map1.put("degree", "36");
+        map1.put("age", 21);
+        map1.put("degree", 36);
         map1.put("link_name", "小八");
-        map1.put("link_age", "33");
+        map1.put("link_age", 33);
         dataList.add(map1);
 
         Map<String, Object> map2 = new HashMap<>();
         map2.put("name", "小王");
-        map2.put("age", "24");
-        map2.put("degree", "37");
+        map2.put("age", 24);
+        map2.put("degree", 37);
         map2.put("link_name", "小六");
-        map2.put("link_age", "26");
+        map2.put("link_age", 26);
         dataList.add(map2);
 
-        // 配置ExcelExportEntity集合
         List<ExcelExportEntity> entityList = new ArrayList<>();
+        // 一般表头
+        entityList.add(new ExcelExportEntity("姓名", "name"));
+        entityList.add(new ExcelExportEntity("年龄", "age"));
+        entityList.add(new ExcelExportEntity("体温", "degree"));
         
-        // 一般表头使用两个参数的构造器
-        ExcelExportEntity e1 = new ExcelExportEntity("姓名", "name");
-        ExcelExportEntity e2 = new ExcelExportEntity("年龄", "age");
-        ExcelExportEntity e3 = new ExcelExportEntity("体温", "degree");
-        entityList.add(e1);
-        entityList.add(e2);
-        entityList.add(e3);
+        // 多表头方式1：需要先添加子列，再添加父列（Map数据专用）
+        // 子列需要使用三个参数的构造器，第三个参数为 true
+        entityList.add(new ExcelExportEntity("姓名", "link_name", true));
+        entityList.add(new ExcelExportEntity("年龄", "link_age", true));
         
-        // 需要被设置成子表头的使用三个参数的构造器,设置colspan为true
-        ExcelExportEntity e5 = new ExcelExportEntity("姓名", "link_name", true);
-        ExcelExportEntity e6 = new ExcelExportEntity("年龄", "link_age", true);
-        entityList.add(e5);
-        entityList.add(e6);
-        
-        // 合并表头也需要设置colspan为true
-        ExcelExportEntity e4 = new ExcelExportEntity("紧急联系人", "linkman", true);
-        List<String> sub = new ArrayList<>();
-        sub.add("link_name");
-        sub.add("link_age");
-        // 还需要设置一个子表头key的集合
-        e4.setSubColumnList(sub);
-        entityList.add(e4);
+        // 父列也需要设置 colspan=true，并设置 SubColumnList
+        ExcelExportEntity contactEntity = new ExcelExportEntity("紧急联系人", "linkman", true);
+        List<String> subKeys = new ArrayList<>();
+        subKeys.add("link_name");
+        subKeys.add("link_age");
+        contactEntity.setSubColumnList(subKeys);
+        entityList.add(contactEntity);
 
-        // 导出
-        Workbook wb = ExcelExportUtil.exportExcel(
-            new ExportParams(null, "多表头测试"), 
-            entityList, 
-            dataList
-        );
+        // 导出 - 使用 XSSF 格式对应 .xlsx 文件
+        Workbook wb = ExcelExportUtil.exportExcel(new ExportParams("测试多表头", "sheetName", ExcelType.XSSF), entityList, dataList);
 
-        // 保存文件
+        // 保存文件 - 使用 .xlsx 扩展名
         saveWorkbook(wb, "test1_multiheader.xlsx");
         System.out.println("✅ 多表头导出测试完成");
     }
@@ -265,7 +253,7 @@ public class Poi541ComprehensiveTest {
             dataList.add(entity);
         }
 
-        ExportParams params = new ExportParams("API兼容性测试", "Sheet1");
+        ExportParams params = new ExportParams("API兼容性测试", "Sheet1", ExcelType.XSSF);
         Workbook wb = ExcelExportUtil.exportExcel(params, TestEntity.class, dataList);
 
         // 保存文件
@@ -297,7 +285,7 @@ public class Poi541ComprehensiveTest {
         }
 
         Workbook wb = ExcelExportUtil.exportExcel(
-            new ExportParams("Map数据导出", "员工表"), 
+            new ExportParams("Map数据导出", "员工表", ExcelType.XSSF), 
             entityList, 
             dataList
         );
@@ -372,12 +360,27 @@ public class Poi541ComprehensiveTest {
         }
         
         String filePath = OUTPUT_DIR + fileName;
-        try (FileOutputStream fos = new FileOutputStream(filePath)) {
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(filePath);
             workbook.write(fos);
+            fos.flush();
         } finally {
-            // POI 5.x 需要显式关闭 Workbook
+            // 先关闭输出流
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            // 再关闭 Workbook (POI 5.x 需要显式关闭)
             if (workbook != null) {
-                workbook.close();
+                try {
+                    workbook.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
         
