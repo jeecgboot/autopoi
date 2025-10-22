@@ -148,7 +148,7 @@ try (FileOutputStream fos = new FileOutputStream("output.xlsx")) {
 
 - [完整使用文档](./README.md)
 - [GitHub Issues](https://github.com/zhangdaiscott/autopoi/issues)
-- [示例代码](./autopoi-spring-boot-2-starter/src/test/java/)
+- [示例代码](./autopoi/src/test/java/)
 
 ## 💡 常见问题
 
@@ -172,12 +172,3 @@ POI 5.x 的图表 API 已重构，该功能暂未适配，建议使用其他图�
 - ✅ **推荐升级**: 如果不使用图表功能
 - ⚠️ **谨慎升级**: 如果依赖图表生成功能
 - ✅ **强烈推荐**: Spring Boot 3.x 新项目
-
-## 技术支持
-
-遇到问题？欢迎提交 Issue 或 PR！
-
----
-
-**最后更新**: 2025-10-21
-
