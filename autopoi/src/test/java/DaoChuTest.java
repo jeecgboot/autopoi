@@ -1,6 +1,9 @@
 import org.apache.poi.ss.usermodel.Workbook;
 import org.jeecgframework.poi.excel.ExcelExportUtil;
 import org.jeecgframework.poi.excel.entity.TemplateExportParams;
+import org.jeecgframework.poi.excel.entity.ExportParams;
+import org.jeecgframework.poi.excel.entity.enmus.ExcelType;
+import org.jeecgframework.poi.excel.entity.params.ExcelExportEntity;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -84,6 +87,50 @@ public class DaoChuTest {
     }
 
     /**
+     * 测试 Map 数据导出功能（使用 ExcelExportEntity）
+     *
+     * 测试内容：
+     * - 手动构造 ExcelExportEntity 定义 Excel 列结构
+     * - 使用 Map 方式填充数据（适用于动态列场景）
+     * - 设置 sheetName 和 ExcelType.XSSF 格式
+     * - 验证基于 ExportParams + ExcelExportEntity + Map 的导出方式
+     *
+     * 数据结构：
+     * - ExcelExportEntity：定义列名、字段名、列宽
+     * - Map数据：key 对应 ExcelExportEntity 的字段名
+     *
+     * @return Workbook 填充数据后的工作簿对象
+     */
+    public static Workbook testMapDataExport() {
+        // 定义 Excel 列结构
+        List<ExcelExportEntity> entityList = new ArrayList<>();
+        entityList.add(new ExcelExportEntity("姓名", "name", 15));
+        entityList.add(new ExcelExportEntity("年龄", "age", 10));
+        entityList.add(new ExcelExportEntity("部门", "dept", 20));
+        entityList.add(new ExcelExportEntity("薪资", "salary", 15));
+
+        // 构造 Map 数据列表
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (int i = 0; i < 20; i++) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("name", "员工" + i);
+            map.put("age", 25 + i);
+            map.put("dept", i % 3 == 0 ? "研发部" : i % 3 == 1 ? "市场部" : "行政部");
+            map.put("salary", 8000 + i * 500);
+            result.add(map);
+        }
+
+        // 设置导出参数
+        String sheetName = "员工信息表";
+        ExportParams exportParams = new ExportParams(null, sheetName);
+        exportParams.setType(ExcelType.XSSF);
+
+        // 导出 Excel
+        Workbook workbook = ExcelExportUtil.exportExcel(exportParams, entityList, result);
+        return workbook;
+    }
+
+    /**
      * 主方法：执行模板导出测试并保存文件
      *
      * 执行步骤：
@@ -104,7 +151,7 @@ public class DaoChuTest {
         String temName = "test";  // 简单模板
         String temNameNextM = "testNextMarge";  // 带合并单元格的复杂模板
 
-        // 使用复杂模板进行测试
+        // 测试1：使用复杂模板进行测试
         Workbook workbook = test(temNameNextM);
 
         File savefile = new File(TEMPLATE_PATH);
@@ -115,5 +162,13 @@ public class DaoChuTest {
         FileOutputStream fos = new FileOutputStream("D:/excel/testNew.xlsx");
         workbook.write(fos);
         fos.close();
+
+        // 测试2：Map 数据导出测试
+        Workbook workbook2 = testMapDataExport();
+        FileOutputStream fos2 = new FileOutputStream("D:/excel/testMapDataExport.xlsx");
+        workbook2.write(fos2);
+        fos2.close();
+        
+        System.out.println("✅ 所有测试完成，文件已保存到 D:/excel/ 目录");
     }
 }
