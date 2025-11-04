@@ -1,5 +1,7 @@
 package org.jeecgframework.poi.entity;
 
+import org.jeecgframework.poi.consts.ImageScaleMode;
+
 /**
  * word导出,图片设置和图片信息
  * 
@@ -9,7 +11,8 @@ package org.jeecgframework.poi.entity;
 public class ImageEntity {
 
     public static String URL  = "url";
-    public static String Data = "data";
+    public static String Data = "data"; 
+    
     /**
      * 图片输入方式
      */
@@ -27,6 +30,12 @@ public class ImageEntity {
 
     private int          rowspan = 1;
     private int          colspan = 1;
+    
+    /**
+     * 图片缩放模式枚举
+     * for [issues/8892] AutoPoi ImageEntity建议添加scale属性，控制图片导出缩放模式
+     */
+    private ImageScaleMode scaleMode = ImageScaleMode.STRETCH;
 
 
     public ImageEntity() {
@@ -100,5 +109,43 @@ public class ImageEntity {
 
     public void setColspan(int colspan) {
         this.colspan = colspan;
+    }
+
+    /**
+     * 获取图片缩放模式
+     * @deprecated 使用 {@link #getScaleModeEnum()} 代替
+     * @return 缩放模式代码值
+     */
+    @Deprecated
+    public int getScaleMode() {
+        return scaleModeEnum.getCode();
+    }
+
+    /**
+     * 设置图片缩放模式
+     * @deprecated 使用 {@link #setScaleModeEnum(ImageScaleMode)} 代替
+     * @param scaleMode 缩放模式代码值
+     */
+    @Deprecated
+    public void setScaleMode(int scaleMode) {
+        this.scaleMode = scaleMode;
+        this.scaleModeEnum = ImageScaleMode.valueOf(scaleMode);
+    }
+    
+    /**
+     * 获取图片缩放模式枚举
+     * @return 缩放模式枚举
+     */
+    public ImageScaleMode getScaleModeEnum() {
+        return scaleModeEnum;
+    }
+    
+    /**
+     * 设置图片缩放模式枚举
+     * @param scaleModeEnum 缩放模式枚举
+     */
+    public void setScaleModeEnum(ImageScaleMode scaleModeEnum) {
+        this.scaleModeEnum = scaleModeEnum;
+        this.scaleMode = scaleModeEnum.getCode();
     }
 }
