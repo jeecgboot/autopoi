@@ -126,3 +126,12 @@ src/main/java/org/jeecgframework/poi/excel/imports/ExcelImportServer.java
 ---author:chenrui---date:2025/8/19-----for:[issues/8699]AutoPoi在使用@ExcelEntity当设置show=true并且该项为null时报错---
 src/main/java/org/jeecgframework/poi/excel/export/base/ExportBase.java
 ---author:chenrui---date:2025/8/19-----for:[issues/8699]AutoPoi在使用@ExcelEntity当设置show=true并且该项为null时报错---
+
+---author:chenrui---date:2025/10/29-----for:[issues/8892] AutoPoi ImageEntity建议添加scale属性，控制图片导出缩放模式---
+src/main/java/org/jeecgframework/poi/consts/ImageScaleMode.java
+src/main/java/org/jeecgframework/poi/entity/ImageEntity.java
+src/main/java/org/jeecgframework/poi/excel/export/template/ExcelExportOfTemplateUtil.java
+src/test/java/TestImageScale.java
+src/test/resources/templates/dakytot.jpeg
+src/test/resources/templates/testImageScale.xlsx
+---author:chenrui---date:2025/10/29-----for:[issues/8892] AutoPoi ImageEntity建议添加scale属性，控制图片导出缩放模式---

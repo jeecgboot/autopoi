@@ -27,7 +27,10 @@ import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jeecgframework.poi.cache.ExcelCache;
 import org.jeecgframework.poi.cache.ImageCache;
+import org.jeecgframework.poi.consts.ImageScaleMode;
 import org.jeecgframework.poi.entity.ImageEntity;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import org.jeecgframework.poi.excel.annotation.ExcelTarget;
 import org.jeecgframework.poi.excel.entity.TemplateExportParams;
 import org.jeecgframework.poi.excel.entity.enmus.ExcelType;
@@ -661,7 +664,7 @@ public final class ExcelExportOfTemplateUtil extends ExcelExportBase {
 						row.getCell(ci).getSheet().addMergedRegion(new CellRangeAddress(row.getCell(ci).getRowIndex(),
 								row.getCell(ci).getRowIndex() + img.getRowspan() - 1, row.getCell(ci).getColumnIndex(), row.getCell(ci).getColumnIndex() + img.getColspan() - 1));
 					}
-					createImageCell(row.getCell(ci), img.getHeight(), img.getRowspan(), img.getColspan(), img.getUrl(), img.getData());
+					createImageCell(row.getCell(ci), img.getHeight(), img.getRowspan(), img.getColspan(), img.getUrl(), img.getData(), img.getScaleModeEnum());
 				} else if (isNumber && StringUtils.isNotEmpty(val)) {
 					row.getCell(ci).setCellValue(Double.parseDouble(val));
 				} else {
@@ -702,6 +705,46 @@ public final class ExcelExportOfTemplateUtil extends ExcelExportBase {
 	 */
 	public void createImageCell(Cell cell, double height, int rowspan, int colspan,
 								String imagePath, byte[] data) throws Exception {
+		createImageCell(cell, height, rowspan, colspan, imagePath, data, ImageScaleMode.STRETCH);
+	}
+	
+	/**
+	 * 图片类型的Cell（带缩放功能）
+     *
+     * @param cell
+     * @param height
+     * @param rowspan
+     * @param colspan
+     * @param imagePath
+     * @param data
+     * @param scaleMode 缩放模式：0=拉伸填充, 1=等比例缩放适应, 2=不缩放（原始大小） for [issues/8892] AutoPoi ImageEntity建议添加scale属性，控制图片导出缩放模式
+     * @throws Exception
+     * @author chenrui
+     * @date 2025/10/28 17:36
+     * @deprecated 使用 {@link #createImageCell(Cell, double, int, int, String, byte[], ImageScaleMode)} 代替
+     */
+	@Deprecated
+	public void createImageCell(Cell cell, double height, int rowspan, int colspan,
+								String imagePath, byte[] data, int scaleMode) throws Exception {
+		createImageCell(cell, height, rowspan, colspan, imagePath, data, ImageScaleMode.valueOf(scaleMode));
+	}
+	
+	/**
+	 * 图片类型的Cell（带缩放功能，使用枚举）
+     *
+     * @param cell 单元格对象
+     * @param height 高度
+     * @param rowspan 行跨度
+     * @param colspan 列跨度
+     * @param imagePath 图片路径
+     * @param data 图片数据
+     * @param scaleMode 缩放模式枚举 for [issues/8892] AutoPoi ImageEntity建议添加scale属性，控制图片导出缩放模式
+     * @throws Exception
+     * @author chenrui
+     * @date 2025/10/28 17:36
+     */
+	public void createImageCell(Cell cell, double height, int rowspan, int colspan,
+								String imagePath, byte[] data, ImageScaleMode scaleMode) throws Exception {
 		if (height > cell.getRow().getHeight()) {
 			cell.getRow().setHeight((short) height);
 		}
@@ -717,10 +760,77 @@ public final class ExcelExportOfTemplateUtil extends ExcelExportBase {
 			data = ImageCache.getImage(imagePath);
 		}
 		if (data != null) {
-			PoiExcelGraphDataUtil.getDrawingPatriarch(cell.getSheet()).createPicture(anchor,
+            //update-begin---author:chenrui ---date:20251028  for：[issues/8892] AutoPoi ImageEntity建议添加scale属性，控制图片导出缩放模式 ------------
+			// 创建图片
+			Picture picture = PoiExcelGraphDataUtil.getDrawingPatriarch(cell.getSheet()).createPicture(anchor,
 					cell.getSheet().getWorkbook().addPicture(data, getImageType(data)));
+			
+			// 根据缩放模式处理图片
+			if (scaleMode == ImageScaleMode.FIT) {
+				// 等比例缩放适应单元格
+				picture.resize();
+				picture.resize(getImageScale(cell, rowspan, colspan, data));
+			} else if (scaleMode == ImageScaleMode.ORIGINAL) {
+				// 不缩放，保持原始大小
+				picture.resize();
+			}
+            //update-end---author:chenrui ---date:20251028  for：[issues/8892] AutoPoi ImageEntity建议添加scale属性，控制图片导出缩放模式 ------------
 		}
 	}
+	
+	/**
+	 * 获取图片缩放比例，确保图片等比例适应单元格大小
+     * for [issues/8892] AutoPoi ImageEntity建议添加scale属性，控制图片导出缩放模式
+	 * @param cell 单元格对象
+	 * @param rowspan 行跨度
+	 * @param colspan 列跨度
+	 * @param data 图片数据
+	 * @return
+     * @author chenrui
+     * @date 2025/10/28 17:38
+     */
+	private double getImageScale(Cell cell, int rowspan, int colspan, byte[] data) {
+		try {
+			BufferedImage image = ImageIO.read(new java.io.ByteArrayInputStream(data));
+			
+			int imageWidth = image.getWidth();
+			int imageHeight = image.getHeight();
+			
+			// 获取单元格的实际尺寸（像素）
+			double cellWidth = 0;
+			for (int i = 0; i < colspan; i++) {
+				cellWidth += cell.getSheet().getColumnWidthInPixels(cell.getColumnIndex() + i);
+			}
+			
+			double cellHeight = 0;
+			for (int i = 0; i < rowspan; i++) {
+				Row row = cell.getSheet().getRow(cell.getRowIndex() + i);
+				if (row != null) {
+					cellHeight += row.getHeightInPoints() * 96.0 / 72.0;
+				}
+			}
+			
+			// 如果图片或单元格尺寸无效，返回默认缩放比例
+			if (imageWidth <= 0 || imageHeight <= 0 || cellWidth <= 0 || cellHeight <= 0) {
+				return 1.0;
+			}
+			
+			// 计算宽度和高度的缩放比例
+			double widthScale = cellWidth / imageWidth;
+			double heightScale = cellHeight / imageHeight;
+			
+			// 取较小的缩放比例，确保图片完全适配在单元格内（等比例缩放）
+			double scale = Math.min(widthScale, heightScale);
+			
+			// 确保缩放比例不超过1.0（不放大图片，只缩小）
+			return Math.min(scale, 1.0);
+			
+		} catch (Exception e) {
+			LOGGER.warn("创建图片锚点失败: " + e.getMessage());
+			return 1.0;
+		}
+	}
+	
 	/**
 	 * 处理内循环
 	 *
