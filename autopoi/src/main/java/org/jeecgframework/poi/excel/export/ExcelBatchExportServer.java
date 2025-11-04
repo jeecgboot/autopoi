@@ -12,6 +12,7 @@ import org.jeecgframework.poi.excel.export.styler.IExcelExportStyler;
 import org.jeecgframework.poi.exception.excel.ExcelExportException;
 import org.jeecgframework.poi.exception.excel.enums.ExcelExportEnum;
 import org.jeecgframework.poi.handler.inter.IExcelExportServer;
+import org.jeecgframework.poi.handler.inter.IExcelExportServerEnhanced;
 import org.jeecgframework.poi.handler.inter.IWriter;
 import org.jeecgframework.poi.util.PoiExcelGraphDataUtil;
 import org.jeecgframework.poi.util.PoiPublicUtil;
@@ -146,6 +147,48 @@ public class ExcelBatchExportServer extends ExcelExportServer implements IWriter
 			write(list);
 			list = server.selectListForExcelExport(queryParams, page++);
 		}
+		return close();
+	}
+
+	/**
+	 * 大数据导出 - 游标分页方式
+	 * 推荐用于大数据量（20万+）导出,避免深分页性能问题
+     * for [QQYUN-13964]演示系统数据量大，点击没反应
+	 * 
+	 * 实现原理:
+	 * 1. 使用上一批次的最后一条记录作为查询起点
+	 * 2. 避免 LIMIT offset, size 造成的性能衰减
+	 * 3. 查询速度恒定,不会随着数据量增加而变慢
+	 * 
+	 * @param server 增强的查询服务
+	 * @param queryParams 查询参数
+	 * @return Workbook
+	 */
+	public <T> Workbook exportBigExcelEnhanced(IExcelExportServerEnhanced<T> server, Object queryParams) {
+		int pageSize = server.getPageSize();
+		T lastRecord = null;
+		int totalCount = 0;
+		
+		List<T> list = server.selectListForExcelExport(queryParams, lastRecord, pageSize);
+		while (list != null && list.size() > 0) {
+			write(list);
+			totalCount += list.size();
+			// 记录最后一条记录,用于下次查询
+			lastRecord = list.get(list.size() - 1);
+			
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("已导出 {} 条数据", totalCount);
+			}
+			
+			// 如果返回的数据少于pageSize,说明已经是最后一批了
+			if (list.size() < pageSize) {
+				break;
+			}
+			
+			list = server.selectListForExcelExport(queryParams, lastRecord, pageSize);
+		}
+		
+		LOGGER.info("大数据导出完成,共导出 {} 条数据", totalCount);
 		return close();
 	}
 

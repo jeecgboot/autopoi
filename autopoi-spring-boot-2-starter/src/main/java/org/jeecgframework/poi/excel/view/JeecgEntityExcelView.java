@@ -30,6 +30,7 @@ import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
 import org.jeecgframework.poi.excel.export.ExcelExportServer;
 import org.jeecgframework.poi.handler.inter.IExcelExportServer;
+import org.jeecgframework.poi.handler.inter.IExcelExportServerEnhanced;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -67,12 +68,22 @@ public class JeecgEntityExcelView extends MiniAbstractExcelView {
 				new ExcelExportServer().createSheet(workbook, (ExportParams) list.get(i).get(NormalExcelConstants.PARAMS), (Class<?>) list.get(i).get(NormalExcelConstants.CLASS), (Collection<?>) list.get(i).get(NormalExcelConstants.DATA_LIST),exportFields);
 			}
 		} else if(model.containsKey(NormalExcelConstants.EXPORT_SERVER)){
-			//update-begin---author:chenrui ---date:20250812  for：[issues/8652]excel导出大数据问题 #8652------------
-			workbook = ExcelExportUtil.exportBigExcel((ExportParams) model.get(NormalExcelConstants.PARAMS),
-					(Class<?>) model.get(NormalExcelConstants.CLASS),
-					(IExcelExportServer) model.get(NormalExcelConstants.EXPORT_SERVER),
-					model.get(NormalExcelConstants.QUERY_PARAMS));
-			//update-end---author:chenrui ---date:20250812  for：[issues/8652]excel导出大数据问题 #8652------------
+            //update-begin---author:chenrui ---date:20251104  for：[QQYUN-13964]演示系统数据量大，点击没反应------------
+			Object exportServerObj = model.get(NormalExcelConstants.EXPORT_SERVER);
+			if(exportServerObj instanceof IExcelExportServer){
+				//update-begin---author:chenrui ---date:20250812  for：[issues/8652]excel导出大数据问题 #8652------------
+				workbook = ExcelExportUtil.exportBigExcel((ExportParams) model.get(NormalExcelConstants.PARAMS),
+				(Class<?>) model.get(NormalExcelConstants.CLASS),
+				(IExcelExportServer) model.get(NormalExcelConstants.EXPORT_SERVER),
+				model.get(NormalExcelConstants.QUERY_PARAMS));
+				//update-end---author:chenrui ---date:20250812  for：[issues/8652]excel导出大数据问题 #8652------------
+			} else if(exportServerObj instanceof IExcelExportServerEnhanced){
+				workbook = ExcelExportUtil.exportBigExcelEnhanced((ExportParams) model.get(NormalExcelConstants.PARAMS),
+						(Class<?>) model.get(NormalExcelConstants.CLASS),
+						(IExcelExportServerEnhanced) exportServerObj,
+						model.get(NormalExcelConstants.QUERY_PARAMS));
+			}
+            //update-end---author:chenrui ---date:20251104  for：[QQYUN-13964]演示系统数据量大，点击没反应------------
 		} else {
 			workbook = ExcelExportUtil.exportExcel((ExportParams) model.get(NormalExcelConstants.PARAMS), (Class<?>) model.get(NormalExcelConstants.CLASS), (Collection<?>) model.get(NormalExcelConstants.DATA_LIST),exportFields);
 		}

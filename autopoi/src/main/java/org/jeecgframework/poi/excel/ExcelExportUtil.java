@@ -31,6 +31,7 @@ import org.jeecgframework.poi.excel.export.ExcelBatchExportServer;
 import org.jeecgframework.poi.excel.export.ExcelExportServer;
 import org.jeecgframework.poi.excel.export.template.ExcelExportOfTemplateUtil;
 import org.jeecgframework.poi.handler.inter.IExcelExportServer;
+import org.jeecgframework.poi.handler.inter.IExcelExportServerEnhanced;
 import org.jeecgframework.poi.handler.inter.IWriter;
 
 /**
@@ -240,4 +241,65 @@ public class ExcelExportUtil {
 		return batchServer.exportBigExcel(server, queryParams);
 	}
 	//update-end---author:liusq  Date:20211227 for：[LOWCOD-2521]大数据导出方法【全局】----
+
+	//update-begin---author:chenrui  Date:20251103 for：[issues/8892]解决40万+数据导出查询效率问题----
+	/**
+	 * 大数据量导出 - 高性能游标分页方案
+     * for [QQYUN-13964]演示系统数据量大，点击没反应
+	 * <p>
+	 * 适用场景:
+	 * 1. 数据量超过40万+的导出场景
+	 * 2. 需要避免深分页性能问题
+	 * 3. 数据表有自增ID或其他有序字段
+	 * 
+	 * 性能对比:
+	 * - 传统方式: 40万数据,最后一页查询可能需要10+秒
+	 * - 游标方式: 40万数据,每页查询时间恒定在0.1秒左右
+	 * 
+	 * 使用示例:
+	 * <pre>
+	 * ExportParams params = new ExportParams("订单列表", "订单");
+	 * IExcelExportServerEnhanced server = new IExcelExportServerEnhanced() {
+	 *     public List<Object> selectListForExcelExport(Object queryParams, Object lastRecord, int pageSize) {
+	 *         Long lastId = lastRecord != null ? ((Order)lastRecord).getId() : 0L;
+	 *         return orderMapper.selectList(new QueryWrapper<Order>()
+	 *             .gt("id", lastId)
+	 *             .orderByAsc("id")
+	 *             .last("LIMIT " + pageSize));
+	 *     }
+	 * };
+	 * Workbook workbook = ExcelExportUtil.exportBigExcelEnhanced(params, Order.class, server, queryParams);
+	 * </pre>
+	 * 
+	 * @param entity      导出参数属性
+	 * @param pojoClass   Excel对象Class
+	 * @param server      增强的查询数据接口(支持游标分页)
+	 * @param queryParams 查询数据的参数
+	 * @date 2025年11月3号
+	 * @return Workbook
+	 */
+	public static <T> Workbook exportBigExcelEnhanced(ExportParams entity, Class<T> pojoClass,
+												  IExcelExportServerEnhanced<T> server, Object queryParams) {
+		ExcelBatchExportServer batchServer = new ExcelBatchExportServer();
+		batchServer.init(entity, pojoClass);
+		return batchServer.exportBigExcelEnhanced(server, queryParams);
+	}
+
+	/**
+	 * 大数据量导出 - 高性能游标分页方案(自定义列)
+	 * 
+	 * @param entity       导出参数属性
+	 * @param excelParams  自定义导出列
+	 * @param server       增强的查询数据接口(支持游标分页)
+	 * @param queryParams  查询数据的参数
+	 * @date 2025年11月3号
+	 * @return Workbook
+	 */
+	public static <T> Workbook exportBigExcelEnhanced(ExportParams entity, List<ExcelExportEntity> excelParams,
+												  IExcelExportServerEnhanced<T> server, Object queryParams) {
+		ExcelBatchExportServer batchServer = new ExcelBatchExportServer();
+		batchServer.init(entity, excelParams);
+		return batchServer.exportBigExcelEnhanced(server, queryParams);
+	}
+	//update-end---author:chenrui  Date:20251103 for：[issues/8892]解决40万+数据导出查询效率问题----
 }
