@@ -35,7 +35,7 @@ public class ImageEntity {
      * 图片缩放模式枚举
      * for [issues/8892] AutoPoi ImageEntity建议添加scale属性，控制图片导出缩放模式
      */
-    private ImageScaleMode scaleMode = ImageScaleMode.STRETCH;
+    private ImageScaleMode scaleModeEnum = ImageScaleMode.STRETCH;
 
 
     public ImageEntity() {
@@ -128,7 +128,6 @@ public class ImageEntity {
      */
     @Deprecated
     public void setScaleMode(int scaleMode) {
-        this.scaleMode = scaleMode;
         this.scaleModeEnum = ImageScaleMode.valueOf(scaleMode);
     }
     
@@ -146,6 +145,5 @@ public class ImageEntity {
      */
     public void setScaleModeEnum(ImageScaleMode scaleModeEnum) {
         this.scaleModeEnum = scaleModeEnum;
-        this.scaleMode = scaleModeEnum.getCode();
     }
 }
