@@ -132,6 +132,13 @@ public class ExportParams extends ExcelBaseParams {
 		this.secondTitle = secondTitle;
 		this.sheetName = sheetName;
 	}
+    
+    public ExportParams(String title, String secondTitle, String sheetName, ExcelType type) {
+        this.title = title;
+        this.secondTitle = secondTitle;
+        this.sheetName = sheetName;
+        this.type = type;
+    }
 
 	public ExportParams(String title, String secondTitle, String sheetName,String imageBasePath) {
 		this.title = title;
