@@ -84,7 +84,7 @@ public final class PoiFunctionUtil {
 		}
 		double number = Double.valueOf(obj.toString());
 		DecimalFormat decimalFormat = null;
-		if (TWO_DECIMAL.equals(format)) {
+		if (TWO_DECIMAL_STR.equals(format)) {
 			decimalFormat = TWO_DECIMAL;
 		} else if (THREE_DECIMAL_STR.equals(format)) {
 			decimalFormat = THREE_DECIMAL;
