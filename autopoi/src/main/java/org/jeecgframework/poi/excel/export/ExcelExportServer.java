@@ -168,6 +168,9 @@ public class ExcelExportServer extends ExcelExportBase {
 			ExcelTarget etarget = pojoClass.getAnnotation(ExcelTarget.class);
 			String targetId = etarget == null ? null : etarget.value();
 			getAllExcelField(entity.getExclusions(), targetId, fileds, excelParams, pojoClass, null);
+			//update-begin-author:liusq date:20251211 for:JHHB-1212【AutoPoi】导出时，支持动态生成Excel的列
+			rebuildDynamicColumns(dataSet, excelParams);
+			//update-end-author:liusq date:20251211 for:JHHB-1212【AutoPoi】导出时，支持动态生成Excel的列
 			//update-begin-author:taoyan date:20200304 for:在此方法循环内设置一下图片磁盘目录，便于导出
 			reConfigExcelExportParams(excelParams,entity);
 			//update-end-author:taoyan date:20200304 for:在此方法循环内设置一下图片磁盘目录，便于导出
@@ -245,6 +248,9 @@ public class ExcelExportServer extends ExcelExportBase {
 				excelParams.add(indexExcelEntity(entity));
 			}
 			excelParams.addAll(entityList);
+			//update-begin-author:liusq date:20251211 for:JHHB-1212【AutoPoi】导出时，支持动态生成Excel的列
+			rebuildDynamicColumns(dataSet, excelParams);
+			//update-end-author:liusq date:20251211 for:JHHB-1212【AutoPoi】导出时，支持动态生成Excel的列
 			sortAllParams(excelParams);
 			int index = entity.isCreateHeadRows() ? createHeaderAndTitle(entity, sheet, workbook, excelParams) : 0;
 			int titleHeight = index;
@@ -405,6 +411,9 @@ public class ExcelExportServer extends ExcelExportBase {
 				excelParams.add(indexExcelEntity(entity));
 			}
 			excelParams.addAll(entityList);
+			//update-begin-author:liusq date:20251211 for:JHHB-1212【AutoPoi】导出时，支持动态生成Excel的列
+			rebuildDynamicColumns(dataSet, excelParams);
+			//update-end-author:liusq date:20251211 for:JHHB-1212【AutoPoi】导出时，支持动态生成Excel的列
 			sortAllParams(excelParams);
 			int index = entity.isCreateHeadRows()
 					? createHeaderAndTitle(entity, sheet, workbook, excelParams) : 0;
