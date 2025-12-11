@@ -95,6 +95,27 @@ public class ExcelExportEntity extends ExcelBaseEntity implements Comparable<Exc
 	 */
 	private boolean isColumnHidden;
 
+	/**
+	 * 是否为动态列
+	 */
+	private boolean dynamic;
+	/**
+	 * 动态列标题字段
+	 */
+	private String dynamicField;
+	/**
+	 * 动态列值字段
+	 */
+	private String dynamicValue;
+	/**
+	 * 是否保留原始列
+	 */
+	private boolean dynamicKeepSelf;
+	/**
+	 * 当前动态列对应的标题名称
+	 */
+	private String dynamicColumnName;
+
 	private List<ExcelExportEntity> list;
 
 	public ExcelExportEntity() {
@@ -281,7 +302,45 @@ public class ExcelExportEntity extends ExcelBaseEntity implements Comparable<Exc
 		return this.colspan && this.subColumnList!=null && this.subColumnList.size()>0;
 	}
 
+	public boolean isDynamic() {
+		return dynamic;
+	}
 
+	public void setDynamic(boolean dynamic) {
+		this.dynamic = dynamic;
+	}
+
+	public String getDynamicField() {
+		return dynamicField;
+	}
+
+	public void setDynamicField(String dynamicField) {
+		this.dynamicField = dynamicField;
+	}
+
+	public String getDynamicValue() {
+		return dynamicValue;
+	}
+
+	public void setDynamicValue(String dynamicValue) {
+		this.dynamicValue = dynamicValue;
+	}
+
+	public boolean isDynamicKeepSelf() {
+		return dynamicKeepSelf;
+	}
+
+	public void setDynamicKeepSelf(boolean dynamicKeepSelf) {
+		this.dynamicKeepSelf = dynamicKeepSelf;
+	}
+
+	public String getDynamicColumnName() {
+		return dynamicColumnName;
+	}
+
+	public void setDynamicColumnName(String dynamicColumnName) {
+		this.dynamicColumnName = dynamicColumnName;
+	}
 	/**
 	 * 获取被合并的子列
 	 * @param all
