@@ -203,4 +203,26 @@ public @interface Excel {
 	 * @return
 	 */
 	public boolean isHyperlink() default false;
+	
+	//update-begin-author:liusq date:20251211 for:JHHB-1212【AutoPoi】导出时，支持动态生成Excel的列
+	/**
+	 * 是否为动态列
+	 */
+	public boolean dynamic() default false;
+
+	/**
+	 * 动态列标题字段名，默认 name
+	 */
+	public String dynamicField() default "name";
+
+	/**
+	 * 动态列表格值字段名，默认 value
+	 */
+	public String dynamicVal() default "value";
+
+	/**
+	 * 是否保留原始字段列，默认不保留
+	 */
+	public boolean dynamicKeepSelf() default false;
+	//update-end-author:liusq date:20251211 for:JHHB-1212【AutoPoi】导出时，支持动态生成Excel的列
 }

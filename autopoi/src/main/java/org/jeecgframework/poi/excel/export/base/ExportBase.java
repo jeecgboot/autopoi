@@ -36,6 +36,7 @@ import org.jeecgframework.poi.excel.entity.ExportParams;
 import org.jeecgframework.poi.excel.entity.params.ExcelExportEntity;
 import org.jeecgframework.poi.handler.inter.IExcelDataHandler;
 import org.jeecgframework.poi.handler.inter.IExcelDictHandler;
+import org.jeecgframework.poi.util.JsonParser;
 import org.jeecgframework.poi.util.PoiPublicUtil;
 
 /**
@@ -207,7 +208,11 @@ public class ExportBase {
 			return "";
 		}
 		//update-end---author:chenrui ---date:20250819  for：[issues/8699]AutoPoi在使用@ExcelEntity当设置show=true并且该项为null时报错------------
-		if (obj instanceof Map) {
+		//update-begin-author:liusq date:20251211 for:JHHB-1212【AutoPoi】导出时，支持动态生成Excel的列
+		if (entity.isDynamic()) {
+			value = getDynamicCellValue(entity, obj);
+		//update-end-author:liusq date:20251211 for:JHHB-1212【AutoPoi】导出时，支持动态生成Excel的列
+		}else if (obj instanceof Map) {
 			value = ((Map<?, ?>) obj).get(entity.getKey());
 		} else {
 			value = entity.getMethods() != null ? getFieldBySomeMethod(entity.getMethods(), obj) : entity.getMethod().invoke(obj, new Object[] {});
@@ -331,6 +336,11 @@ public class ExportBase {
 		//update-begin-author:taoyan date:20200319 for:Excel注解的numFormat方法似乎未实现 #970
 		excelEntity.setNumFormat(excel.numFormat());
 		//update-end-author:taoyan date:20200319 for:Excel注解的numFormat方法似乎未实现 #970
+        // 动态列配置
+		excelEntity.setDynamic(excel.dynamic());
+		excelEntity.setDynamicField(excel.dynamicField());
+		excelEntity.setDynamicValue(excel.dynamicVal());
+		excelEntity.setDynamicKeepSelf(excel.dynamicKeepSelf());
 
 		//update-begin-author:liusq date:202010723 for:Excel注解的isColumnHidden方法未实现
 		excelEntity.setColumnHidden(excel.isColumnHidden());
@@ -540,6 +550,189 @@ public class ExportBase {
 		Collections.sort(excelParams);
 	}
 
+	//update-begin-author:liusq date:20251211 for:JHHB-1212【AutoPoi】导出时，支持动态生成Excel的列
+	/**
+	 * 动态列获取值
+	 * @param entity
+	 * @param obj
+	 * @return
+	 * @throws Exception
+	 */
+	private Object getDynamicCellValue(ExcelExportEntity entity, Object obj) throws Exception {
+		Collection<?> dataList = getDynamicListValue(entity, obj);
+		if (dataList == null) {
+			return "";
+		}
+		String header = entity.getDynamicColumnName();
+		String titleField = StringUtils.defaultIfBlank(entity.getDynamicField(), "name");
+		String valueField = StringUtils.defaultIfBlank(entity.getDynamicValue(), "value");
+		for (Object item : dataList) {
+			Object nameVal = PoiPublicUtil.getParamsValue(titleField, item);
+			if (nameVal != null && header != null && header.equals(nameVal.toString())) {
+				Object result = PoiPublicUtil.getParamsValue(valueField, item);
+				return result == null ? "" : result;
+			}
+		}
+		return "";
+	}
+
+	/**
+	 * 获取动态列数据集合
+	 * @param entity
+	 * @param obj
+	 * @return
+	 * @throws Exception
+	 */
+	protected Collection<?> getDynamicListValue(ExcelExportEntity entity, Object obj) throws Exception {
+		Object value;
+		if (obj instanceof Map) {
+			value = ((Map<?, ?>) obj).get(entity.getKey());
+		} else {
+			value = entity.getMethods() != null ? getFieldBySomeMethod(entity.getMethods(), obj) : entity.getMethod().invoke(obj, new Object[] {});
+		}
+		if (value == null) {
+			return null;
+		}
+		if (value instanceof String) {
+			Collection<?> parsed = parseJsonArrayToList((String) value);
+			if (parsed != null) {
+				return parsed;
+			}
+		}
+		if (value instanceof Collection) {
+			return (Collection<?>) value;
+		}
+		if (value.getClass().isArray()) {
+			return Arrays.asList((Object[]) value);
+		}
+		return Collections.singletonList(value);
+	}
+	/**
+	 * 解析 JSON 数组字符串为集合（使用 JDK ScriptEngine，避免额外依赖）
+	 */
+	private Collection<?> parseJsonArrayToList(String json) {
+		if (StringUtils.isBlank(json)) {
+			return null;
+		}
+		String trim = json.trim();
+		if (!trim.startsWith("[") || !trim.endsWith("]")) {
+			return null;
+		}
+		try {
+			List<Object> objects = JsonParser.parseJsonArrayToList(json);
+			return objects;
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	/**
+	 * 处理动态列,根据数据动态扩充表头
+	 * @param dataSet
+	 * @param excelParams
+	 */
+	protected void rebuildDynamicColumns(Collection<?> dataSet, List<ExcelExportEntity> excelParams) throws Exception {
+		if (excelParams == null || excelParams.isEmpty() || dataSet == null || dataSet.isEmpty()) {
+			return;
+		}
+		List<ExcelExportEntity> result = new ArrayList<ExcelExportEntity>();
+		for (ExcelExportEntity entity : excelParams) {
+			if (!entity.isDynamic()) {
+				result.add(entity);
+				continue;
+			}
+			List<ExcelExportEntity> dynamicList = buildDynamicEntities(entity, dataSet);
+			if (dynamicList.isEmpty() && !entity.isDynamicKeepSelf()) {
+				// 没有动态数据时仍然保留原列避免列缺失
+				result.add(entity);
+				continue;
+			}
+			if (entity.isDynamicKeepSelf()) {
+				result.add(copyKeepSelfEntity(entity));
+			}
+			result.addAll(dynamicList);
+		}
+		excelParams.clear();
+		excelParams.addAll(result);
+	}
+
+	private ExcelExportEntity copyKeepSelfEntity(ExcelExportEntity source){
+		ExcelExportEntity target = copyDynamicBase(source);
+		target.setDynamic(false);
+		target.setDynamicField(null);
+		target.setDynamicValue(null);
+		target.setDynamicColumnName(null);
+		target.setDynamicKeepSelf(false);
+		target.setName(source.getName());
+		return target;
+	}
+
+	private List<ExcelExportEntity> buildDynamicEntities(ExcelExportEntity entity, Collection<?> dataSet) throws Exception {
+		LinkedHashSet<String> headers = new LinkedHashSet<String>();
+		for (Object data : dataSet) {
+			Collection<?> list = getDynamicListValue(entity, data);
+			if (list == null) {
+				continue;
+			}
+			for (Object item : list) {
+				Object header = PoiPublicUtil.getParamsValue(StringUtils.defaultIfBlank(entity.getDynamicField(), "name"), item);
+				if (header != null && StringUtils.isNotBlank(header.toString())) {
+					headers.add(header.toString());
+				}
+			}
+		}
+		List<ExcelExportEntity> dynamicEntities = new ArrayList<ExcelExportEntity>();
+		int order = entity.getOrderNum();
+		int offset = 0;
+		for (String header : headers) {
+			ExcelExportEntity copy = copyDynamicBase(entity);
+			copy.setName(header);
+			copy.setDynamicColumnName(header);
+			copy.setOrderNum(order + offset);
+			dynamicEntities.add(copy);
+			offset++;
+		}
+		return dynamicEntities;
+	}
+
+	private ExcelExportEntity copyDynamicBase(ExcelExportEntity source) {
+		ExcelExportEntity target = new ExcelExportEntity();
+		target.setType(source.getType());
+		target.setName(source.getName());
+		target.setKey(source.getKey());
+		target.setWidth(source.getWidth());
+		target.setHeight(source.getHeight());
+		target.setExportImageType(source.getExportImageType());
+		target.setImageBasePath(source.getImageBasePath());
+		target.setOrderNum(source.getOrderNum());
+		target.setWrap(source.isWrap());
+		target.setNeedMerge(source.isNeedMerge());
+		target.setMergeVertical(source.isMergeVertical());
+		target.setMergeRely(source.getMergeRely());
+		target.setSuffix(source.getSuffix());
+		target.setStatistics(source.isStatistics());
+		target.setColspan(source.isColspan());
+		target.setSubColumnList(source.getSubColumnList());
+		target.setGroupName(source.getGroupName());
+		target.setColumnHidden(source.isColumnHidden());
+		target.setReplace(source.getReplace());
+		target.setMethod(source.getMethod());
+		target.setMethods(source.getMethods());
+		target.setMultiReplace(source.isMultiReplace());
+		target.setNumFormat(source.getNumFormat());
+		target.setDatabaseFormat(source.getDatabaseFormat());
+		target.setFormat(source.getFormat());
+		target.setFixedIndex(source.getFixedIndex());
+		target.setDict(source.getDict());
+		target.setHyperlink(source.isHyperlink());
+		target.setMergeVertical(source.isMergeVertical());
+		// 动态配置
+		target.setDynamic(true);
+		target.setDynamicField(source.getDynamicField());
+		target.setDynamicValue(source.getDynamicValue());
+		target.setDynamicKeepSelf(source.isDynamicKeepSelf());
+		return target;
+	}
 	/**
 	 * 字典文本中含多个下划线横岗，取最后一个（解决空值情况）
 	 *
@@ -553,4 +746,5 @@ public class ExportBase {
 		c[1]=val.substring(i+1); //key
 		return c;
 	}
+	//update-end-author:liusq date:20251211 for:JHHB-1212【AutoPoi】导出时，支持动态生成Excel的列
 }
