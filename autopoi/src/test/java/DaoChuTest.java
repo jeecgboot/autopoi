@@ -1,5 +1,6 @@
 import org.apache.poi.ss.usermodel.Workbook;
 import org.jeecgframework.poi.excel.ExcelExportUtil;
+import org.jeecgframework.poi.excel.annotation.Excel;
 import org.jeecgframework.poi.excel.entity.TemplateExportParams;
 import org.jeecgframework.poi.excel.entity.ExportParams;
 import org.jeecgframework.poi.excel.entity.enmus.ExcelType;
@@ -168,7 +169,62 @@ public class DaoChuTest {
         FileOutputStream fos2 = new FileOutputStream("D:/excel/testMapDataExport.xlsx");
         workbook2.write(fos2);
         fos2.close();
+
+        // 测试3：动态列导出示例
+        dynamicExport();
         
         System.out.println("✅ 所有测试完成，文件已保存到 D:/excel/ 目录");
+    }
+
+    /**
+     * 动态列导出示例：@Excel(dynamic=true)
+     */
+    public static void dynamicExport() throws IOException {
+        List<DynamicRow> data = new ArrayList<DynamicRow>();
+        // 示例数据：每行的假期列表都包含 name/value 字段
+        DynamicRow row = new DynamicRow();
+        row.setUser("张三");
+        row.setHolidaysJson("[{\"name\":\"年假\",\"value\":\"10天\"},{\"name\":\"事假\",\"value\":\"31小时\"}]");
+        data.add(row);
+        // 示例数据：每行的假期列表都包含 name/value 字段
+        DynamicRow row1 = new DynamicRow();
+        row1.setUser("李四");
+        row1.setHolidaysJson("[{\"name\":\"年假\",\"value\":\"20天\"},{\"name\":\"事假\",\"value\":\"41小时\"}]");
+        data.add(row1);
+
+        ExportParams params = new ExportParams("动态列示例", "sheet1");
+        Workbook workbook = ExcelExportUtil.exportExcel(params, DynamicRow.class, data);
+        File savefile = new File("D:\\excel");
+        if (!savefile.exists()) {
+            savefile.mkdirs();
+        }
+        FileOutputStream fos = new FileOutputStream( "D:\\excel\\dynamic.xlsx");
+        workbook.write(fos);
+        fos.close();
+    }
+
+    /**
+     * 演示动态列的实体
+     */
+    public static class DynamicRow {
+        @Excel(name = "姓名")
+        private String user;
+
+        @Excel(name = "假期json", dynamic = true, dynamicField = "name", dynamicVal = "value", dynamicKeepSelf = false)
+        private String holidaysJson;
+
+        public String getUser() {
+            return user;
+        }
+        public void setUser(String user) {
+            this.user = user;
+        }
+        public String getHolidaysJson() {
+            return holidaysJson;
+        }
+
+        public void setHolidaysJson(String holidaysJson) {
+            this.holidaysJson = holidaysJson;
+        }
     }
 }
