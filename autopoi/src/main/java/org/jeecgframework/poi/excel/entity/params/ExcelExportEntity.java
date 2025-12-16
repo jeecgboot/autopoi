@@ -95,6 +95,7 @@ public class ExcelExportEntity extends ExcelBaseEntity implements Comparable<Exc
 	 */
 	private boolean isColumnHidden;
 
+	//update-begin-author:liusq date:20251211 for:JHHB-1212【AutoPoi】导出时，支持动态生成Excel的列
 	/**
 	 * 是否为动态列
 	 */
@@ -115,6 +116,7 @@ public class ExcelExportEntity extends ExcelBaseEntity implements Comparable<Exc
 	 * 当前动态列对应的标题名称
 	 */
 	private String dynamicColumnName;
+	//update-end-author:liusq date:20251211 for:JHHB-1212【AutoPoi】导出时，支持动态生成Excel的列
 
 	private List<ExcelExportEntity> list;
 

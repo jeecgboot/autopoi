@@ -549,6 +549,8 @@ public class ExportBase {
 		}
 		Collections.sort(excelParams);
 	}
+
+	//update-begin-author:liusq date:20251211 for:JHHB-1212【AutoPoi】导出时，支持动态生成Excel的列
 	/**
 	 * 动态列获取值
 	 * @param entity
@@ -744,4 +746,5 @@ public class ExportBase {
 		c[1]=val.substring(i+1); //key
 		return c;
 	}
+	//update-end-author:liusq date:20251211 for:JHHB-1212【AutoPoi】导出时，支持动态生成Excel的列
 }

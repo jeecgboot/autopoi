@@ -203,6 +203,8 @@ public @interface Excel {
 	 * @return
 	 */
 	public boolean isHyperlink() default false;
+	
+	//update-begin-author:liusq date:20251211 for:JHHB-1212【AutoPoi】导出时，支持动态生成Excel的列
 	/**
 	 * 是否为动态列
 	 */
@@ -222,4 +224,5 @@ public @interface Excel {
 	 * 是否保留原始字段列，默认不保留
 	 */
 	public boolean dynamicKeepSelf() default false;
+	//update-end-author:liusq date:20251211 for:JHHB-1212【AutoPoi】导出时，支持动态生成Excel的列
 }
