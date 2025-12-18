@@ -682,15 +682,12 @@ public class ExportBase {
 			}
 		}
 		List<ExcelExportEntity> dynamicEntities = new ArrayList<ExcelExportEntity>();
-		int order = entity.getOrderNum();
-		int offset = 0;
 		for (String header : headers) {
 			ExcelExportEntity copy = copyDynamicBase(entity);
 			copy.setName(header);
 			copy.setDynamicColumnName(header);
-			copy.setOrderNum(order + offset);
+			copy.setOrderNum(entity.getOrderNum());
 			dynamicEntities.add(copy);
-			offset++;
 		}
 		return dynamicEntities;
 	}
