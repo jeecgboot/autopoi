@@ -158,3 +158,7 @@ autopoi\src\main\java\org\jeecgframework\poi\excel\export\ExcelExportServer.java
 autopoi\src\main\java\org\jeecgframework\poi\excel\export\base\ExportBase.java
 autopoi\src\main\java\org\jeecgframework\poi\util\JsonParser.java
 ---author:liusq---date:2025/12/11-----for:JHHB-1212【AutoPoi】导出时，支持动态生成Excel的列---
+
+-- author:sjlei---date:20251218--for: AutoPoi 导出动态列继承父列的 orderNum，不应动态增加，否则会导致列顺序错乱 ---
+autopoi/src/main/java/org/jeecgframework/poi/excel/export/base/ExportBase.java
+-- author:sjlei---date:20251218--for: AutoPoi 导出动态列继承父列的 orderNum，不应动态增加，否则会导致列顺序错乱 ---
