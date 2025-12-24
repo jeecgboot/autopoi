@@ -1,47 +1,50 @@
-AutoPOI (Excel和 Word简易工具类)
+[中文](./README.zh-CN.md) | [English](./README.md)
+
+
+AutoPOI (Excel and Word Easy Utility)
 ===========================
- AutoPOI 功能如同名字auto，追求的就是自动化，让一个没接触过poi的人员，可以傻瓜化的快速实现Excel导入导出、Word模板导出、可以仅仅5行代码就可以完成Excel的导入导出。
- 
- 当前最新版本： 2.0.4（发布日期：2025-12-21）
- 
+AutoPOI, as its name suggests "auto", pursues automation. It enables anyone without POI experience to quickly implement Excel import/export and Word template export in a foolproof manner. You can complete Excel import/export with just 5 lines of code.
+
+Current Version: 2.0.4 (Released: 2025-12-21)
+
 ---------------------------
-AutoPOI的主要特点
+Key Features of AutoPOI
 --------------------------
-	1.设计精巧,使用简单
-	2.接口丰富,扩展简单
-	3.默认值多,write less do more
-	4.AbstractView 支持,web导出可以简单明了
+1. Elegant design, easy to use
+2. Rich interfaces, easy to extend
+3. Many default values, write less do more
+4. AbstractView support, web export made simple
 
 ---------------------------
-AutoPOI的几个入口工具类
+Main Utility Classes
 ---------------------------
 
-	1.ExcelExportUtil Excel导出(普通导出,模板导出)
-	2.ExcelImportUtil Excel导入
-	3.WordExportUtil  Word导出(只支持docx ,doc版本poi存在图片的bug,暂不支持)
-	
+1. ExcelExportUtil - Excel export (normal export, template export)
+2. ExcelImportUtil - Excel import
+3. WordExportUtil - Word export (only supports docx, doc version has image bugs in POI, not supported yet)
+
 ---------------------------
-关于Excel导出XLS和XLSX区别
+Difference Between XLS and XLSX Export
 ---------------------------
 
-	1.导出时间XLS比XLSX快2-3倍
-	2.导出大小XLS是XLSX的2-3倍或者更多
-	3.导出需要综合网速和本地速度做考虑^~^
-	
+1. Export time: XLS is 2-3x faster than XLSX
+2. Export size: XLS is 2-3x larger than XLSX or more
+3. Need to consider both network speed and local processing speed
+
 ---------------------------
-几个工程的说明
+Project Modules
 ---------------------------
-	1.autopoi-parent 父包--作用大家都懂得
-	2.autopoi 导入导出的工具包,可以完成Excel导出,导入,Word的导出,Excel的导出功能
-	3.autopoi-spring-boot-2-starter  Spring Boot 2.x 支持(兼容 javax.servlet)
-	4.autopoi-spring-boot-3-starter  Spring Boot 3.x 支持(兼容 jakarta.servlet)
-	5.sax 导入使用xercesImpl这个包(这个包可能造成奇怪的问题哈),word导出使用poi-scratchpad,都作为可选包了
-	
+1. autopoi-parent - Parent POM
+2. autopoi - Core utility package for Excel export/import and Word export
+3. autopoi-spring-boot-2-starter - Spring Boot 2.x support (compatible with javax.servlet)
+4. autopoi-spring-boot-3-starter - Spring Boot 3.x support (compatible with jakarta.servlet)
+5. SAX import uses xercesImpl package (may cause unexpected issues), Word export uses poi-scratchpad, all as optional dependencies
+
 --------------------------
-Maven 依赖配置
+Maven Dependencies
 --------------------------
 
-**Spring Boot 2.x 项目：**
+**For Spring Boot 2.x projects:**
 ```xml
 <dependency>
  <groupId>org.jeecgframework</groupId>
@@ -50,7 +53,7 @@ Maven 依赖配置
 </dependency>
 ```
 
-**Spring Boot 3.x 项目：**
+**For Spring Boot 3.x projects:**
 ```xml
 <dependency>
  <groupId>org.jeecgframework</groupId>
@@ -59,7 +62,7 @@ Maven 依赖配置
 </dependency>
 ```
 
-**纯 Java 项目（无 Spring）：**
+**For pure Java projects (without Spring):**
 ```xml
 <dependency>
  <groupId>org.jeecgframework</groupId>
@@ -69,345 +72,364 @@ Maven 依赖配置
 ```
 
 --------------------------
-AutoPoi 模板 表达式支持
+Template Expression Support
 --------------------------
-- 空格分割
-- 三目运算  {{test ? obj:obj2}}
-- n: 表示 这个cell是数值类型 {{n:}}
-- le: 代表长度{{le:()}} 在if/else 运用{{le:() > 8 ? obj1 :  obj2}}
-- fd: 格式化时间 {{fd:(obj;yyyy-MM-dd)}}
-- fn: 格式化数字 {{fn:(obj;###.00)}}
-- fe: 遍历数据,创建row
-- !fe: 遍历数据不创建row 
-- $fe: 下移插入,把当前行,下面的行全部下移.size()行,然后插入
-- !if: 删除当前列 {{!if:(test)}}
-- 单引号表示常量值 ''  比如'1' 那么输出的就是 1
+- Space separation
+- Ternary operator: {{test ? obj:obj2}}
+- n: Indicates numeric cell type {{n:}}
+- le: Represents length {{le:()}} used in if/else {{le:() > 8 ? obj1 : obj2}}
+- fd: Format date {{fd:(obj;yyyy-MM-dd)}}
+- fn: Format number {{fn:(obj;###.00)}}
+- fe: Iterate data, create row
+- !fe: Iterate data without creating row
+- $fe: Insert by moving down, move current and below rows down by .size() rows, then insert
+- !if: Delete current column {{!if:(test)}}
+- Single quotes for constant values '', e.g., '1' outputs 1
 
 
 ---------------------------
-AutoPoi导出实例
+Export Examples
 ---------------------------
-1.注解,导入导出都是基于注解的,实体上做上注解,标示导出对象,同时可以做一些操作
+1. Annotations - Both import and export are annotation-based. Add annotations to entities to mark export objects and perform operations.
 
 ```Java
-	@ExcelTarget("courseEntity")
-	public class CourseEntity implements java.io.Serializable {
-	/** 主键 */
-	private String id;
-	/** 课程名称 */
-	@Excel(name = "课程名称", orderNum = "1", needMerge = true)
-	private String name;
-	/** 老师主键 */
-	@ExcelEntity(id = "yuwen")
-	@ExcelVerify()
-	private TeacherEntity teacher;
-	/** 老师主键 */
-	@ExcelEntity(id = "shuxue")
-	private TeacherEntity shuxueteacher;
+@ExcelTarget("courseEntity")
+public class CourseEntity implements java.io.Serializable {
+    /** Primary Key */
+    private String id;
+    /** Course Name */
+    @Excel(name = "Course Name", orderNum = "1", needMerge = true)
+    private String name;
+    /** Teacher */
+    @ExcelEntity(id = "yuwen")
+    @ExcelVerify()
+    private TeacherEntity teacher;
+    /** Math Teacher */
+    @ExcelEntity(id = "shuxue")
+    private TeacherEntity shuxueteacher;
 
-	@ExcelCollection(name = "选课学生", orderNum = "4")
-	private List<StudentEntity> students;
+    @ExcelCollection(name = "Students", orderNum = "4")
+    private List<StudentEntity> students;
+}
 ```
 
-2.基础导出
-	传入导出参数,导出对象,以及对象列表即可完成导出
-	
+2. Basic Export
+Pass export parameters, export object, and object list to complete the export.
+
 ```Java
-	HSSFWorkbook workbook = ExcelExportUtil.exportExcel(new ExportParams(
-				"2412312", "测试", "测试"), CourseEntity.class, list);
+HSSFWorkbook workbook = ExcelExportUtil.exportExcel(new ExportParams(
+    "2412312", "Test", "Test"), CourseEntity.class, list);
 ```
 
-3.基础导出,带有索引
-	在到处参数设置一个值,就可以在导出列增加索引
-	
-```Java
-	ExportParams params = new ExportParams("2412312", "测试", "测试");
-	params.setAddIndex(true);
-	HSSFWorkbook workbook = ExcelExportUtil.exportExcel(params,
-			TeacherEntity.class, telist);
-```			
+3. Export with Index
+Set a parameter value to add an index column in the export.
 
-4.导出Map
-	创建类似注解的集合,即可完成Map的导出,略有麻烦
-	
 ```Java
-	List<ExcelExportEntity> entity = new ArrayList<ExcelExportEntity>();
-	entity.add(new ExcelExportEntity("姓名", "name"));
-	entity.add(new ExcelExportEntity("性别", "sex"));
-
-	List<Map<String, String>> list = new ArrayList<Map<String, String>>();
-	Map<String, String> map;
-	for (int i = 0; i < 10; i++) {
-		map = new HashMap<String, String>();
-		map.put("name", "1" + i);
-		map.put("sex", "2" + i);
-		list.add(map);
-	}
-
-	HSSFWorkbook workbook = ExcelExportUtil.exportExcel(new ExportParams(
-			"测试", "测试"), entity, list);	
-```		
-	
-5.模板导出
-	根据模板配置,完成对应导出
-	
-```Java
-	TemplateExportParams params = new TemplateExportParams();
-	params.setHeadingRows(2);
-	params.setHeadingStartRow(2);
-	Map<String,Object> map = new HashMap<String, Object>();
-    map.put("year", "2013");
-    map.put("sunCourses", list.size());
-    Map<String,Object> obj = new HashMap<String, Object>();
-    map.put("obj", obj);
-    obj.put("name", list.size());
-	 params.setTemplateUrl("org/jeecgframework/poi/excel/doc/exportTemp.xls");
-	Workbook book = ExcelExportUtil.exportExcel(params, CourseEntity.class, list,
-			map);
-```			
-
-6.导入
-	设置导入参数,传入文件或者流,即可获得相应的list
-	
-```Java
-	ImportParams params = new ImportParams();
-	params.setTitleRows(2);
-	params.setHeadRows(2);
-	//params.setSheetNum(9);
-	params.setNeedSave(true);
-	long start = new Date().getTime();
-	List<CourseEntity> list = ExcelImportUtil.importExcel(new File(
-			"d:/tt.xls"), CourseEntity.class, params);
-```	
-
-7.SpringMvc的无缝融合
-	简单几句话,Excel导出搞定
-	
-```Java
-	@RequestMapping(value = "/exportXls")
-	public ModelAndView exportXls(HttpServletRequest request, HttpServletResponse response) {
-		ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
-		List<JeecgDemo> pageList = jeecgDemoService.list();
-		//导出文件名称
-		mv.addObject(NormalExcelConstants.FILE_NAME,"导出Excel文件名字");
-		//注解对象Class
-		mv.addObject(NormalExcelConstants.CLASS,JeecgDemo.class);
-		//自定义表格参数
-		mv.addObject(NormalExcelConstants.PARAMS,new ExportParams("自定义导出Excel模板内容标题", "自定义Sheet名字"));
-		//导出数据列表
-		mv.addObject(NormalExcelConstants.DATA_LIST,pageList);
-		return mv;
-	}
+ExportParams params = new ExportParams("2412312", "Test", "Test");
+params.setAddIndex(true);
+HSSFWorkbook workbook = ExcelExportUtil.exportExcel(params,
+    TeacherEntity.class, telist);
 ```
 
+4. Export Map
+Create annotation-like collections to complete Map export.
 
-| 自定义视图 | 用途 |  描述 |
+```Java
+List<ExcelExportEntity> entity = new ArrayList<ExcelExportEntity>();
+entity.add(new ExcelExportEntity("Name", "name"));
+entity.add(new ExcelExportEntity("Gender", "sex"));
+
+List<Map<String, String>> list = new ArrayList<Map<String, String>>();
+Map<String, String> map;
+for (int i = 0; i < 10; i++) {
+    map = new HashMap<String, String>();
+    map.put("name", "1" + i);
+    map.put("sex", "2" + i);
+    list.add(map);
+}
+
+HSSFWorkbook workbook = ExcelExportUtil.exportExcel(new ExportParams(
+    "Test", "Test"), entity, list);
+```
+
+5. Template Export
+Complete export based on template configuration.
+
+```Java
+TemplateExportParams params = new TemplateExportParams();
+params.setHeadingRows(2);
+params.setHeadingStartRow(2);
+Map<String,Object> map = new HashMap<String, Object>();
+map.put("year", "2013");
+map.put("sunCourses", list.size());
+Map<String,Object> obj = new HashMap<String, Object>();
+map.put("obj", obj);
+obj.put("name", list.size());
+params.setTemplateUrl("org/jeecgframework/poi/excel/doc/exportTemp.xls");
+Workbook book = ExcelExportUtil.exportExcel(params, CourseEntity.class, list, map);
+```
+
+6. Import
+Set import parameters, pass file or stream to get the corresponding list.
+
+```Java
+ImportParams params = new ImportParams();
+params.setTitleRows(2);
+params.setHeadRows(2);
+//params.setSheetNum(9);
+params.setNeedSave(true);
+long start = new Date().getTime();
+List<CourseEntity> list = ExcelImportUtil.importExcel(new File(
+    "d:/tt.xls"), CourseEntity.class, params);
+```
+
+7. Seamless Spring MVC Integration
+Excel export done with just a few lines.
+
+```Java
+@RequestMapping(value = "/exportXls")
+public ModelAndView exportXls(HttpServletRequest request, HttpServletResponse response) {
+    ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
+    List<JeecgDemo> pageList = jeecgDemoService.list();
+    // Export file name
+    mv.addObject(NormalExcelConstants.FILE_NAME, "Export Excel File Name");
+    // Annotated object Class
+    mv.addObject(NormalExcelConstants.CLASS, JeecgDemo.class);
+    // Custom table parameters
+    mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("Custom Export Excel Title", "Custom Sheet Name"));
+    // Export data list
+    mv.addObject(NormalExcelConstants.DATA_LIST, pageList);
+    return mv;
+}
+```
+
+| Custom View | Purpose | Description |
 | ------ | ------ | ------ |
-| JeecgMapExcelView | 实体对象导出视图 | 例如：List<JeecgDemo> |
-| JeecgEntityExcelView | Map对象导出视图 | List<Map<String, String>> list |
-| JeecgTemplateExcelView | Excel模板导出视图 | - | 
-| JeecgTemplateWordView | Word模板导出视图 | - |
+| JeecgEntityExcelView | Entity object export view | e.g., List&lt;JeecgDemo&gt; |
+| JeecgMapExcelView | Map object export view | List&lt;Map&lt;String, String&gt;&gt; list |
+| JeecgTemplateExcelView | Excel template export view | - |
+| JeecgTemplateWordView | Word template export view | - |
 
-
-8.Excel导入校验,过滤不符合规则的数据,追加错误信息到Excel,提供常用的校验规则,已经通用的校验接口
+8. Excel Import Validation
+Filter data that doesn't meet rules, append error messages to Excel. Provides common validation rules and generic validation interface.
 
 ```Java
-	/**
-     * Email校验
-     */
-    @Excel(name = "Email", width = 25)
-    @ExcelVerify(isEmail = true, notNull = true)
-    private String email;
-    /**
-     * 手机号校验
-     */
-    @Excel(name = "Mobile", width = 20)
-    @ExcelVerify(isMobile = true, notNull = true)
-    private String mobile;
-    
-    ExcelImportResult<ExcelVerifyEntity> result = ExcelImportUtil.importExcelVerify(new File(
-            "d:/tt.xls"), ExcelVerifyEntity.class, params);
-    for (int i = 0; i < result.getList().size(); i++) {
-        System.out.println(ReflectionToStringBuilder.toString(result.getList().get(i)));
-    }
+/**
+ * Email validation
+ */
+@Excel(name = "Email", width = 25)
+@ExcelVerify(isEmail = true, notNull = true)
+private String email;
+
+/**
+ * Mobile phone validation
+ */
+@Excel(name = "Mobile", width = 20)
+@ExcelVerify(isMobile = true, notNull = true)
+private String mobile;
+
+ExcelImportResult<ExcelVerifyEntity> result = ExcelImportUtil.importExcelVerify(
+    new File("d:/tt.xls"), ExcelVerifyEntity.class, params);
+for (int i = 0; i < result.getList().size(); i++) {
+    System.out.println(ReflectionToStringBuilder.toString(result.getList().get(i)));
+}
 ```
 
-9.导入Map
-	设置导入参数,传入文件或者流,即可获得相应的list,自定义Key,需要实现IExcelDataHandler接口
-	
+9. Import Map
+Set import parameters, pass file or stream to get the corresponding list. Custom Key requires implementing IExcelDataHandler interface.
+
 ```Java
-	ImportParams params = new ImportParams();
-	List<Map<String,Object>> list = ExcelImportUtil.importExcel(new File(
-			"d:/tt.xls"), Map.class, params);
+ImportParams params = new ImportParams();
+List<Map<String,Object>> list = ExcelImportUtil.importExcel(new File(
+    "d:/tt.xls"), Map.class, params);
 ```
 
-10.字典用法
-        在实体属性注解excel中添加dicCode="",此处dicCode即为jeecg系统中数据字典的Code
-	
+10. Dictionary Usage
+Add dicCode="" in the entity property Excel annotation, where dicCode is the Code of the data dictionary in the jeecg system.
+
 ```Java
-   @Excel(name="性别",width=15,dicCode="sex")
-   private java.lang.String sex;
+@Excel(name="Gender", width=15, dicCode="sex")
+private java.lang.String sex;
 ```
 
-11.字典表用法
-       此处dictTable为数据库表名，dicCode为关联字段名，dicText为excel中显示的内容对应的字段
-	
+11. Dictionary Table Usage
+dictTable is the database table name, dicCode is the associated field name, dicText is the field corresponding to the content displayed in Excel.
+
 ```Java
-	@Excel(name="部门",dictTable="t_s_depart",dicCode="id",dicText="departname")
-    private java.lang.String depart;
+@Excel(name="Department", dictTable="t_s_depart", dicCode="id", dicText="departname")
+private java.lang.String depart;
 ```
 
-12.Replace用法
-       若数据库中存储的是0/1 ，则导出/导入的excel单元格中显示的是女/男
-	
+12. Replace Usage
+If database stores 0/1, Excel cells display Female/Male.
+
 ```Java
-	@Excel(name="测试替换",width=15,replace={"男_1","女_0"})
-	private java.lang.String fdReplace;
+@Excel(name="Test Replace", width=15, replace={"Male_1","Female_0"})
+private java.lang.String fdReplace;
 ```
 
-13.高级字段转换用法
-- exportConvert：在导出的时候需要替换值则配置该值为true，同时增加一个方法，方法名为原get方法名前加convert。
-- importConvert：在导入的时候需要替换值则配置该值为true，同时增加一个方法，方法名为原set方法名前加convert。
+13. Advanced Field Conversion
+- exportConvert: Set to true to replace values during export, add a method with "convert" prefix before the original get method name.
+- importConvert: Set to true to replace values during import, add a method with "convert" prefix before the original set method name.
 
 ```Java
-	@Excel(name="测试转换",width=15,exportConvert=true,importConvert=true)
-	private java.lang.String fdConvert;
-	
-	/**
-	  * 转换值示例： 在该字段值的后面加上元
-	  * @return
-	  */
-	public String convertgetFdConvert(){
-	  return this.fdConvert+"元";
-	}
-	  
-	/**
-	 * 转换值示例： 替换掉excel单元格中的"元"
-	 * @return
-	 */
-	public void convertsetFdConvert(String fdConvert){
-	  this.fdConvert = fdConvert.replace("元","");
-	}
+@Excel(name="Test Convert", width=15, exportConvert=true, importConvert=true)
+private java.lang.String fdConvert;
+
+/**
+ * Conversion example: Add suffix to the field value
+ * @return
+ */
+public String convertgetFdConvert(){
+    return this.fdConvert + " Yuan";
+}
+
+/**
+ * Conversion example: Replace "Yuan" in Excel cell
+ * @return
+ */
+public void convertsetFdConvert(String fdConvert){
+    this.fdConvert = fdConvert.replace(" Yuan", "");
+}
 ```
 
 ---------------------------
- Excel 注解说明
+Excel Annotation Reference
 ---------------------------
 
-@Excel
+**@Excel**
 
-| 属性             | 类型       | 默认值              | 功能                                                                     |
+| Property | Type | Default | Description |
 |----------------|----------|------------------|------------------------------------------------------------------------|
-| name           | String   | null             | 列名,支持name_id                                                           |
-| needMerge      | boolean  | fasle            | 是否需要纵向合并单元格(用于含有list中,单个的单元格,合并list创建的多个row)                           |
-| orderNum       | String   | "0"              | 列的排序,支持name_id                                                         |
-| replace        | String[] | {}               | 值得替换 导出是{a_id,b_id} 导入反过来                                              |
-| savePath       | String   | "upload"         | 导入文件保存路径,如果是图片可以填写,默认是upload/className/ IconEntity这个类对应的就是upload/Icon/ |
-| type           | int      | 1                | 导出类型 1 是文本 2 是图片,3 是函数,10 是数字 默认是文本                                    |
-| width          | double   | 10               | 列宽                                                                     |
-| height         | double   | 10               | 列高,后期打算统一使用@ExcelTarget的height,这个会被废弃,注意                               |
-| isStatistics   | boolean  | fasle            | 自动统计数据,在追加一行统计,把所有数据都和输出 这个处理会吞没异常,请注意这一点                              |
-| isHyperlink    | boolean  | FALSE            | 超链接,如果是需要实现接口返回对象                                                      |
-| isImportField  | boolean  | TRUE             | 校验字段,看看这个字段是不是导入的Excel中有,如果没有说明是错误的Excel,读取失败,支持name_id                |
-| exportFormat   | String   | ""               | 导出的时间格式,以这个是否为空来判断是否需要格式化日期                                            |
-| importFormat   | String   | ""               | 导入的时间格式,以这个是否为空来判断是否需要格式化日期                                            |
-| format         | String   | ""               | 时间格式,相当于同时设置了exportFormat 和 importFormat                               |
-| databaseFormat | String   | "yyyyMMddHHmmss" | 导出时间设置,如果字段是Date类型则不需要设置 数据库如果是string 类型,这个需要设置这个数据库格式,用以转换时间格式输出      |
-| numFormat      | String   | ""               | 数字格式化,参数是Pattern,使用的对象是DecimalFormat                                   |
-| imageType      | int      | 1                | 导出类型 1 从file读取 2 是从数据库中读取 默认是文件 同样导入也是一样的                              |
-| suffix         | String   | ""               | 文字后缀,如% 90 变成90%                                                       |
-| isWrap         | boolean  | TRUE             | 是否换行 即支持\n                                                             |
-| mergeRely      | int[]    | {}               | 合并单元格依赖关系,比如第二列合并是基于第一列 则{0}就可以了                                       |
-| mergeVertical  | boolean  | fasle            | 纵向合并内容相同的单元格                                                           |
-| fixedIndex     | int      | -1               | 对应excel的列,忽略名字                                                         |
-| isColumnHidden | boolean  | FALSE            | 导出隐藏列                                                                  |
+| name | String | null | Column name, supports name_id |
+| needMerge | boolean | false | Whether to merge cells vertically (for single cells in a list, merge multiple rows created by list) |
+| orderNum | String | "0" | Column order, supports name_id |
+| replace | String[] | {} | Value replacement, export {a_id,b_id}, import reversed |
+| savePath | String | "upload" | Import file save path, can be filled for images, default is upload/className/ |
+| type | int | 1 | Export type: 1=text, 2=image, 3=function, 10=number, default is text |
+| width | double | 10 | Column width |
+| height | double | 10 | Column height (will be deprecated, use @ExcelTarget height instead) |
+| isStatistics | boolean | false | Auto statistics, append a statistics row with all data summed |
+| isHyperlink | boolean | FALSE | Hyperlink, need to implement interface to return object |
+| isImportField | boolean | TRUE | Validate field exists in imported Excel, supports name_id |
+| exportFormat | String | "" | Export date format |
+| importFormat | String | "" | Import date format |
+| format | String | "" | Date format, equivalent to setting both exportFormat and importFormat |
+| databaseFormat | String | "yyyyMMddHHmmss" | Database format for string type date fields |
+| numFormat | String | "" | Number format, Pattern parameter, uses DecimalFormat |
+| imageType | int | 1 | Image type: 1=from file, 2=from database, default is file |
+| suffix | String | "" | Text suffix, e.g., % makes 90 become 90% |
+| isWrap | boolean | TRUE | Whether to wrap, supports \n |
+| mergeRely | int[] | {} | Merge cell dependencies, e.g., {0} for second column based on first |
+| mergeVertical | boolean | false | Vertically merge cells with same content |
+| fixedIndex | int | -1 | Corresponds to Excel column, ignore name |
+| isColumnHidden | boolean | FALSE | Export hidden column |
 
+**@ExcelCollection**
 
-@ExcelCollection
-
-| 属性       | 类型       | 默认值             | 功能               |
+| Property | Type | Default | Description |
 |----------|----------|-----------------|------------------|
-| id       | String   | null            | 定义ID             |
-| name     | String   | null            | 定义集合列名,支持nanm_id |
-| orderNum | int      | 0               | 排序,支持name_id     |
-| type     | Class<?> | ArrayList.class | 导入时创建对象使用        |
+| id | String | null | Define ID |
+| name | String | null | Define collection column name, supports name_id |
+| orderNum | int | 0 | Order, supports name_id |
+| type | Class<?> | ArrayList.class | Used to create objects during import |
 
-
-
-单表导出实体注解源码
+**Single Table Export Entity Example**
 
 ```Java
 public class SysUser implements Serializable {
 
-    /**id*/
+    /** id */
     private String id;
 
-    /**登录账号 */
-    @Excel(name = "登录账号", width = 15)
+    /** Login Account */
+    @Excel(name = "Login Account", width = 15)
     private String username;
 
-    /**真实姓名*/
-    @Excel(name = "真实姓名", width = 15)
+    /** Real Name */
+    @Excel(name = "Real Name", width = 15)
     private String realname;
 
-    /**头像*/
-    @Excel(name = "头像", width = 15)
+    /** Avatar */
+    @Excel(name = "Avatar", width = 15)
     private String avatar;
 
-    /**生日*/
-    @Excel(name = "生日", width = 15, format = "yyyy-MM-dd")
+    /** Birthday */
+    @Excel(name = "Birthday", width = 15, format = "yyyy-MM-dd")
     private Date birthday;
 
-    /**性别（1：男 2：女）*/
-    @Excel(name = "性别", width = 15,dicCode="sex")
+    /** Gender (1: Male 2: Female) */
+    @Excel(name = "Gender", width = 15, dicCode="sex")
     private Integer sex;
 
-    /**电子邮件*/
-    @Excel(name = "电子邮件", width = 15)
+    /** Email */
+    @Excel(name = "Email", width = 15)
     private String email;
 
-    /**电话*/
-    @Excel(name = "电话", width = 15)
+    /** Phone */
+    @Excel(name = "Phone", width = 15)
     private String phone;
 
-    /**状态(1：正常  2：冻结 ）*/
-    @Excel(name = "状态", width = 15,replace={"正常_1","冻结_0"})
+    /** Status (1: Normal 2: Frozen) */
+    @Excel(name = "Status", width = 15, replace={"Normal_1","Frozen_0"})
     private Integer status;
+}
 ```
 
-一对多导出实体注解源码
+**One-to-Many Export Entity Example**
 
 ```Java
 @Data
 public class JeecgOrderMainPage {
-	
-	/**主键*/
-	private java.lang.String id;
-	/**订单号*/
-	@Excel(name="订单号",width=15)
-	private java.lang.String orderCode;
-	/**订单类型*/
-	private java.lang.String ctype;
-	/**订单日期*/
-	@Excel(name="订单日期",width=15,format = "yyyy-MM-dd")
-	private java.util.Date orderDate;
-	/**订单金额*/
-	@Excel(name="订单金额",width=15)
-	private java.lang.Double orderMoney;
-	/**订单备注*/
-	private java.lang.String content;
-	/**创建人*/
-	private java.lang.String createBy;
-	/**创建时间*/
-	private java.util.Date createTime;
-	/**修改人*/
-	private java.lang.String updateBy;
-	/**修改时间*/
-	private java.util.Date updateTime;
-	
-	@ExcelCollection(name="客户")
-	private List<JeecgOrderCustomer> jeecgOrderCustomerList;
-	@ExcelCollection(name="机票")
-	private List<JeecgOrderTicket> jeecgOrderTicketList;
+    
+    /** Primary Key */
+    private java.lang.String id;
+    
+    /** Order Number */
+    @Excel(name="Order Number", width=15)
+    private java.lang.String orderCode;
+    
+    /** Order Type */
+    private java.lang.String ctype;
+    
+    /** Order Date */
+    @Excel(name="Order Date", width=15, format = "yyyy-MM-dd")
+    private java.util.Date orderDate;
+    
+    /** Order Amount */
+    @Excel(name="Order Amount", width=15)
+    private java.lang.Double orderMoney;
+    
+    /** Order Note */
+    private java.lang.String content;
+    
+    /** Created By */
+    private java.lang.String createBy;
+    
+    /** Create Time */
+    private java.util.Date createTime;
+    
+    /** Updated By */
+    private java.lang.String updateBy;
+    
+    /** Update Time */
+    private java.util.Date updateTime;
+    
+    @ExcelCollection(name="Customer")
+    private List<JeecgOrderCustomer> jeecgOrderCustomerList;
+    
+    @ExcelCollection(name="Ticket")
+    private List<JeecgOrderTicket> jeecgOrderTicketList;
 }
 ```
+
+---------------------------
+Example Code
+---------------------------
+- [Example Code](./autopoi-spring-boot-2-starter/src/test/java/) - Unit test code location
+
+---------------------------
+License
+---------------------------
+Apache License 2.0
+
