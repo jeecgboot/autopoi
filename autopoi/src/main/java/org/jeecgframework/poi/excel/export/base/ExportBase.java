@@ -28,6 +28,7 @@ import java.util.*;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.jeecgframework.core.util.ApplicationContextUtil;
+import org.jeecgframework.dict.service.AutoPoiDictMapServiceI;
 import org.jeecgframework.dict.service.AutoPoiDictServiceI;
 import org.jeecgframework.poi.excel.annotation.Excel;
 import org.jeecgframework.poi.excel.annotation.ExcelCollection;
@@ -237,16 +238,16 @@ public class ExportBase {
 		if (StringUtils.isNotEmpty(entity.getFormat())) {
 			value = formatValue(value, entity);
 		}
-		if (entity.getReplace() != null && entity.getReplace().length > 0) {
+		if (entity.getReplaceMap() != null && !entity.getReplaceMap().isEmpty()) {
 			//update-begin-author:taoyan date：20180731 for:TASK #3038 【bug】Excel 导出多个值（逗号隔开的情况下，导出字典值是ID值）
 			if(value == null){
 				value = "";//String.valueOf(value) 如果value为null 则返回"null"
 			}
 			String oldVal=value.toString();
 			if(entity.isMultiReplace()){
-				value = multiReplaceValue(entity.getReplace(), String.valueOf(value));
+				value = multiReplaceValueByHashMap(entity.getReplaceMap(), String.valueOf(value));
 			}else{
-				value = replaceValue(entity.getReplace(), String.valueOf(value));
+				value = replaceValueByHashMap(entity.getReplaceMap(), String.valueOf(value));
 			}
 			//update-end-author:taoyan date：20180731 for:TASK #3038 【bug】Excel 导出多个值（逗号隔开的情况下，导出字典值是ID值）
 
@@ -310,15 +311,15 @@ public class ExportBase {
 		excelEntity.setReplace(excel.replace());
 		excelEntity.setHyperlink(excel.isHyperlink());
 		if(StringUtils.isNotEmpty(excel.dicCode())){
-			AutoPoiDictServiceI jeecgDictService = null;
+			AutoPoiDictMapServiceI jeecgDictService = null;
 			try {
-				jeecgDictService = ApplicationContextUtil.getContext().getBean(AutoPoiDictServiceI.class);
+				jeecgDictService = ApplicationContextUtil.getContext().getBean(AutoPoiDictMapServiceI.class);
 			} catch (Exception e) {
 			}
 			if(jeecgDictService!=null){
-				 String[] dictReplace = jeecgDictService.queryDict(excel.dictTable(), excel.dicCode(), excel.dicText());
-				 if(excelEntity.getReplace()!=null && dictReplace!=null && dictReplace.length!=0){
-					 excelEntity.setReplace(dictReplace);
+				HashMap<String,String> dictMap = jeecgDictService.queryDict(excel.dictTable(), excel.dicCode(), excel.dicText(),true);
+				if( dictMap!=null && !dictMap.isEmpty()){
+					 excelEntity.setReplaceMap(dictMap);
 				 }
 			}
 		}
@@ -447,7 +448,40 @@ public class ExportBase {
 		}
 		return value;
 	}
-	
+
+	/**
+	 * 当字典的值比较多时，使用HashMap方式相比使用字符串分割方式更快
+	 * @author TestNet
+	 * @since 2025年1月01日
+	 */
+	private Object replaceValueByHashMap(HashMap<String,String> replace, String key) {
+		return replace.get(key);
+	}
+
+	/**
+	 * 当字典的值比较多时，使用HashMap方式相比使用字符串分割方式更快
+	 * 如果需要被替换的值是多选项，则每一项之间有逗号隔开，走以下方法
+	 * @author TestNet
+	 * @since 2025年1月01日
+	 */
+	private Object multiReplaceValueByHashMap(HashMap<String,String> replace, String value) {
+		if(value.indexOf(",")>0){
+			String[] radioVals = value.split(",");
+			String[] temp;
+			String result = "";
+            for (String radioVal : radioVals) {
+                result = result.concat(replace.get(radioVal)) + ",";
+            }
+			if(result.equals("")){
+				result = value;
+			}else{
+				result = result.substring(0, result.length()-1);
+			}
+			return result;
+		}else{
+			return replaceValueByHashMap(replace, value);
+		}
+	}
 	//update-begin-author:taoyan date：20180731 for:TASK #3038 【bug】Excel 导出多个值（逗号隔开的情况下，导出字典值是ID值）
 	/**
 	 * 如果需要被替换的值是多选项，则每一项之间有逗号隔开，走以下方法
