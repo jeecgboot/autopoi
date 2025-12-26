@@ -1,6 +1,6 @@
 /**
  * Copyright 2013-2015 JEECG (jeecgos@163.com)
- *   
+ *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
@@ -50,7 +50,7 @@ import java.util.regex.Pattern;
 
 /**
  * Excel 导入服务
- * 
+ *
  * @author JEECG
  * @date 2014年6月26日 下午9:20:51
  */
@@ -78,7 +78,7 @@ public class ExcelImportServer extends ImportBaseService {
 
 	/***
 	 * 向List里面继续添加元素
-	 * 
+	 *
 	 * @param object
 	 * @param param
 	 * @param row
@@ -114,7 +114,7 @@ public class ExcelImportServer extends ImportBaseService {
 
 	/**
 	 * 获取key的值,针对不同类型获取不同的值
-	 * 
+	 *
 	 * @Author JEECG
 	 * @date 2013-11-21
 	 * @param cell
@@ -144,7 +144,7 @@ public class ExcelImportServer extends ImportBaseService {
 
 	/**
 	 * 获取保存的真实路径
-	 * 
+	 *
 	 * @param excelImportEntity
 	 * @param object
 	 * @return
@@ -211,12 +211,15 @@ public class ExcelImportServer extends ImportBaseService {
 				for (ExcelCollectionParams param : excelCollection) {
 					addListContinue(object, param, row, titlemap, targetId, pictures, params);
 				}
-				
-			} else {			
+
+			} else {
 				object = PoiPublicUtil.createObject(pojoClass, targetId);
 				try {
                     //update-begin-author:taoyan date:20200303 for:导入图片
 				    int firstCellNum = row.getFirstCellNum();
+					if(firstCellNum<0){
+						firstCellNum = 0;
+					}
 				    if(firstCellNum>minColumnIndex){
                         firstCellNum = minColumnIndex;
                     }
@@ -322,7 +325,7 @@ public class ExcelImportServer extends ImportBaseService {
 
 	/**
 	 * 获取表格字段列名对应信息
-	 * 
+	 *
 	 * @param rows
 	 * @param params
 	 * @param excelCollection
@@ -360,7 +363,7 @@ public class ExcelImportServer extends ImportBaseService {
 				titlemap.put(cell.getColumnIndex(), value);//加入表头列表
 			}
 		}
-		
+
 		//多行表头
 		for (int j = headBegin; j < headBegin + params.getHeadRows()-1; j++) {
 			headRow = sheet.getRow(j);
@@ -412,7 +415,7 @@ public class ExcelImportServer extends ImportBaseService {
 	//update-end--Author:xuelin  Date:20171205 for：TASK #2098 【excel问题】 Online 一对多导入失败--------------------
 	/**
 	 * 获取这个名称对应的集合信息
-	 * 
+	 *
 	 * @param excelCollection
 	 * @param collectionName
 	 * @return
@@ -428,7 +431,7 @@ public class ExcelImportServer extends ImportBaseService {
 
 	/**
 	 * Excel 导入 field 字段类型 Integer,Long,Double,Date,String,Boolean
-	 * 
+	 *
 	 * @param inputstream
 	 * @param pojoClass
 	 * @param params
@@ -493,7 +496,7 @@ public class ExcelImportServer extends ImportBaseService {
 				}
 			}
 			//update-end-author:taoyan date:2023-3-4 for: 导入数据支持指定sheet名称
-				
+
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug(" start to read excel by is ,startTime is {}", System.currentTimeMillis());
 			}
@@ -542,7 +545,7 @@ public class ExcelImportServer extends ImportBaseService {
 
 	/**
 	 * 保存字段值(获取值,校验值,追加错误信息)
-	 * 
+	 *
 	 * @param params
 	 * @param object
 	 * @param cell
@@ -576,7 +579,7 @@ public class ExcelImportServer extends ImportBaseService {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param object
 	 * @param picId
 	 * @param excelParams
