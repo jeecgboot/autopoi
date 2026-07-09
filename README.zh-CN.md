@@ -5,7 +5,7 @@ AutoPOI (Excel和 Word简易工具类)
 ===========================
  AutoPOI 功能如同名字auto，追求的就是自动化，让一个没接触过poi的人员，可以傻瓜化的快速实现Excel导入导出、Word模板导出、可以仅仅5行代码就可以完成Excel的导入导出。
  
- 当前最新版本： 2.0.4（发布日期：2025-12-21）
+ 当前最新版本： 2.0.5（发布日期：2026-07-09）
  
 ---------------------------
 AutoPOI的主要特点
@@ -49,7 +49,7 @@ Maven 依赖配置
 <dependency>
  <groupId>org.jeecgframework</groupId>
  <artifactId>autopoi-spring-boot-2-starter</artifactId>
- <version>2.0.4</version>
+ <version>2.0.5</version>
 </dependency>
 ```
 
@@ -58,7 +58,7 @@ Maven 依赖配置
 <dependency>
  <groupId>org.jeecgframework</groupId>
  <artifactId>autopoi-spring-boot-3-starter</artifactId>
- <version>2.0.4</version>
+ <version>2.0.5</version>
 </dependency>
 ```
 
@@ -67,7 +67,7 @@ Maven 依赖配置
 <dependency>
  <groupId>org.jeecgframework</groupId>
  <artifactId>autopoi</artifactId>
- <version>2.0.4</version>
+ <version>2.0.5</version>
 </dependency>
 ```
 

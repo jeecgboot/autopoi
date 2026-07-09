@@ -5,7 +5,7 @@ AutoPOI (Excel and Word Easy Utility)
 ===========================
 AutoPOI, as its name suggests "auto", pursues automation. It enables anyone without POI experience to quickly implement Excel import/export and Word template export in a foolproof manner. You can complete Excel import/export with just 5 lines of code.
 
-Current Version: 2.0.4 (Released: 2025-12-21)
+Current Version: 2.0.5 (Released: 2026-07-09)
 
 ---------------------------
 Key Features of AutoPOI
@@ -49,7 +49,7 @@ Maven Dependencies
 <dependency>
  <groupId>org.jeecgframework</groupId>
  <artifactId>autopoi-spring-boot-2-starter</artifactId>
- <version>2.0.4</version>
+ <version>2.0.5</version>
 </dependency>
 ```
 
@@ -58,7 +58,7 @@ Maven Dependencies
 <dependency>
  <groupId>org.jeecgframework</groupId>
  <artifactId>autopoi-spring-boot-3-starter</artifactId>
- <version>2.0.4</version>
+ <version>2.0.5</version>
 </dependency>
 ```
 
@@ -67,7 +67,7 @@ Maven Dependencies
 <dependency>
  <groupId>org.jeecgframework</groupId>
  <artifactId>autopoi</artifactId>
- <version>2.0.4</version>
+ <version>2.0.5</version>
 </dependency>
 ```
 
