@@ -14,6 +14,7 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<java.version>1.8</java.version>
+		<spring-boot3.version>7.0.8</spring-boot3.version>
 	</properties>
 	
 	<dependencies>
@@ -82,6 +83,7 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-webmvc</artifactId>
+			<version>${spring-boot3.version}</version>
 			<optional>true</optional>
 		</dependency>
 	
