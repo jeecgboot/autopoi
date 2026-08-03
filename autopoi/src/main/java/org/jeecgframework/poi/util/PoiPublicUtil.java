@@ -532,6 +532,12 @@ public final class PoiPublicUtil {
 				path = ClassUtils.getDefaultClassLoader().getResource("").getPath();
 			}
 			//update-end--Author:zhangdaihao  Date:20190424 for：解决springboot 启动模式，上传路径获取为空问题----------------------
+			//update-begin for: jar包部署时 getResource("") 返回嵌套jar虚拟路径(nested:...jar!BOOT-INF)不可写,导致Excel导入保存文件报FileNotFoundException,回退系统临时目录
+			if (path == null || path.isEmpty() || path.contains("!") || path.endsWith(".jar")) {
+				LOGGER.info("getWebRootPath: classpath根路径[{}]为jar包嵌套虚拟路径不可写, 回退系统临时目录: {}", path, System.getProperty("java.io.tmpdir"));
+				path = System.getProperty("java.io.tmpdir");
+			}
+			//update-end for: jar包部署时嵌套jar虚拟路径不可写问题
 			LOGGER.debug("--- getWebRootPath ----filePath--- " + path);
 			path = path.replace("WEB-INF/classes/", "");
 			path = path.replace("file:/", "");
