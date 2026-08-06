@@ -162,3 +162,8 @@ autopoi\src\main\java\org\jeecgframework\poi\util\JsonParser.java
 -- author:sjlei---date:20251218--for: AutoPoi 导出动态列继承父列的 orderNum，不应动态增加，否则会导致列顺序错乱 ---
 autopoi/src/main/java/org/jeecgframework/poi/excel/export/base/ExportBase.java
 -- author:sjlei---date:20251218--for: AutoPoi 导出动态列继承父列的 orderNum，不应动态增加，否则会导致列顺序错乱 ---
+
+---author:liusq---date:2025/12/30-----for:issues/9237 修复多个字段设置numFormat时，样式被共享导致格式化错误的问题---
+autopoi\src\main\java\org\jeecgframework\poi\excel\export\base\ExcelExportBase.java
+autopoi\src\test\java\DaoChuTest.java
+---author:liusq---date:2025/12/30-----for:issues/9237 修复多个字段设置numFormat时，样式被共享导致格式化错误的问题---

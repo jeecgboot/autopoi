@@ -172,6 +172,9 @@ public class DaoChuTest {
 
         // 测试3：动态列导出示例
         dynamicExport();
+
+        // 测试4：NumFormat导出示例
+        numFormatExport();
         
         System.out.println("✅ 所有测试完成，文件已保存到 D:/excel/ 目录");
     }
@@ -201,6 +204,94 @@ public class DaoChuTest {
         FileOutputStream fos = new FileOutputStream( "D:\\excel\\dynamic.xlsx");
         workbook.write(fos);
         fos.close();
+    }
+    /**
+     * 动态列导出示例：@Excel(numFormat = "0.00000")
+     */
+    public static void numFormatExport() throws IOException {
+        List<NumFormatRows> data = new ArrayList<NumFormatRows>();
+        // 示例数据
+        NumFormatRows row = new NumFormatRows();
+        row.setOkCount(100L);
+        row.setPrice(0.06);
+        row.setGz(32.4);
+        row.setFtxs(9.09);
+        row.setFtxsgz(2.95);
+        data.add(row);
+        // 示例数据
+        NumFormatRows row1 = new NumFormatRows();
+        row1.setOkCount(200L);
+        row1.setPrice(0.06);
+        row1.setGz(21.6);
+        row1.setFtxs(9.1);
+        row1.setFtxsgz(1.97);
+        data.add(row1);
+
+        ExportParams params = new ExportParams("NumFormat示例", "sheet1");
+        Workbook workbook = ExcelExportUtil.exportExcel(params, NumFormatRows.class, data);
+        File savefile = new File("D:\\excel");
+        if (!savefile.exists()) {
+            savefile.mkdirs();
+        }
+        FileOutputStream fos = new FileOutputStream( "D:\\excel\\numFormat.xlsx");
+        workbook.write(fos);
+        fos.close();
+    }
+
+    /**
+     * 演示动态列的实体
+     */
+    public static class NumFormatRows {
+        @Excel(name = "数量",type=4,isStatistics = true)
+        private Long okCount;
+        @Excel(name = "工价",type=4,numFormat = "0.00000")
+        private Double price;
+        @Excel(name = "工资",type=4,numFormat = "0.000",isStatistics = true)
+        private Double gz;
+        @Excel(name = "分摊系数")
+        private Double ftxs;
+        @Excel(name = "分摊系数工资",type=4,numFormat = "0.0000",isStatistics = true)
+        private Double ftxsgz;
+
+        public Long getOkCount() {
+            return okCount;
+        }
+
+        public void setOkCount(Long okCount) {
+            this.okCount = okCount;
+        }
+
+        public Double getPrice() {
+            return price;
+        }
+
+        public void setPrice(Double price) {
+            this.price = price;
+        }
+
+        public Double getGz() {
+            return gz;
+        }
+
+        public void setGz(Double gz) {
+            this.gz = gz;
+        }
+
+        public Double getFtxs() {
+            return ftxs;
+        }
+
+        public void setFtxs(Double ftxs) {
+            this.ftxs = ftxs;
+        }
+
+        public Double getFtxsgz() {
+            return ftxsgz;
+        }
+
+        public void setFtxsgz(Double ftxsgz) {
+            this.ftxsgz = ftxsgz;
+        }
     }
 
     /**

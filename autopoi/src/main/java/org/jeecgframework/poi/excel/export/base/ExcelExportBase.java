@@ -137,7 +137,7 @@ public abstract class ExcelExportBase extends ExportBase {
 				if (entity.getType() == 1) {
 					createStringCell(row, cellNum++, value == null ? "" : value.toString(), index % 2 == 0 ? getStyles(false, entity) : getStyles(true, entity), entity);
 				} else if (entity.getType() == 4){
-					createNumericCell(row, cellNum++, value == null ? "" : value.toString(), getNumberCellStyle(index, df, entity), entity);
+					createNumericCell(row, cellNum++, value == null ? "" : value.toString(), getNumberCellStyle(index, df, entity, workbook), entity);
 				} else if (entity.getType() == 0) {
 					//update-begin---author:chenrui ---date:20250604  for：[issues/8248]AutoPOI导出的单元格格式建议加一个常规类型 #8248------------
 					createStringCell(row, cellNum++, value == null ? "" : value.toString(), getGeneralCellStyle(index, workbook,entity), entity);
@@ -190,15 +190,29 @@ public abstract class ExcelExportBase extends ExportBase {
 	 * @param index
 	 * @param df
 	 * @param entity
+	 * @param workbook
 	 * @return
 	 */
-	private CellStyle getNumberCellStyle(int index,DataFormat df, ExcelExportEntity entity) {
-       //update-begin-author:liusq---date:2023-12-07--for: [issues/5538]导出表格设置了数字格式导出之后仍然是文本格式，并且无法进行计算
-		CellStyle cellStyle = index % 2 == 0 ? getStyles(false, entity) : getStyles(true, entity);
+	private CellStyle getNumberCellStyle(int index,DataFormat df, ExcelExportEntity entity, Workbook workbook) {
+		//update-begin-author:liusq---date:20251230--for: issues/9237 修复多个字段设置numFormat时，样式被共享导致格式化错误的问题
 		String numFormat = StringUtils.isNotBlank(entity.getNumFormat())? entity.getNumFormat():"0.00_ ";
-		cellStyle.setDataFormat(df.getFormat(numFormat));
-		return cellStyle;
-		//update-end-author:liusq---date:2023-12-07--for:[issues/5538]导出表格设置了数字格式导出之后仍然是文本格式，并且无法进行计算
+		String cellStyleKey = (index % 2 == 0 ? "two" : "one") + "_num_" + numFormat;
+
+		// 检查缓存中是否已有该格式的样式
+		if (this.cellStyleMap.containsKey(cellStyleKey)) {
+			return this.cellStyleMap.get(cellStyleKey);
+		}
+
+		// 创建新样式，基于基础样式但不直接修改原样式
+		CellStyle baseStyle = index % 2 == 0 ? getStyles(false, entity) : getStyles(true, entity);
+		CellStyle newStyle = workbook.createCellStyle();
+		newStyle.cloneStyleFrom(baseStyle);
+		newStyle.setDataFormat(df.getFormat(numFormat));
+
+		// 缓存新样式
+		this.cellStyleMap.put(cellStyleKey, newStyle);
+		return newStyle;
+		//update-end-author:liusq---date:20251230--for: issues/9237 修复多个字段设置numFormat时，样式被共享导致格式化错误的问题
 	}
 
 	/**
@@ -417,7 +431,7 @@ public abstract class ExcelExportBase extends ExportBase {
 				}
 				//update-end-author:liusq---date:20220728--for: 新增isHyperlink属性 ---
 			} else if (entity.getType() == 4){
-				createNumericCell(row, cellNum++, value == null ? "" : value.toString(), getNumberCellStyle(index, df, entity), entity);
+				createNumericCell(row, cellNum++, value == null ? "" : value.toString(), getNumberCellStyle(index, df, entity, workbook), entity);
 				//update-begin-author:liusq---date:20220728--for: 新增isHyperlink属性 ---
 				if (entity.isHyperlink()) {
 					row.getCell(cellNum - 1)
@@ -751,7 +765,7 @@ public abstract class ExcelExportBase extends ExportBase {
 
 					} else if (entity.getType() == 4) {
 						createNumericCell(row, cellNum++, value == null ? "" : value.toString(),
-								getNumberCellStyle(index, df, entity),
+								getNumberCellStyle(index, df, entity, workbook),
 								entity);
 					} else if (entity.getType() == 0) {
 						//update-begin---author:chenrui ---date:20250604  for：[issues/8248]AutoPOI导出的单元格格式建议加一个常规类型 #8248------------
