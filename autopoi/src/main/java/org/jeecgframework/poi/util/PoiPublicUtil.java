@@ -1,6 +1,6 @@
 /**
  * Copyright 2013-2015 JEECG (jeecgos@163.com)
- *   
+ *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
@@ -66,7 +66,7 @@ import org.xml.sax.SAXException;
 
 /**
  * AutoPoi 的公共基础类
- * 
+ *
  * @author JEECG
  * @date 2015年4月5日 上午12:59:22
  */
@@ -89,7 +89,7 @@ public final class PoiPublicUtil {
 
 	/**
 	 * 彻底创建一个对象
-	 * 
+	 *
 	 * @param clazz
 	 * @return
 	 */
@@ -126,7 +126,7 @@ public final class PoiPublicUtil {
 
 	/**
 	 * 获取class的 包括父类的
-	 * 
+	 *
 	 * @param clazz
 	 * @return
 	 */
@@ -163,7 +163,7 @@ public final class PoiPublicUtil {
 
 	/**
 	 * 获取GET方法
-	 * 
+	 *
 	 * @param name
 	 * @param pojoClass
 	 * @return
@@ -184,7 +184,7 @@ public final class PoiPublicUtil {
 
 	/**
 	 * 获取SET方法
-	 * 
+	 *
 	 * @param name
 	 * @param pojoClass
 	 * @param type
@@ -197,7 +197,7 @@ public final class PoiPublicUtil {
 		getMethodName.append(name.substring(1));
 		return pojoClass.getMethod(getMethodName.toString(), new Class[] { type });
 	}
-	
+
 	//update-begin-author:taoyan date:20180615 for:TASK #2798 导入扩展方法，支持自定义导入字段转换规则
 	/**
 	 * 获取get方法 通过EXCEL注解exportConvert判断是否支持值的转换
@@ -223,7 +223,7 @@ public final class PoiPublicUtil {
 		}
 		return method;
 	}
-	
+
 	/**
 	 * 获取set方法  通过EXCEL注解importConvert判断是否支持值的转换
 	 * @param name
@@ -244,10 +244,10 @@ public final class PoiPublicUtil {
 		return pojoClass.getMethod(setMethodName.toString(), new Class[] { type });
 	}
 	//update-end-author:taoyan date:20180615 for:TASK #2798 导入扩展方法，支持自定义导入字段转换规则
-	
+
 	/**
 	 * 获取Excel2003图片
-	 * 
+	 *
 	 * @param sheet
 	 *            当前sheet对象
 	 * @param workbook
@@ -276,7 +276,7 @@ public final class PoiPublicUtil {
 
 	/**
 	 * 获取Excel2007图片
-	 * 
+	 *
 	 * @param sheet
 	 *            当前sheet对象
 	 * @param workbook
@@ -290,11 +290,13 @@ public final class PoiPublicUtil {
 				XSSFDrawing drawing = (XSSFDrawing) dr;
 				List<XSSFShape> shapes = drawing.getShapes();
 				for (XSSFShape shape : shapes) {
-					XSSFPicture pic = (XSSFPicture) shape;
-					XSSFClientAnchor anchor = pic.getPreferredSize();
-					CTMarker ctMarker = anchor.getFrom();
-					String picIndex = ctMarker.getRow() + "_" + ctMarker.getCol();
-					sheetIndexPicMap.put(picIndex, pic.getPictureData());
+					if (shape instanceof XSSFPicture) {
+						XSSFPicture pic = (XSSFPicture) shape;
+						XSSFClientAnchor anchor = pic.getPreferredSize();
+						CTMarker ctMarker = anchor.getFrom();
+						String picIndex = ctMarker.getRow() + "_" + ctMarker.getCol();
+						sheetIndexPicMap.put(picIndex, pic.getPictureData());
+					}
 				}
 			}
 		}
@@ -551,7 +553,7 @@ public final class PoiPublicUtil {
 
 	/**
 	 * 判断是不是集合的实现类
-	 * 
+	 *
 	 * @param clazz
 	 * @return
 	 */
@@ -561,7 +563,7 @@ public final class PoiPublicUtil {
 
 	/**
 	 * 是不是java基础类
-	 * 
+	 *
 	 * @param field
 	 * @return
 	 */
@@ -584,7 +586,7 @@ public final class PoiPublicUtil {
 
 	/**
 	 * 判断是否不要在这个excel操作中
-	 * 
+	 *
 	 * @param
 	 * @param field
 	 * @param targetId
@@ -606,7 +608,7 @@ public final class PoiPublicUtil {
 
 	/**
 	 * 判断是不是使用
-	 * 
+	 *
 	 * @param exportName
 	 * @param targetId
 	 * @return
@@ -633,7 +635,7 @@ public final class PoiPublicUtil {
 
 	/**
 	 * 返回流和图片类型
-	 * 
+	 *
 	 * @Author JEECG
 	 * @date 2013-11-20
 	 * @param entity
@@ -665,7 +667,7 @@ public final class PoiPublicUtil {
 
 	/**
 	 * 获取参数值
-	 * 
+	 *
 	 * @param params
 	 * @param map
 	 * @return
@@ -684,7 +686,7 @@ public final class PoiPublicUtil {
 
 	/**
 	 * 解析数据
-	 * 
+	 *
 	 * @Author JEECG
 	 * @date 2013-11-16
 	 * @return
@@ -713,7 +715,7 @@ public final class PoiPublicUtil {
 
 	/**
 	 * 通过遍历过去对象值
-	 * 
+	 *
 	 * @param object
 	 * @param paramsArr
 	 * @param index
@@ -738,7 +740,7 @@ public final class PoiPublicUtil {
 
 	/**
 	 * double to String 防止科学计数法
-	 * 
+	 *
 	 * @param value
 	 * @return
 	 */
