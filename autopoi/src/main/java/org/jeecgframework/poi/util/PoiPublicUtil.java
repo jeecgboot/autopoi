@@ -265,7 +265,9 @@ public final class PoiPublicUtil {
 					int pictureIndex = pic.getPictureIndex() - 1;
 					HSSFPictureData picData = pictures.get(pictureIndex);
 					String picIndex = String.valueOf(anchor.getRow1()) + "_" + String.valueOf(anchor.getCol1());
-					sheetIndexPicMap.put(picIndex, picData);
+					//update-begin---author:scott ---date:20260813  for：【issues/9605】保留同一单元格内的多张图片------------
+					putPictureData(sheetIndexPicMap, picIndex, picData);
+					//update-end---author:scott ---date:20260813  for：【issues/9605】保留同一单元格内的多张图片------------
 				}
 			}
 			return sheetIndexPicMap;
@@ -294,11 +296,52 @@ public final class PoiPublicUtil {
 					XSSFClientAnchor anchor = pic.getPreferredSize();
 					CTMarker ctMarker = anchor.getFrom();
 					String picIndex = ctMarker.getRow() + "_" + ctMarker.getCol();
-					sheetIndexPicMap.put(picIndex, pic.getPictureData());
+					//update-begin---author:scott ---date:20260813  for：【issues/9605】保留同一单元格内的多张图片------------
+					putPictureData(sheetIndexPicMap, picIndex, pic.getPictureData());
+					//update-end---author:scott ---date:20260813  for：【issues/9605】保留同一单元格内的多张图片------------
 				}
 			}
 		}
 		return sheetIndexPicMap;
+	}
+
+	/**
+	 * 获取指定单元格内的全部图片，首张图片沿用原索引键以保持兼容。
+	 *
+	 * @param pictures 图片索引
+	 * @param picIndex 单元格索引
+	 * @return 单元格图片集合
+	 * @author scott
+	 * @since 2026-08-13 issues/9605 支持读取同一单元格内的多张图片
+	 */
+	public static List<PictureData> getPictureDataList(Map<String, PictureData> pictures, String picIndex) {
+		if (pictures == null || pictures.get(picIndex) == null) {
+			return Collections.emptyList();
+		}
+		List<PictureData> pictureDataList = new ArrayList<>();
+		pictureDataList.add(pictures.get(picIndex));
+		for (int index = 1; pictures.containsKey(picIndex + "_" + index); index++) {
+			pictureDataList.add(pictures.get(picIndex + "_" + index));
+		}
+		return pictureDataList;
+	}
+
+	/**
+	 * 保存图片索引；同一单元格的后续图片使用递增后缀，避免覆盖首张图片。
+	 *
+	 * @author scott
+	 * @since 2026-08-13 issues/9605 支持保存同一单元格内的多张图片索引
+	 */
+	private static void putPictureData(Map<String, PictureData> pictures, String picIndex, PictureData pictureData) {
+		if (!pictures.containsKey(picIndex)) {
+			pictures.put(picIndex, pictureData);
+			return;
+		}
+		int index = 1;
+		while (pictures.containsKey(picIndex + "_" + index)) {
+			index++;
+		}
+		pictures.put(picIndex + "_" + index, pictureData);
 	}
 
 	/**

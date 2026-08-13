@@ -240,14 +240,20 @@ public class ExcelImportServer extends ImportBaseService {
 								saveImage(object, picId, excelParams, titleString, pictures, params);
 							} else {
 								if(params.getImageList()!=null && params.getImageList().contains(titleString)){
-									if (pictures != null) {
-										picId = row.getRowNum() + "_" + i;
-										PictureData image = pictures.get(picId);
-										if(image!=null){
-											byte[] data = image.getData();
-											params.getDataHanlder().setMapValue((Map) object, titleString, data);
+									//update-begin---author:scott ---date:20260813  for：【issues/9605】图片列自动兼容多张嵌图和路径文本导入------------
+									picId = row.getRowNum() + "_" + i;
+									List<PictureData> cellPictures = PoiPublicUtil.getPictureDataList(pictures, picId);
+									if (!cellPictures.isEmpty()) {
+										for (PictureData image : cellPictures) {
+											params.getDataHanlder().setMapValue((Map) object, titleString, image.getData());
+										}
+									} else {
+										Object value = saveFieldValue(params, object, cell, excelParams, titleString, row);
+										if(null == value){
+											noneCellNum++;
 										}
 									}
+									//update-end---author:scott ---date:20260813  for：【issues/9605】图片列自动兼容多张嵌图和路径文本导入------------
 								}else{
 									Object value = saveFieldValue(params, object, cell, excelParams, titleString, row);
 									if(null == value){

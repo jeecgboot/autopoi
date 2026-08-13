@@ -162,3 +162,10 @@ autopoi\src\main\java\org\jeecgframework\poi\util\JsonParser.java
 -- author:sjlei---date:20251218--for: AutoPoi 导出动态列继承父列的 orderNum，不应动态增加，否则会导致列顺序错乱 ---
 autopoi/src/main/java/org/jeecgframework/poi/excel/export/base/ExportBase.java
 -- author:sjlei---date:20251218--for: AutoPoi 导出动态列继承父列的 orderNum，不应动态增加，否则会导致列顺序错乱 ---
+
+-- author:scott---date:20260813--for: 【issues/9605】AutoPoi支持同一单元格多图片导入导出 ---
+autopoi/src/main/java/org/jeecgframework/poi/excel/export/base/ExcelExportBase.java
+autopoi/src/main/java/org/jeecgframework/poi/excel/imports/ExcelImportServer.java
+autopoi/src/main/java/org/jeecgframework/poi/util/PoiPublicUtil.java
+autopoi/src/test/java/org/jeecgframework/poi/excel/export/ExcelMultiImageExportTest.java (+)
+-- author:scott---date:20260813--for: 【issues/9605】AutoPoi支持同一单元格多图片导入导出 ---

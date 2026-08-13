@@ -21,6 +21,7 @@ import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
 import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.util.Units;
 import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.jeecgframework.poi.excel.entity.enmus.ExcelType;
@@ -273,82 +274,126 @@ public abstract class ExcelExportBase extends ExportBase {
 	public void createImageCell(Drawing patriarch, ExcelExportEntity entity, Row row, int i, String imagePath, Object obj) throws Exception {
 		row.setHeight((short) (50 * entity.getHeight()));
 		row.createCell(i);
-		ClientAnchor anchor;
-		if (type.equals(ExcelType.HSSF)) {
-			anchor = new HSSFClientAnchor(0, 0, 0, 0, (short) i, row.getRowNum(), (short) (i + 1), row.getRowNum() + 1);
-		} else {
-			anchor = new XSSFClientAnchor(0, 0, 0, 0, (short) i, row.getRowNum(), (short) (i + 1), row.getRowNum() + 1);
-		}
-
 		if (StringUtils.isEmpty(imagePath)) {
 			return;
 		}
 
 		//update-beign-author:taoyan date:20200302 for:【多任务】online 专项集中问题 LOWCOD-159
 		int imageType = entity.getExportImageType();
-		byte[] value = null;
+		//update-begin---author:scott ---date:20260813  for：【issues/9605】图片字段支持在同一单元格导出多张图片------------
+		List<byte[]> imageDataList = new ArrayList<>();
 		if(imageType == 2){
 			//原来逻辑 2
-			value = (byte[]) (entity.getMethods() != null ? getFieldBySomeMethod(entity.getMethods(), obj) : entity.getMethod().invoke(obj, new Object[] {}));
-		} else if(imageType==4 || imagePath.startsWith("http")){
-			//新增逻辑 网络图片4
-			try {
-				if (imagePath.indexOf(",") != -1) {
-					if(imagePath.startsWith(",")){
-						imagePath = imagePath.substring(1);
-					}
-					String[] images = imagePath.split(",");
-					imagePath = images[0];
-				}
-				if(imagePath.startsWith("https")){
-					value = getImageDataByHttps(imagePath);
-				}else{
-					value = getImageDataByHttp(imagePath);
-				}
-			} catch (Exception exception) {
-				LOGGER.warn(exception.getMessage());
-				//exception.printStackTrace();
+			byte[] value = (byte[]) (entity.getMethods() != null ? getFieldBySomeMethod(entity.getMethods(), obj) : entity.getMethod().invoke(obj, new Object[] {}));
+			if (value != null) {
+				imageDataList.add(value);
 			}
 		} else {
-			ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream();
-			BufferedImage bufferImg;
-			String path = null;
-			if(imageType == 1){
-				//原来逻辑 1
-				path = PoiPublicUtil.getWebRootPath(imagePath);
-				LOGGER.debug("--- createImageCell getWebRootPath ----filePath--- "+ path);
-				path = path.replace("WEB-INF/classes/", "");
-				path = path.replace("file:/", "");
-			}else if(imageType==3){
-				//新增逻辑 本地图片3
-				//begin-------author：liusq---data：2021-01-27----for：本地图片ImageBasePath为空报错的问题
-				if(StringUtils.isNotBlank(entity.getImageBasePath())){
-					if(!entity.getImageBasePath().endsWith(File.separator) && !imagePath.startsWith(File.separator)){
-						path = entity.getImageBasePath()+File.separator+imagePath;
-					}else{
-						path = entity.getImageBasePath()+imagePath;
-					}
-				}else{
-					path = imagePath;
+			for (String currentImagePath : splitImagePaths(imagePath)) {
+				byte[] value = getImageData(entity, imageType, currentImagePath);
+				if (value != null) {
+					imageDataList.add(value);
 				}
-				//end-------author：liusq---data：2021-01-27----for：本地图片ImageBasePath为空报错的问题
-			}
-			try {
-				bufferImg = ImageIO.read(new File(path));
-				//update-begin-author:taoYan date:20211203 for: Excel 导出图片的文件带小数点符号 导出报错 https://gitee.com/jeecg/jeecg-boot/issues/I4JNHR
-				ImageIO.write(bufferImg, imagePath.substring(imagePath.lastIndexOf(".") + 1, imagePath.length()), byteArrayOut);
-				//update-end-author:taoYan date:20211203 for: Excel 导出图片的文件带小数点符号 导出报错 https://gitee.com/jeecg/jeecg-boot/issues/I4JNHR
-				value = byteArrayOut.toByteArray();
-			} catch (Exception e) {
-				LOGGER.error(e.getMessage());
 			}
 		}
-		if (value != null) {
+		for (int imageIndex = 0; imageIndex < imageDataList.size(); imageIndex++) {
+			byte[] value = imageDataList.get(imageIndex);
+			ClientAnchor anchor = createImageAnchor(row, i, imageIndex, imageDataList.size());
 			patriarch.createPicture(anchor, row.getSheet().getWorkbook().addPicture(value, getImageType(value)));
 		}
+		//update-end---author:scott ---date:20260813  for：【issues/9605】图片字段支持在同一单元格导出多张图片------------
 		//update-end-author:taoyan date:20200302 for:【多任务】online 专项集中问题 LOWCOD-159
+	}
 
+	/**
+	 * 拆分图片字段中的多个路径，忽略空路径。
+	 *
+	 * @author scott
+	 * @since 2026-08-13 issues/9605 支持多图片路径导出
+	 */
+	private List<String> splitImagePaths(String imagePath) {
+		List<String> imagePaths = new ArrayList<>();
+		for (String path : imagePath.split(",")) {
+			if (StringUtils.isNotBlank(path)) {
+				imagePaths.add(path.trim());
+			}
+		}
+		return imagePaths;
+	}
 
+	/**
+	 * 根据图片来源读取图片数据。
+	 *
+	 * @author scott
+	 * @since 2026-08-13 issues/9605 支持逐张读取导出图片
+	 */
+	private byte[] getImageData(ExcelExportEntity entity, int imageType, String imagePath) {
+		try {
+			if (imageType == 4 || imagePath.startsWith("http")) {
+				return imagePath.startsWith("https") ? getImageDataByHttps(imagePath) : getImageDataByHttp(imagePath);
+			}
+
+			String path = getLocalImagePath(entity, imageType, imagePath);
+			BufferedImage bufferImg = ImageIO.read(new File(path));
+			if (bufferImg == null) {
+				return null;
+			}
+			ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream();
+			String imageFormat = imagePath.substring(imagePath.lastIndexOf(".") + 1);
+			ImageIO.write(bufferImg, imageFormat, byteArrayOut);
+			return byteArrayOut.toByteArray();
+		} catch (Exception e) {
+			LOGGER.warn("读取导出图片失败: " + imagePath + ", " + e.getMessage());
+			return null;
+		}
+	}
+
+	/**
+	 * 获取本地图片绝对路径。
+	 *
+	 * @author scott
+	 * @since 2026-08-13 issues/9605 支持逐张读取本地图片
+	 */
+	private String getLocalImagePath(ExcelExportEntity entity, int imageType, String imagePath) throws Exception {
+		if (imageType == 1) {
+			String path = PoiPublicUtil.getWebRootPath(imagePath);
+			LOGGER.debug("--- createImageCell getWebRootPath ----filePath--- " + path);
+			return path.replace("WEB-INF/classes/", "").replace("file:/", "");
+		}
+		if (StringUtils.isBlank(entity.getImageBasePath())) {
+			return imagePath;
+		}
+		if (!entity.getImageBasePath().endsWith(File.separator) && !imagePath.startsWith(File.separator)) {
+			return entity.getImageBasePath() + File.separator + imagePath;
+		}
+		return entity.getImageBasePath() + imagePath;
+	}
+
+	/**
+	 * 多图时在同一单元格内横向等分图片区域；单图保持原有整格锚点。
+	 *
+	 * @author scott
+	 * @since 2026-08-13 issues/9605 支持同一单元格展示多张图片
+	 */
+	private ClientAnchor createImageAnchor(Row row, int columnIndex, int imageIndex, int imageCount) {
+		if (imageCount == 1) {
+			if (type.equals(ExcelType.HSSF)) {
+				return new HSSFClientAnchor(0, 0, 0, 0, (short) columnIndex, row.getRowNum(), (short) (columnIndex + 1), row.getRowNum() + 1);
+			}
+			return new XSSFClientAnchor(0, 0, 0, 0, columnIndex, row.getRowNum(), columnIndex + 1, row.getRowNum() + 1);
+		}
+
+		if (type.equals(ExcelType.HSSF)) {
+			int startX = 1023 * imageIndex / imageCount;
+			int endX = 1023 * (imageIndex + 1) / imageCount;
+			return new HSSFClientAnchor(startX, 0, endX, 255, (short) columnIndex, row.getRowNum(), (short) columnIndex, row.getRowNum());
+		}
+
+		int cellWidth = Units.pixelToEMU((int) row.getSheet().getColumnWidthInPixels(columnIndex));
+		int cellHeight = Units.toEMU(row.getHeightInPoints());
+		int startX = cellWidth * imageIndex / imageCount;
+		int endX = cellWidth * (imageIndex + 1) / imageCount;
+		return new XSSFClientAnchor(startX, 0, endX, cellHeight, columnIndex, row.getRowNum(), columnIndex, row.getRowNum());
 	}
 
 	/**
