@@ -169,3 +169,10 @@ autopoi/src/main/java/org/jeecgframework/poi/excel/imports/ExcelImportServer.jav
 autopoi/src/main/java/org/jeecgframework/poi/util/PoiPublicUtil.java
 autopoi/src/test/java/org/jeecgframework/poi/excel/export/ExcelMultiImageExportTest.java (+)
 -- author:scott---date:20260813--for: 【issues/9605】AutoPoi支持同一单元格多图片导入导出 ---
+
+-- author:scott---date:20261012--for: [issues/9741] excel模板导出图片失败，单值占位符{{xxx}}支持ImageEntity ---
+autopoi/src/main/java/org/jeecgframework/poi/excel/export/template/ExcelExportOfTemplateUtil.java
+autopoi/src/test/java/org/jeecgframework/poi/excel/export/template/ExcelTemplateImageExportTest.java (+)
+autopoi/src/test/resources/templates/issues9741/template_image.xlsx (+)
+autopoi/src/test/resources/templates/issues9741/template_image.xls (+)
+-- author:scott---date:20261012--for: [issues/9741] excel模板导出图片失败，单值占位符{{xxx}}支持ImageEntity ---

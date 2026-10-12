@@ -326,8 +326,34 @@ public final class ExcelExportOfTemplateUtil extends ExcelExportBase {
 			while (oldString.indexOf(START_STR) != -1) {
 				params = oldString.substring(oldString.indexOf(START_STR) + 2, oldString.indexOf(END_STR));
 
+				//update-begin-author:scott---date:20261012--for: [issues/9741] excel模板导出图片失败，单值占位符{{xxx}}支持ImageEntity
+				Object value = eval(params, map);
+				if (value instanceof ImageEntity) {
+					ImageEntity img = (ImageEntity) value;
+					cell.setCellValue("");
+					if (img.getRowspan() > 1 || img.getColspan() > 1) {
+						img.setHeight(0);
+						CellRangeAddress imgRegion = new CellRangeAddress(cell.getRowIndex(),
+								cell.getRowIndex() + img.getRowspan() - 1, cell.getColumnIndex(), cell.getColumnIndex() + img.getColspan() - 1);
+						// 模板中已合并过的单元格不再重复合并，否则POI抛出overlaps异常导致整个导出失败
+						boolean overlap = false;
+						for (CellRangeAddress region : cell.getSheet().getMergedRegions()) {
+							if (region.intersects(imgRegion)) {
+								overlap = true;
+								break;
+							}
+						}
+						if (!overlap) {
+							cell.getSheet().addMergedRegion(imgRegion);
+						}
+					}
+					createImageCell(cell, img.getHeight(), img.getRowspan(), img.getColspan(), img.getUrl(), img.getData(), img.getScaleModeEnum());
+					return;
+				}
+				//update-end-author:scott---date:20261012--for: [issues/9741] excel模板导出图片失败，单值占位符{{xxx}}支持ImageEntity
+
 				//update-begin-author:liusq---date:2025-06-04--for: [issues/8230] autopoi使用模板导出时,如果传入的map中存在值为null时会导致异常出错，导出失败
-				oldString = oldString.replace(START_STR + params + END_STR, ObjectUtils.isNotEmpty(eval(params, map))?eval(params, map).toString():"");
+				oldString = oldString.replace(START_STR + params + END_STR, ObjectUtils.isNotEmpty(value)?value.toString():"");
 				//update-end-author:liusq---date:2025-06-04--for:[issues/8230] autopoi使用模板导出时,如果传入的map中存在值为null时会导致异常出错，导出失败
 
 			}
