@@ -169,16 +169,19 @@ public abstract class ExcelExportBase extends ExportBase {
 					sheet.getRow(i).createCell(cellNum);
 					sheet.getRow(i).getCell(cellNum).setCellStyle(getStyles(false, entity));
 				}
-				//update-begin-author:wangshuai date:20201116 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
-				try {
-					if (maxHeight > 1) {
-						sheet.addMergedRegion(new CellRangeAddress(index, index + maxHeight - 1, cellNum, cellNum));
+				int lastRow = index + maxHeight - 1;
+				if(index < lastRow){
+					//update-begin-author:wangshuai date:20201116 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
+					try {
+						if (maxHeight > 1) {
+							sheet.addMergedRegion(new CellRangeAddress(index, lastRow, cellNum, cellNum));
+						}
+					}catch (IllegalArgumentException e){
+						LOGGER.error("合并单元格错误日志："+e.getMessage());
+						e.fillInStackTrace();
 					}
-				}catch (IllegalArgumentException e){
-					LOGGER.error("合并单元格错误日志："+e.getMessage());
-					e.fillInStackTrace();
+					//update-end-author:wangshuai date:20201116 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
 				}
-				//update-end-author:wangshuai date:20201116 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
 				cellNum++;
 			}
 		}

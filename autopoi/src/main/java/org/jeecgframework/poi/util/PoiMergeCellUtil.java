@@ -101,14 +101,18 @@ public final class PoiMergeCellUtil {
 		}
 		if (mergeDataMap.size() > 0) {
 			for (Integer index : mergeDataMap.keySet()) {
-				//update-begin-author:wangshuai date:20201118 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
-				try{
-				sheet.addMergedRegion(new CellRangeAddress(mergeDataMap.get(index).getStartRow(), mergeDataMap.get(index).getEndRow(), index, index));
-				}catch (IllegalArgumentException e){
-					LOGGER.error("合并单元格错误日志："+e.getMessage());
-					e.fillInStackTrace();
+				final int mergeStartRow = mergeDataMap.get(index).getStartRow();
+				final int mergeEndRow = mergeDataMap.get(index).getEndRow();
+				if(mergeStartRow < mergeEndRow){
+					//update-begin-author:wangshuai date:20201118 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
+					try{
+						sheet.addMergedRegion(new CellRangeAddress(mergeStartRow, mergeEndRow, index, index));
+					}catch (IllegalArgumentException e){
+						LOGGER.error("合并单元格错误日志："+e.getMessage());
+						e.fillInStackTrace();
+					}
+					//update-end-author:wangshuai date:20201118 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
 				}
-				//update-end-author:wangshuai date:20201118 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
 			}
 		}
 
@@ -130,14 +134,18 @@ public final class PoiMergeCellUtil {
 			if (checkIsEqualByCellContents(mergeDataMap.get(index), text, cell, delys, rowNum)) {
 				mergeDataMap.get(index).setEndRow(rowNum);
 			} else {
-				//update-begin-author:wangshuai date:20201118 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
-				try{
-				sheet.addMergedRegion(new CellRangeAddress(mergeDataMap.get(index).getStartRow(), mergeDataMap.get(index).getEndRow(), index, index));
-				}catch (IllegalArgumentException e){
-					LOGGER.error("合并单元格错误日志："+e.getMessage());
-					e.fillInStackTrace();
+				final int startRow = mergeDataMap.get(index).getStartRow();
+				final int endRow = mergeDataMap.get(index).getEndRow();
+				if(startRow < endRow){
+					//update-begin-author:wangshuai date:20201118 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
+					try{
+						sheet.addMergedRegion(new CellRangeAddress(startRow, endRow, index, index));
+					}catch (IllegalArgumentException e){
+						LOGGER.error("合并单元格错误日志："+e.getMessage());
+						e.fillInStackTrace();
+					}
+					//update-end-author:wangshuai date:20201118 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
 				}
-				//update-end-author:wangshuai date:20201118 for:一对多导出needMerge 子表数据对应数量小于2时报错 github#1840、gitee I1YH6B
 				mergeDataMap.put(index, createMergeEntity(text, rowNum, cell, delys));
 			}
 		} else {
