@@ -234,7 +234,9 @@ public class CellValueServer {
 			}
 			if ("class java.lang.Long".equals(xclass) || "long".equals(xclass)) {
 				//update-begin-author:taoYan date:20200319 for:Excel注解的numFormat方法似乎未实现 #970
-				Long temp = Long.valueOf(ExcelUtil.remove0Suffix(String.valueOf(result)));
+				//update-begin---author:lvdandan ---date:20261020  for：[issues/120]导入Excel功能中8位数的整形数据报错，数值被转成科学计数法------------
+				Long temp = Long.valueOf(numberToString(result));
+				//update-end---author:lvdandan ---date:20261020  for：[issues/120]导入Excel功能中8位数的整形数据报错，数值被转成科学计数法------------
 				//if(StringUtils.isNotEmpty(entity.getNumFormat())){
 				//	return Long.valueOf(new DecimalFormat(entity.getNumFormat()).format(temp));
 				//}else{
@@ -254,7 +256,9 @@ public class CellValueServer {
 			}
 			if ("class java.lang.Integer".equals(xclass) || "int".equals(xclass)) {
 				//update-begin-author:taoYan date:20200319 for:Excel注解的numFormat方法似乎未实现 #970
-				Integer temp = Integer.valueOf(ExcelUtil.remove0Suffix(String.valueOf(result)));
+				//update-begin---author:lvdandan ---date:20261020  for：[issues/120]导入Excel功能中8位数的整形数据报错，数值被转成科学计数法------------
+				Integer temp = Integer.valueOf(numberToString(result));
+				//update-end---author:lvdandan ---date:20261020  for：[issues/120]导入Excel功能中8位数的整形数据报错，数值被转成科学计数法------------
 				//if(StringUtils.isNotEmpty(entity.getNumFormat())){
 				//	return Integer.valueOf(new DecimalFormat(entity.getNumFormat()).format(temp));
 				//}else{
@@ -294,9 +298,24 @@ public class CellValueServer {
 		}
 	}
 
+	//update-begin---author:lvdandan ---date:20261020  for：[issues/120]导入Excel功能中8位数的整形数据报错，数值被转成科学计数法------------
+	/**
+	 * 把单元格的值转成适合解析为整数的字符串：Double 防止出现科学计数法（如 1.2345678E7），并去掉 .0 后缀
+	 *
+	 * @param result
+	 * @return
+	 */
+	private String numberToString(Object result) {
+		if (result instanceof Double) {
+			return PoiPublicUtil.doubleToString((Double) result);
+		}
+		return ExcelUtil.remove0Suffix(String.valueOf(result));
+	}
+	//update-end---author:lvdandan ---date:20261020  for：[issues/120]导入Excel功能中8位数的整形数据报错，数值被转成科学计数法------------
+
 	/**
 	 * 调用处理接口处理值
-	 * 
+	 *
 	 * @param dataHanlder
 	 * @param object
 	 * @param result
