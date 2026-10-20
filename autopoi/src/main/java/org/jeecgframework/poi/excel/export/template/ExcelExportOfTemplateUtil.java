@@ -292,9 +292,14 @@ public final class ExcelExportOfTemplateUtil extends ExcelExportBase {
 					String text = cell.getStringCellValue();
 					if (text.contains(IF_DELETE)) {
 						if (Boolean.valueOf(eval(text.substring(text.indexOf(START_STR) + 2, text.indexOf(END_STR)).trim(), map).toString())) {
+							//update-begin---author:lvdandan ---date:20261020  for：[issues/174]!if删除列后再操作已被删除的单元格，XSSF抛XmlValueDisconnectedException；删除后后面的列左移到当前位置，需要重新处理------------
 							PoiSheetUtility.deleteColumn(sheet, i);
+							// 这一列已被删除，不能再操作原来的单元格；后面的列已左移到当前位置，下一轮循环要重新处理当前位置
+							i--;
+						} else {
+							cell.setCellValue("");
+							//update-end---author:lvdandan ---date:20261020  for：[issues/174]!if删除列后再操作已被删除的单元格，XSSF抛XmlValueDisconnectedException；删除后后面的列左移到当前位置，需要重新处理------------
 						}
-						cell.setCellValue("");
 					}
 				}
 			}
