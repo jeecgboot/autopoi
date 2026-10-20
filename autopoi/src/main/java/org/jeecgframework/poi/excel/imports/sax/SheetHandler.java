@@ -17,10 +17,14 @@ package org.jeecgframework.poi.excel.imports.sax;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.xssf.model.SharedStrings;
+import org.apache.poi.xssf.model.StylesTable;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.jeecgframework.poi.excel.entity.enmus.CellValueType;
 import org.jeecgframework.poi.excel.entity.sax.SaxReadCellEntity;
 import org.jeecgframework.poi.excel.imports.sax.parse.ISaxRowRead;
@@ -58,9 +62,49 @@ public class SheetHandler extends DefaultHandler {
 	private List<SaxReadCellEntity> rowlist = Lists.newArrayList();
 
 	public SheetHandler(SharedStrings sst, ISaxRowRead rowRead) {
+		this(sst, null, rowRead);
+	}
+
+	//update-begin---author:lvdandan ---date:20261020  for：[issues/190]SAX导入日期只认style下标为1的样式，其它日期样式被当成数字；改为按样式的数字格式判断是不是日期------------
+	/**
+	 * @param styles 样式表，用来判断单元格样式的数字格式是不是日期；为 null 时保持原来的判断（style 下标为 1 的是日期）
+	 */
+	public SheetHandler(SharedStrings sst, StylesTable styles, ISaxRowRead rowRead) {
 		this.sst = sst;
+		this.styles = styles;
 		this.read = rowRead;
 	}
+
+	private StylesTable styles;
+
+	/** 样式下标 → 是不是日期样式，每种样式只判断一次 */
+	private final Map<Integer, Boolean> dateStyleCache = new HashMap<Integer, Boolean>();
+
+	/**
+	 * 单元格的样式（s属性）的数字格式是不是日期格式
+	 */
+	private boolean isDateStyle(String styleIndex) {
+		if (styleIndex == null) {
+			return false;
+		}
+		if (styles == null) {
+			return "1".equals(styleIndex);
+		}
+		int idx;
+		try {
+			idx = Integer.parseInt(styleIndex.trim());
+		} catch (NumberFormatException e) {
+			return false;
+		}
+		Boolean cached = dateStyleCache.get(idx);
+		if (cached == null) {
+			XSSFCellStyle style = styles.getStyleAt(idx);
+			cached = style != null && DateUtil.isADateFormat(style.getDataFormat(), style.getDataFormatString());
+			dateStyleCache.put(idx, cached);
+		}
+		return cached;
+	}
+	//update-end---author:lvdandan ---date:20261020  for：[issues/190]SAX导入日期只认style下标为1的样式，其它日期样式被当成数字；改为按样式的数字格式判断是不是日期------------
 
 	@Override
 	public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException {
@@ -91,13 +135,12 @@ public class SheetHandler extends DefaultHandler {
 				type = CellValueType.String;
 				return;
 			}
-			// 日期格式
-			cellType = attributes.getValue("s");
-			if ("1".equals(cellType)) {
+			//update-begin---author:lvdandan ---date:20261020  for：[issues/190]SAX导入日期只认style下标为1的样式，其它日期样式被当成数字；改为按样式的数字格式判断是不是日期------------
+			// 日期：数字单元格，并且样式的数字格式是日期格式（不能只认style下标为1，真实Excel文件里日期样式的下标不固定）
+			if (CellValueType.Number.equals(type) && isDateStyle(attributes.getValue("s"))) {
 				type = CellValueType.Date;
-			} else if ("2".equals(cellType)) {
-				type = CellValueType.Number;
 			}
+			//update-end---author:lvdandan ---date:20261020  for：[issues/190]SAX导入日期只认style下标为1的样式，其它日期样式被当成数字；改为按样式的数字格式判断是不是日期------------
 		} else if ("t".equals(name)) {// 当元素为t时
 			type = CellValueType.TElement;
 		}

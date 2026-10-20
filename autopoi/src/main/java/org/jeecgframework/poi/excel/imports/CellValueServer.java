@@ -273,6 +273,12 @@ public class CellValueServer {
 				//update-end-author:taoYan date:20200319 for:Excel注解的numFormat方法似乎未实现 #970
 			}
 			if ("class java.lang.String".equals(xclass)) {
+				//update-begin---author:lvdandan ---date:20261020  for：[issues/190]SAX导入日期单元格得到Date，String字段按@Excel的format格式化，没有配置时用yyyy-MM-dd HH:mm:ss------------
+				if (result instanceof Date) {
+					String pattern = entity != null && StringUtils.isNotEmpty(entity.getFormat()) ? entity.getFormat() : "yyyy-MM-dd HH:mm:ss";
+					return new SimpleDateFormat(pattern).format((Date) result);
+				}
+				//update-end---author:lvdandan ---date:20261020  for：[issues/190]SAX导入日期单元格得到Date，String字段按@Excel的format格式化，没有配置时用yyyy-MM-dd HH:mm:ss------------
 				// 针对String 类型,但是Excel获取的数据却不是String,比如Double类型,防止科学计数法
 				if (result instanceof String) {
 					//---update-begin-----autor:scott------date:20191016-------for:excel导入数字类型，去掉后缀.0------
