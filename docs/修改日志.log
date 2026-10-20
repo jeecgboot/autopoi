@@ -176,3 +176,8 @@ autopoi/src/test/java/org/jeecgframework/poi/excel/export/template/ExcelTemplate
 autopoi/src/test/resources/templates/issues9741/template_image.xlsx (+)
 autopoi/src/test/resources/templates/issues9741/template_image.xls (+)
 -- author:scott---date:20261012--for: [issues/9741] excel模板导出图片失败，单值占位符{{xxx}}支持ImageEntity ---
+
+-- author:lvdandan---date:20261020--for: [issues/124] Integer字段导入字典翻译时，值前后有空格不会自动过滤导致翻译失败 ---
+autopoi/src/main/java/org/jeecgframework/poi/excel/imports/CellValueServer.java
+autopoi/src/test/java/org/jeecgframework/poi/excel/imports/ImportDictTrimTest.java (+)
+-- author:lvdandan---date:20261020--for: [issues/124] Integer字段导入字典翻译时，值前后有空格不会自动过滤导致翻译失败 ---

@@ -360,11 +360,14 @@ public class CellValueServer {
 	 */
 	private String replaceSingleValue(String[] replace, String temp){
 		String[] tempArr;
+		//update-begin---author:lvdandan ---date:20261020  for：[issues/124]字典翻译时，导入值前后有空格（含不间断空格、全角空格）导致匹配失败------------
+		String key = trimBlank(temp);
+		//update-end---author:lvdandan ---date:20261020  for：[issues/124]字典翻译时，导入值前后有空格（含不间断空格、全角空格）导致匹配失败------------
 		for (int i = 0; i < replace.length; i++) {
 			//update-begin---author:scott   Date:20211220  for：[issues/I4MBB3]@Excel dicText字段的值有下划线时，导入功能不能正确解析---
 			//tempArr = replace[i].split("_");
 			tempArr = getValueArr(replace[i]);
-			if (temp.equals(tempArr[0]) || temp.replace("_","---").equals(tempArr[0])) {
+			if (key.equals(tempArr[0]) || key.replace("_","---").equals(tempArr[0])) {
                 //update-begin---author:wangshuai ---date:20220422  for：导入字典替换需要将---替换成_，不然数据库会存--- ------------
                 if(tempArr[1].contains("---")){
                     return tempArr[1].replace("---","_");
@@ -376,6 +379,18 @@ public class CellValueServer {
 		}
 		return temp;
 	}
+
+	//update-begin---author:lvdandan ---date:20261020  for：[issues/124]字典翻译时，导入值前后有空格（含不间断空格、全角空格）导致匹配失败------------
+	/**
+	 * 去掉字符串前后的空白字符，除普通空白外，还包括 Excel 里常见的不间断空格( )和全角空格(　)
+	 *
+	 * @param value
+	 * @return
+	 */
+	private String trimBlank(String value) {
+		return value.replaceAll("^[\\s\\u00A0\\u3000]+|[\\s\\u00A0\\u3000]+$", "");
+	}
+	//update-end---author:lvdandan ---date:20261020  for：[issues/124]字典翻译时，导入值前后有空格（含不间断空格、全角空格）导致匹配失败------------
 	//update-end-author:taoyan date:20180807 for:导入多值替换--
 
 	/**
