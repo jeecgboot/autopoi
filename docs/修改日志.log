@@ -176,3 +176,9 @@ autopoi/src/test/java/org/jeecgframework/poi/excel/export/template/ExcelTemplate
 autopoi/src/test/resources/templates/issues9741/template_image.xlsx (+)
 autopoi/src/test/resources/templates/issues9741/template_image.xls (+)
 -- author:scott---date:20261012--for: [issues/9741] excel模板导出图片失败，单值占位符{{xxx}}支持ImageEntity ---
+
+-- author:lvdandan---date:20261020--for: [issues/18] 导入时没有考虑字段类型是枚举的情况，枚举字段导入报NPE ---
+autopoi/src/main/java/org/jeecgframework/poi/util/PoiPublicUtil.java
+autopoi/src/main/java/org/jeecgframework/poi/excel/imports/CellValueServer.java
+autopoi/src/test/java/org/jeecgframework/poi/excel/imports/ImportEnumFieldTest.java (+)
+-- author:lvdandan---date:20261020--for: [issues/18] 导入时没有考虑字段类型是枚举的情况，枚举字段导入报NPE ---
