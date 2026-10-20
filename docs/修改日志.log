@@ -176,3 +176,8 @@ autopoi/src/test/java/org/jeecgframework/poi/excel/export/template/ExcelTemplate
 autopoi/src/test/resources/templates/issues9741/template_image.xlsx (+)
 autopoi/src/test/resources/templates/issues9741/template_image.xls (+)
 -- author:scott---date:20261012--for: [issues/9741] excel模板导出图片失败，单值占位符{{xxx}}支持ImageEntity ---
+
+-- author:lvdandan---date:20261020--for: [issues/190] SAX导入日期以字符串保存时没有按@Excel的format转成Date，导致导入中断 ---
+autopoi/src/main/java/org/jeecgframework/poi/excel/imports/CellValueServer.java
+autopoi/src/test/java/org/jeecgframework/poi/excel/imports/SaxImportStringDateTest.java (+)
+-- author:lvdandan---date:20261020--for: [issues/190] SAX导入日期以字符串保存时没有按@Excel的format转成Date，导致导入中断 ---
