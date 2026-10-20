@@ -1,5 +1,6 @@
 package org.jeecgframework.poi.util;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -90,7 +92,9 @@ public final class PoiMergeCellUtil {
 						mergeDataMap.get(index).setEndRow(i - 1);
 					}
 				} else {
-					text = row.getCell(index).getStringCellValue();
+					//update-begin---author:lvdandan ---date:20261020  for：[issues/29]合并列是数值类型(type=4)时，getStringCellValue读取数值单元格报错------------
+					text = getCellText(row.getCell(index));
+					//update-end---author:lvdandan ---date:20261020  for：[issues/29]合并列是数值类型(type=4)时，getStringCellValue读取数值单元格报错------------
 					if (StringUtils.isNotEmpty(text)) {
 						hanlderMergeCells(index, i, text, mergeDataMap, sheet, row.getCell(index), mergeMap.get(index));
 					} else {
@@ -205,12 +209,41 @@ public final class PoiMergeCellUtil {
 	 * @return
 	 */
 	private static String getCellNotNullText(Cell cell, int index, int rowNum) {
-		String temp = cell.getRow().getCell(index).getStringCellValue();
+		//update-begin---author:lvdandan ---date:20261020  for：[issues/29]依赖列是数值类型(type=4)时，getStringCellValue读取数值单元格报错------------
+		String temp = getCellText(cell.getRow().getCell(index));
 		while (StringUtils.isEmpty(temp)) {
-			temp = cell.getRow().getSheet().getRow(--rowNum).getCell(index).getStringCellValue();
+			temp = getCellText(cell.getRow().getSheet().getRow(--rowNum).getCell(index));
 		}
 		return temp;
 	}
+
+	/**
+	 * 按单元格类型获取用于比较的文本，数值、布尔等非字符串单元格不能直接用 getStringCellValue（会抛 IllegalStateException）
+	 *
+	 * @param cell
+	 * @return 单元格为空返回空字符串
+	 */
+	private static String getCellText(Cell cell) {
+		if (cell == null) {
+			return "";
+		}
+		CellType cellType = cell.getCellType();
+		if (cellType == CellType.FORMULA) {
+			cellType = cell.getCachedFormulaResultType();
+		}
+		switch (cellType) {
+			case STRING:
+				return cell.getStringCellValue();
+			case NUMERIC:
+				// 用 BigDecimal 避免 1.0E7 这类科学计数法，同时 5.0 和 5 视为相同
+				return BigDecimal.valueOf(cell.getNumericCellValue()).stripTrailingZeros().toPlainString();
+			case BOOLEAN:
+				return String.valueOf(cell.getBooleanCellValue());
+			default:
+				return "";
+		}
+	}
+	//update-end---author:lvdandan ---date:20261020  for：[issues/29]依赖列是数值类型(type=4)时，getStringCellValue读取数值单元格报错------------
 	//update-begin---author:liusq  Date:20220104  for：[LOWCOD-2521]【autopoi】大数据导出方法【全局】----
     /**
      *处理合并的单元格区域

@@ -176,3 +176,8 @@ autopoi/src/test/java/org/jeecgframework/poi/excel/export/template/ExcelTemplate
 autopoi/src/test/resources/templates/issues9741/template_image.xlsx (+)
 autopoi/src/test/resources/templates/issues9741/template_image.xls (+)
 -- author:scott---date:20261012--for: [issues/9741] excel模板导出图片失败，单值占位符{{xxx}}支持ImageEntity ---
+
+-- author:lvdandan---date:20261020--for: [issues/29] 合并单元格，被合并列或依赖列是数值类型(type=4)时读取单元格内容报错 ---
+autopoi/src/main/java/org/jeecgframework/poi/util/PoiMergeCellUtil.java
+autopoi/src/test/java/org/jeecgframework/poi/util/PoiMergeCellUtilNumericTest.java (+)
+-- author:lvdandan---date:20261020--for: [issues/29] 合并单元格，被合并列或依赖列是数值类型(type=4)时读取单元格内容报错 ---
