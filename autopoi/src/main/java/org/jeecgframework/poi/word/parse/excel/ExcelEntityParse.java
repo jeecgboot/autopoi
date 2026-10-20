@@ -33,6 +33,7 @@ import org.jeecgframework.poi.excel.export.base.ExportBase;
 import org.jeecgframework.poi.exception.word.WordExportException;
 import org.jeecgframework.poi.exception.word.enmus.WordExportEnum;
 import org.jeecgframework.poi.util.PoiPublicUtil;
+import org.jeecgframework.poi.word.parse.WordTextUtil;
 import org.jeecgframework.poi.word.entity.params.ExcelListEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -178,11 +179,13 @@ public class ExcelEntityParse extends ExportBase {
 	}
 
 	private void setCellValue(XWPFTableRow row, Object value, int cellNum) {
+		//update-begin---author:lvdandan ---date:20261020  for：[issues/165]Word表格循环行，文本中存在换行符，无法自动换行------------
 		if (row.getCell(cellNum++) != null) {
-			row.getCell(cellNum - 1).setText(value == null ? "" : value.toString());
+			WordTextUtil.setText(row.getCell(cellNum - 1), value == null ? "" : value.toString());
 		} else {
-			row.createCell().setText(value == null ? "" : value.toString());
+			WordTextUtil.setText(row.createCell(), value == null ? "" : value.toString());
 		}
+		//update-end---author:lvdandan ---date:20261020  for：[issues/165]Word表格循环行，文本中存在换行符，无法自动换行------------
 	}
 
 	/**

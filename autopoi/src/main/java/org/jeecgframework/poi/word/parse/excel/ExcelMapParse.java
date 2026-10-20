@@ -21,6 +21,7 @@ import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 import org.jeecgframework.poi.util.PoiPublicUtil;
+import org.jeecgframework.poi.word.parse.WordTextUtil;
 
 /**
  * 处理和生成Map 类型的数据变成表格
@@ -67,11 +68,15 @@ public final class ExcelMapParse {
 			currentRow = table.insertNewTableRow(index++);
 			for (cellIndex = 0; cellIndex < currentRow.getTableCells().size(); cellIndex++) {
 				String text = PoiPublicUtil.getValueDoWhile(obj, params[cellIndex].split("\\."), 0).toString();
-				currentRow.getTableCells().get(cellIndex).setText(text);
+				//update-begin---author:lvdandan ---date:20261020  for：[issues/165]Word表格循环行，文本中存在换行符，无法自动换行------------
+				WordTextUtil.setText(currentRow.getTableCells().get(cellIndex), text);
+				//update-end---author:lvdandan ---date:20261020  for：[issues/165]Word表格循环行，文本中存在换行符，无法自动换行------------
 			}
             //end-------author:liusq------date:20210129-----for:-------poi3升级到4兼容改造工作【重要敏感修改点】--------//-------author:liusq------date:20210129-----for:-------poi3升级到4兼容改造工作【重要敏感修改点】--------
 			for (; cellIndex < params.length; cellIndex++) {
-				currentRow.createCell().setText(PoiPublicUtil.getValueDoWhile(obj, params[cellIndex].split("\\."), 0).toString());
+				//update-begin---author:lvdandan ---date:20261020  for：[issues/165]Word表格循环行，文本中存在换行符，无法自动换行------------
+				WordTextUtil.setText(currentRow.createCell(), PoiPublicUtil.getValueDoWhile(obj, params[cellIndex].split("\\."), 0).toString());
+				//update-end---author:lvdandan ---date:20261020  for：[issues/165]Word表格循环行，文本中存在换行符，无法自动换行------------
 			}
 		}
 
