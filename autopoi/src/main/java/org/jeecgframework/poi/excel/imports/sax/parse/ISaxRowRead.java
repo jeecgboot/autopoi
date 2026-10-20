@@ -36,4 +36,13 @@ public interface ISaxRowRead {
 	 */
 	public void parse(int index, List<SaxReadCellEntity> datas);
 
+	//update-begin---author:lvdandan ---date:20261020  for：[issues/189]SAX导入用IExcelReadRowHanlder回调时，最后一行数据丢失------------
+	/**
+	 * 一个sheet的所有行都解析完成时调用，用于处理还没有输出的最后一条数据。
+	 * 默认不做处理，已有的自定义实现不需要改动。
+	 */
+	public default void endSheet() {
+	}
+	//update-end---author:lvdandan ---date:20261020  for：[issues/189]SAX导入用IExcelReadRowHanlder回调时，最后一行数据丢失------------
+
 }

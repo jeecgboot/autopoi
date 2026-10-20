@@ -176,3 +176,10 @@ autopoi/src/test/java/org/jeecgframework/poi/excel/export/template/ExcelTemplate
 autopoi/src/test/resources/templates/issues9741/template_image.xlsx (+)
 autopoi/src/test/resources/templates/issues9741/template_image.xls (+)
 -- author:scott---date:20261012--for: [issues/9741] excel模板导出图片失败，单值占位符{{xxx}}支持ImageEntity ---
+
+-- author:lvdandan---date:20261020--for: [issues/189] SAX导入使用IExcelReadRowHanlder回调时，最后一行数据丢失（只有一行数据时一条都不回调） ---
+autopoi/src/main/java/org/jeecgframework/poi/excel/imports/sax/parse/ISaxRowRead.java
+autopoi/src/main/java/org/jeecgframework/poi/excel/imports/sax/parse/SaxRowRead.java
+autopoi/src/main/java/org/jeecgframework/poi/excel/imports/sax/SaxReadExcel.java
+autopoi/src/test/java/org/jeecgframework/poi/excel/imports/SaxImportHandlerTest.java (+)
+-- author:lvdandan---date:20261020--for: [issues/189] SAX导入使用IExcelReadRowHanlder回调时，最后一行数据丢失（只有一行数据时一条都不回调） ---

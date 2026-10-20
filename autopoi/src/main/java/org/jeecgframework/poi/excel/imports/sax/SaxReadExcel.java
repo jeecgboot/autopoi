@@ -72,6 +72,9 @@ public class SaxReadExcel {
 				InputStream sheet = sheets.next();
 				InputSource sheetSource = new InputSource(sheet);
 				parser.parse(sheetSource);
+				//update-begin---author:lvdandan ---date:20261020  for：[issues/189]SAX导入用IExcelReadRowHanlder回调时，最后一行数据丢失------------
+				rowRead.endSheet();
+				//update-end---author:lvdandan ---date:20261020  for：[issues/189]SAX导入用IExcelReadRowHanlder回调时，最后一行数据丢失------------
 				sheet.close();
 			}
 			return rowRead.getList();
