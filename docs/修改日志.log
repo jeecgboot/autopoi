@@ -176,3 +176,9 @@ autopoi/src/test/java/org/jeecgframework/poi/excel/export/template/ExcelTemplate
 autopoi/src/test/resources/templates/issues9741/template_image.xlsx (+)
 autopoi/src/test/resources/templates/issues9741/template_image.xls (+)
 -- author:scott---date:20261012--for: [issues/9741] excel模板导出图片失败，单值占位符{{xxx}}支持ImageEntity ---
+
+-- author:lvdandan---date:20261020--for: [issues/91] SAX导入ImportParams为null报空指针；SAX导入默认sheetNum=0时读取全部sheet，多sheet时表头行不再被当成数据 ---
+autopoi/src/main/java/org/jeecgframework/poi/excel/imports/sax/SaxReadExcel.java
+autopoi/src/main/java/org/jeecgframework/poi/excel/imports/sax/SheetHandler.java
+autopoi/src/test/java/org/jeecgframework/poi/excel/imports/SaxImportParamsTest.java (+)
+-- author:lvdandan---date:20261020--for: [issues/91] SAX导入ImportParams为null报空指针；SAX导入默认sheetNum=0时读取全部sheet，多sheet时表头行不再被当成数据 ---
