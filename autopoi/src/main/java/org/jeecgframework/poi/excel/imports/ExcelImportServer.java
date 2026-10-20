@@ -198,10 +198,18 @@ public class ExcelImportServer extends ImportBaseService {
             row = rows.next();
         } while (row.getRowNum() != skipRowNum - 1);
 		//update-end---author:chenrui ---date:20250715  for：[issues/3943]导入excel时，标题区域的空行会导致下方列表数据被吞------------
+		//update-begin---author:lvdandan ---date:20261020  for：[issues/137]ImportParams.startRows 不生效，表头后需要跳过startRows行------------
+		int dataStartRowNum = skipRowNum + params.getStartRows();
+		//update-end---author:lvdandan ---date:20261020  for：[issues/137]ImportParams.startRows 不生效，表头后需要跳过startRows行------------
 		Object object = null;
 		String picId;
 		while (rows.hasNext() && (row == null || sheet.getLastRowNum() - row.getRowNum() > params.getLastOfInvalidRow())) {
 			row = rows.next();
+			//update-begin---author:lvdandan ---date:20261020  for：[issues/137]ImportParams.startRows 不生效，表头后需要跳过startRows行------------
+			if (row.getRowNum() < dataStartRowNum) {
+				continue;
+			}
+			//update-end---author:lvdandan ---date:20261020  for：[issues/137]ImportParams.startRows 不生效，表头后需要跳过startRows行------------
 			//update-begin--Author:xuelin  Date:20171017 for：TASK #2373 【bug】表改造问题，导致 3.7.1批量导入用户bug-导入不成功--------------------
 			// 判断是集合元素还是不是集合元素,如果是就继续加入这个集合,不是就创建新的对象
 			//update-begin--Author:xuelin  Date:20171206 for：TASK #2451 【excel导出bug】online 一对多导入成功， 但是现在代码生成后的一对多online导入有问题了

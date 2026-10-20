@@ -113,6 +113,10 @@ public class SaxRowRead extends ImportBaseService implements ISaxRowRead {
 			// 表头行
 			if (index < params.getTitleRows() + params.getHeadRows()) {
 				addHeadData(datas);
+			} else if (index < params.getTitleRows() + params.getHeadRows() + params.getStartRows()) {
+				//update-begin---author:lvdandan ---date:20261020  for：[issues/137]ImportParams.startRows 不生效，表头后需要跳过startRows行------------
+				return;
+				//update-end---author:lvdandan ---date:20261020  for：[issues/137]ImportParams.startRows 不生效，表头后需要跳过startRows行------------
 			} else {
 				addListData(datas);
 			}
