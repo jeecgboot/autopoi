@@ -182,3 +182,8 @@ autopoi/src/main/java/org/jeecgframework/poi/excel/imports/sax/SheetHandler.java
 autopoi/src/main/java/org/jeecgframework/poi/excel/imports/sax/parse/SaxRowRead.java
 autopoi/src/test/java/org/jeecgframework/poi/excel/imports/SaxImportColumnIndexTest.java (+)
 -- author:lvdandan---date:20261020--for: [issues/190] SAX导入遇到空单元格后面的列整体前移，值被赋给错误的字段，改为按单元格坐标确定列号 ---
+
+-- author:lvdandan---date:20261020--for: [issues/189] SAX导入数字单元格沿用上一个单元格的类型，被当成共享字符串下标取到表头等其它单元格的文本 ---
+autopoi/src/main/java/org/jeecgframework/poi/excel/imports/sax/SheetHandler.java
+autopoi/src/test/java/org/jeecgframework/poi/excel/imports/SaxImportCellTypeTest.java (+)
+-- author:lvdandan---date:20261020--for: [issues/189] SAX导入数字单元格沿用上一个单元格的类型，被当成共享字符串下标取到表头等其它单元格的文本 ---
