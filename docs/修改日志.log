@@ -176,3 +176,9 @@ autopoi/src/test/java/org/jeecgframework/poi/excel/export/template/ExcelTemplate
 autopoi/src/test/resources/templates/issues9741/template_image.xlsx (+)
 autopoi/src/test/resources/templates/issues9741/template_image.xls (+)
 -- author:scott---date:20261012--for: [issues/9741] excel模板导出图片失败，单值占位符{{xxx}}支持ImageEntity ---
+
+-- author:lvdandan---date:20261020--for: [issues/190] SAX导入遇到空单元格后面的列整体前移，值被赋给错误的字段，改为按单元格坐标确定列号 ---
+autopoi/src/main/java/org/jeecgframework/poi/excel/imports/sax/SheetHandler.java
+autopoi/src/main/java/org/jeecgframework/poi/excel/imports/sax/parse/SaxRowRead.java
+autopoi/src/test/java/org/jeecgframework/poi/excel/imports/SaxImportColumnIndexTest.java (+)
+-- author:lvdandan---date:20261020--for: [issues/190] SAX导入遇到空单元格后面的列整体前移，值被赋给错误的字段，改为按单元格坐标确定列号 ---

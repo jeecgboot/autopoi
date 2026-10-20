@@ -129,7 +129,10 @@ public class SaxRowRead extends ImportBaseService implements ISaxRowRead {
 	 */
 	private void addListData(List<SaxReadCellEntity> datas) throws Exception {
 		// 判断是集合元素还是不是集合元素,如果是就继续加入这个集合,不是就创建新的对象
-		if ((datas.get(params.getKeyIndex()) == null || StringUtils.isEmpty(String.valueOf(datas.get(params.getKeyIndex()).getValue()))) && object != null) {
+		//update-begin---author:lvdandan ---date:20261020  for：[issues/190]SAX导入空单元格用null占位，主键列为空(含该行没有这一列)时是集合元素------------
+		// 与DOM导入一致：只有实体含集合(一对多)时，主键列为空才是上一条数据的集合元素，否则是一条新数据
+		if (excelCollection.size() > 0 && isEmptyCell(datas, params.getKeyIndex()) && object != null) {
+		//update-end---author:lvdandan ---date:20261020  for：[issues/190]SAX导入空单元格用null占位，主键列为空(含该行没有这一列)时是集合元素------------
 			for (ExcelCollectionParams param : excelCollection) {
 				addListContinue(object, param, datas, titlemap, targetId, params);
 			}
@@ -142,7 +145,9 @@ public class SaxRowRead extends ImportBaseService implements ISaxRowRead {
 			for (int i = 0, le = datas.size(); i < le; i++) {
 				entity = datas.get(i);
 				String titleString = (String) titlemap.get(i);
-				if (excelParams.containsKey(titleString)) {
+				//update-begin---author:lvdandan ---date:20261020  for：[issues/190]SAX导入空单元格用null占位，跳过空单元格------------
+				if (entity != null && excelParams.containsKey(titleString)) {
+				//update-end---author:lvdandan ---date:20261020  for：[issues/190]SAX导入空单元格用null占位，跳过空单元格------------
 					saveFieldValue(params, object, entity, excelParams, titleString);
 				}
 			}
@@ -173,7 +178,9 @@ public class SaxRowRead extends ImportBaseService implements ISaxRowRead {
 		boolean isUsed = false;// 是否需要加上这个对象
 		for (int i = 0; i < datas.size(); i++) {
 			String titleString = (String) titlemap.get(i);
-			if (param.getExcelParams().containsKey(titleString)) {
+			//update-begin---author:lvdandan ---date:20261020  for：[issues/190]SAX导入空单元格用null占位，跳过空单元格------------
+			if (datas.get(i) != null && param.getExcelParams().containsKey(titleString)) {
+			//update-end---author:lvdandan ---date:20261020  for：[issues/190]SAX导入空单元格用null占位，跳过空单元格------------
 				saveFieldValue(params, entity, datas.get(i), param.getExcelParams(), titleString);
 				isUsed = true;
 			}
@@ -203,9 +210,23 @@ public class SaxRowRead extends ImportBaseService implements ISaxRowRead {
 	 * 
 	 * @param datas
 	 */
+	//update-begin---author:lvdandan ---date:20261020  for：[issues/190]SAX导入空单元格用null占位------------
+	/**
+	 * 指定列的单元格是否为空：该行没有这一列、该列是空单元格(null占位)、或值为空字符串
+	 */
+	private boolean isEmptyCell(List<SaxReadCellEntity> datas, int index) {
+		if (index < 0 || index >= datas.size() || datas.get(index) == null) {
+			return true;
+		}
+		return StringUtils.isEmpty(String.valueOf(datas.get(index).getValue()));
+	}
+	//update-end---author:lvdandan ---date:20261020  for：[issues/190]SAX导入空单元格用null占位------------
+
 	private void addHeadData(List<SaxReadCellEntity> datas) {
 		for (int i = 0; i < datas.size(); i++) {
-			if (StringUtils.isNotEmpty(String.valueOf(datas.get(i).getValue()))) {
+			//update-begin---author:lvdandan ---date:20261020  for：[issues/190]SAX导入空单元格用null占位，跳过空单元格------------
+			if (datas.get(i) != null && StringUtils.isNotEmpty(String.valueOf(datas.get(i).getValue()))) {
+			//update-end---author:lvdandan ---date:20261020  for：[issues/190]SAX导入空单元格用null占位，跳过空单元格------------
 				titlemap.put(i, String.valueOf(datas.get(i).getValue()));
 			}
 		}
