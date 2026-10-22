@@ -75,8 +75,7 @@ public class CellValueServer {
 				// 日期格式
 				result = cell.getDateCellValue();
 			} else {
-				cell.setCellType( CellType.STRING);
-				result = getDateData(entity, cell.getStringCellValue());
+				result = getDateData(entity, getStringValue(cell));
 			}
 			if (("class java.sql.Time").equals(xclass)) {
 				result = new Time(((Date) result).getTime());
@@ -100,11 +99,23 @@ public class CellValueServer {
 			//---author:liusq---date:20221102-----for:[issues/3369] Excel导入 带公式的时候精度丢失---
 		} else {
 			//设置单元格类型
-			cell.setCellType(CellType.STRING);
-			result = cell.getStringCellValue();
+			result = getStringValue(cell);
 		}
 		return result;
 	}
+
+	//update-begin---author:lvdandan ---date:20261022  for：[issues/190]内联字符串(t="inlineStr")单元格调用 setCellType(STRING) 会把值清空，导致整行读出来全是空被当成空行丢弃------------
+	/**
+	 * 以字符串形式取单元格的值。单元格本来就是字符串类型时直接取值，
+	 * 不再调用 setCellType(STRING)：内联字符串单元格（电子税务局等非 Excel/WPS 生成的文件常见）调用后值会变成空。
+	 */
+	private String getStringValue(Cell cell) {
+		if (CellType.STRING != cell.getCellType()) {
+			cell.setCellType(CellType.STRING);
+		}
+		return cell.getStringCellValue();
+	}
+	//update-end---author:lvdandan ---date:20261022  for：[issues/190]内联字符串(t="inlineStr")单元格调用 setCellType(STRING) 会把值清空，导致整行读出来全是空被当成空行丢弃------------
 
 	/**
 	 * 获取日期类型数据

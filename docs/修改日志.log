@@ -265,3 +265,9 @@ autopoi/src/test/java/org/jeecgframework/poi/word/WordNewlineTest.java (+)
 autopoi/src/main/java/org/jeecgframework/poi/excel/imports/sax/parse/SaxRowRead.java
 autopoi/src/test/java/org/jeecgframework/poi/excel/imports/SaxImportMapTest.java (+)
 -- author:lvdandan---date:20261020--for: [issues/140] SAX导入以Map.class作为目标类型时每行都是空Map，读取内容为空 ---
+
+-- author:lvdandan---date:20261022--for: [issues/190] DOM导入遇到内联字符串(inlineStr)单元格，setCellType(STRING)把值清空，整行被当成空行丢弃，读出0条数据 ---
+autopoi/src/main/java/org/jeecgframework/poi/excel/imports/CellValueServer.java
+autopoi/src/test/java/org/jeecgframework/poi/excel/imports/InlineStringCellImportTest.java (+)
+-- author:lvdandan---date:20261022--for: [issues/190] DOM导入遇到内联字符串(inlineStr)单元格，setCellType(STRING)把值清空，整行被当成空行丢弃，读出0条数据 ---
+
