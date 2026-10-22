@@ -203,3 +203,9 @@ autopoi/src/main/java/org/jeecgframework/poi/util/PoiPublicUtil.java
 autopoi/src/main/java/org/jeecgframework/poi/excel/imports/CellValueServer.java
 autopoi/src/test/java/org/jeecgframework/poi/excel/imports/ImportEnumFieldTest.java (+)
 -- author:lvdandan---date:20261020--for: [issues/18] 导入时没有考虑字段类型是枚举的情况，枚举字段导入报NPE ---
+
+-- author:lvdandan---date:20261020--for: [issues/91] SAX导入ImportParams为null报空指针；SAX导入默认sheetNum=0时读取全部sheet，多sheet时表头行不再被当成数据 ---
+autopoi/src/main/java/org/jeecgframework/poi/excel/imports/sax/SaxReadExcel.java
+autopoi/src/main/java/org/jeecgframework/poi/excel/imports/sax/SheetHandler.java
+autopoi/src/test/java/org/jeecgframework/poi/excel/imports/SaxImportParamsTest.java (+)
+-- author:lvdandan---date:20261020--for: [issues/91] SAX导入ImportParams为null报空指针；SAX导入默认sheetNum=0时读取全部sheet，多sheet时表头行不再被当成数据 ---

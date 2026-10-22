@@ -58,6 +58,16 @@ public class SheetHandler extends DefaultHandler {
 		this.read = rowRead;
 	}
 
+	//update-begin---author:lvdandan ---date:20261020  for：读取多个sheet时，行号没有按sheet重置，导致后面sheet的表头行被当成数据行------------
+	@Override
+	public void startDocument() throws SAXException {
+		// 每个sheet是一个独立的XML文档，行、列计数需要从头开始
+		curRow = 0;
+		curCol = 0;
+		rowlist.clear();
+	}
+	//update-end---author:lvdandan ---date:20261020  for：读取多个sheet时，行号没有按sheet重置，导致后面sheet的表头行被当成数据行------------
+
 	@Override
 	public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException {
 		// 置空

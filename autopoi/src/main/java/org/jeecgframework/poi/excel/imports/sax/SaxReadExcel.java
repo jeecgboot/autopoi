@@ -59,6 +59,11 @@ public class SaxReadExcel {
 
 	private <T> List<T> readExcel(OPCPackage opcPackage, Class<?> pojoClass, ImportParams params, ISaxRowRead rowRead, IExcelReadRowHanlder hanlder) {
 		try {
+			//update-begin---author:lvdandan ---date:20261020  for：[issues/91]importExcelBySax 传入的 ImportParams 为 null 时报空指针------------
+			if (params == null) {
+				params = new ImportParams();
+			}
+			//update-end---author:lvdandan ---date:20261020  for：[issues/91]importExcelBySax 传入的 ImportParams 为 null 时报空指针------------
 			XSSFReader xssfReader = new XSSFReader(opcPackage);
 			SharedStrings sst = xssfReader.getSharedStringsTable();
 			if (rowRead == null) {
@@ -67,7 +72,10 @@ public class SaxReadExcel {
 			XMLReader parser = fetchSheetParser(sst, rowRead);
 			Iterator<InputStream> sheets = xssfReader.getSheetsData();
 			int sheetIndex = 0;
-			while (sheets.hasNext() && sheetIndex < params.getSheetNum()) {
+			//update-begin---author:lvdandan ---date:20261020  for：未设置sheetNum(默认0)时一个sheet都不读取，与DOM导入保持一致，0表示读取全部sheet------------
+			int sheetNum = params.getSheetNum() > 0 ? params.getSheetNum() : Integer.MAX_VALUE;
+			//update-end---author:lvdandan ---date:20261020  for：未设置sheetNum(默认0)时一个sheet都不读取，与DOM导入保持一致，0表示读取全部sheet------------
+			while (sheets.hasNext() && sheetIndex < sheetNum) {
 				sheetIndex++;
 				InputStream sheet = sheets.next();
 				InputSource sheetSource = new InputSource(sheet);
