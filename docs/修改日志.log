@@ -176,3 +176,11 @@ autopoi/src/test/java/org/jeecgframework/poi/excel/export/template/ExcelTemplate
 autopoi/src/test/resources/templates/issues9741/template_image.xlsx (+)
 autopoi/src/test/resources/templates/issues9741/template_image.xls (+)
 -- author:scott---date:20261012--for: [issues/9741] excel模板导出图片失败，单值占位符{{xxx}}支持ImageEntity ---
+
+-- author:lvdandan---date:20261022--for: [issues/9] 请求没有 USER-AGENT 头(如 MockMvc 单元测试)时 isIE 空指针 ---
+autopoi-spring-boot-2-starter/src/main/java/org/jeecgframework/poi/excel/view/MiniAbstractExcelView.java
+autopoi-spring-boot-2-starter/src/main/java/org/jeecgframework/poi/excel/view/JeecgTemplateWordView.java
+autopoi-spring-boot-3-starter/src/main/java/org/jeecgframework/poi/excel/view/MiniAbstractExcelView.java
+autopoi-spring-boot-3-starter/src/main/java/org/jeecgframework/poi/excel/view/JeecgTemplateWordView.java
+-- author:lvdandan---date:20261022--for: [issues/9] 请求没有 USER-AGENT 头(如 MockMvc 单元测试)时 isIE 空指针 ---
+
