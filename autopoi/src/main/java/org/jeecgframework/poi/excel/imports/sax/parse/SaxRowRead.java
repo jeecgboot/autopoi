@@ -88,6 +88,9 @@ public class SaxRowRead extends ImportBaseService implements ISaxRowRead {
 				targetId = etarget.value();
 			}
 			getAllExcelField(targetId, fileds, excelParams, excelCollection, pojoClass, null);
+			//update-begin---author:lvdandan ---date:20261020  for：[issues/189]SAX导入fixedIndex不生效，没有表头行(headRows=0)时也要生效------------
+			applyFixedIndex();
+			//update-end---author:lvdandan ---date:20261020  for：[issues/189]SAX导入fixedIndex不生效，没有表头行(headRows=0)时也要生效------------
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
 			throw new ExcelImportException(e.getMessage());
@@ -225,5 +228,21 @@ public class SaxRowRead extends ImportBaseService implements ISaxRowRead {
 				titlemap.put(i, String.valueOf(datas.get(i).getValue()));
 			}
 		}
+		//update-begin---author:lvdandan ---date:20261020  for：[issues/189]SAX导入fixedIndex不生效，表头文字不能覆盖固定列的映射------------
+		applyFixedIndex();
+		//update-end---author:lvdandan ---date:20261020  for：[issues/189]SAX导入fixedIndex不生效，表头文字不能覆盖固定列的映射------------
 	}
+
+	//update-begin---author:lvdandan ---date:20261020  for：[issues/189]SAX导入fixedIndex不生效------------
+	/**
+	 * 把 @Excel(fixedIndex = n) 的字段固定映射到第 n 列，不依赖表头文字（与 DOM 导入一致）
+	 */
+	private void applyFixedIndex() {
+		for (String key : excelParams.keySet()) {
+			if (key.startsWith("FIXED_")) {
+				titlemap.put(Integer.parseInt(key.substring("FIXED_".length())), key);
+			}
+		}
+	}
+	//update-end---author:lvdandan ---date:20261020  for：[issues/189]SAX导入fixedIndex不生效------------
 }

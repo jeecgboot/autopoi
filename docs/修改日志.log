@@ -226,3 +226,8 @@ autopoi/src/main/java/org/jeecgframework/poi/excel/imports/sax/parse/SaxRowRead.
 autopoi/src/main/java/org/jeecgframework/poi/excel/imports/sax/SaxReadExcel.java
 autopoi/src/test/java/org/jeecgframework/poi/excel/imports/SaxImportHandlerTest.java (+)
 -- author:lvdandan---date:20261020--for: [issues/189] SAX导入使用IExcelReadRowHanlder回调时，最后一行数据丢失（只有一行数据时一条都不回调） ---
+
+-- author:lvdandan---date:20261020--for: [issues/189] SAX导入@Excel的fixedIndex不生效，与DOM导入保持一致按固定列号映射字段 ---
+autopoi/src/main/java/org/jeecgframework/poi/excel/imports/sax/parse/SaxRowRead.java
+autopoi/src/test/java/org/jeecgframework/poi/excel/imports/SaxImportFixedIndexTest.java (+)
+-- author:lvdandan---date:20261020--for: [issues/189] SAX导入@Excel的fixedIndex不生效，与DOM导入保持一致按固定列号映射字段 ---
