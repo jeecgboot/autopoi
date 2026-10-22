@@ -63,11 +63,13 @@ public class StylerHelper {
 	private void printInlineStyle(Workbook wb) {
 		out.format("<style type=\"text/css\">%n");
 		printStyles(wb);
-		prontFonts(wb);
+		//update-begin---author:lvdandan ---date:20261022  for：[issues/38]方法名拼写错误 prontFonts -> printFonts------------
+		printFonts(wb);
+		//update-end---author:lvdandan ---date:20261022  for：[issues/38]方法名拼写错误 prontFonts -> printFonts------------
 		out.format("</style>%n");
 	}
 
-	private void prontFonts(Workbook wb) {
+	private void printFonts(Workbook wb) {
         //update-begin---author:liusq  Date:20220228  for：[I4I3ZY]issue AutoPOi Workbook对象转HTML字符串 数组下标越界异常----
 		for (int i = 0, le = wb.getNumberOfFonts(); i < le; i++) {
 			Font font = wb.getFontAt(i);

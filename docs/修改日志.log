@@ -293,3 +293,7 @@ autopoi/src/main/java/org/jeecgframework/poi/excel/imports/CellValueServer.java
 autopoi/src/test/java/org/jeecgframework/poi/excel/imports/FormulaDateCellImportTest.java (+)
 -- author:lvdandan---date:20261022--for: [issues/40] 公式单元格的结果是日期时，导入到Date字段抛“Excel 值获取失败” ---
 
+-- author:lvdandan---date:20261022--for: [issues/38] StylerHelper.prontFonts 方法名拼写错误，改为 printFonts ---
+autopoi/src/main/java/org/jeecgframework/poi/excel/html/helper/StylerHelper.java
+-- author:lvdandan---date:20261022--for: [issues/38] StylerHelper.prontFonts 方法名拼写错误，改为 printFonts ---
+
