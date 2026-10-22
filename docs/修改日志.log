@@ -252,3 +252,11 @@ autopoi/src/test/java/org/jeecgframework/poi/excel/export/template/TemplateIfDel
 autopoi/src/main/java/org/jeecgframework/poi/excel/imports/CellValueServer.java
 autopoi/src/test/java/org/jeecgframework/poi/excel/imports/SaxImportStringDateTest.java (+)
 -- author:lvdandan---date:20261020--for: [issues/190] SAX导入日期以字符串保存时没有按@Excel的format转成Date，导致导入中断 ---
+
+-- author:lvdandan---date:20261020--for: [issues/165] Word模板填充时，文本中存在换行符，无法自动换行 ---
+autopoi/src/main/java/org/jeecgframework/poi/word/parse/WordTextUtil.java (+)
+autopoi/src/main/java/org/jeecgframework/poi/word/parse/ParseWord07.java
+autopoi/src/main/java/org/jeecgframework/poi/word/parse/excel/ExcelMapParse.java
+autopoi/src/main/java/org/jeecgframework/poi/word/parse/excel/ExcelEntityParse.java
+autopoi/src/test/java/org/jeecgframework/poi/word/WordNewlineTest.java (+)
+-- author:lvdandan---date:20261020--for: [issues/165] Word模板填充时，文本中存在换行符，无法自动换行 ---

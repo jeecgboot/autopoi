@@ -87,7 +87,9 @@ public class ParseWord07 {
 			addAnImage((WordImageEntity) obj, currentRun);
 		} else {
 			currentText = obj.toString();
-			currentRun.setText(currentText, 0);
+			//update-begin---author:lvdandan ---date:20261020  for：[issues/165]Word模板填充时，文本中存在换行符，无法自动换行------------
+			WordTextUtil.setText(currentRun, currentText);
+			//update-end---author:lvdandan ---date:20261020  for：[issues/165]Word模板填充时，文本中存在换行符，无法自动换行------------
 		}
 		for (int k = 0; k < runIndex.size(); k++) {
 			paragraph.getRuns().get(runIndex.get(k)).setText("", 0);
