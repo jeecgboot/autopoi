@@ -182,3 +182,8 @@ autopoi/src/main/java/org/jeecgframework/poi/excel/imports/ExcelImportServer.jav
 autopoi/src/main/java/org/jeecgframework/poi/excel/imports/sax/parse/SaxRowRead.java
 autopoi/src/test/java/org/jeecgframework/poi/excel/imports/ImportStartRowsTest.java (+)
 -- author:lvdandan---date:20261020--for: [issues/137,issues/64] ImportParams.startRows 不生效，表头后需要跳过startRows行 ---
+
+-- author:lvdandan---date:20261020--for: [issues/120] 导入Excel中8位数的整形数据报错，Integer/Long字段不支持科学计数法 ---
+autopoi/src/main/java/org/jeecgframework/poi/excel/imports/CellValueServer.java
+autopoi/src/test/java/org/jeecgframework/poi/excel/imports/ImportLargeNumberTest.java (+)
+-- author:lvdandan---date:20261020--for: [issues/120] 导入Excel中8位数的整形数据报错，Integer/Long字段不支持科学计数法 ---
