@@ -242,3 +242,8 @@ autopoi/src/test/java/org/jeecgframework/poi/excel/imports/SaxImportColumnIndexT
 autopoi/src/main/java/org/jeecgframework/poi/excel/imports/sax/SheetHandler.java
 autopoi/src/test/java/org/jeecgframework/poi/excel/imports/SaxImportCellTypeTest.java (+)
 -- author:lvdandan---date:20261020--for: [issues/189] SAX导入数字单元格沿用上一个单元格的类型，被当成共享字符串下标取到表头等其它单元格的文本 ---
+
+-- author:lvdandan---date:20261020--for: [issues/174] 模板导出!if指令删除当前列时报XmlValueDisconnectedException，相邻多列删除时后面的列被跳过 ---
+autopoi/src/main/java/org/jeecgframework/poi/excel/export/template/ExcelExportOfTemplateUtil.java
+autopoi/src/test/java/org/jeecgframework/poi/excel/export/template/TemplateIfDeleteColumnTest.java (+)
+-- author:lvdandan---date:20261020--for: [issues/174] 模板导出!if指令删除当前列时报XmlValueDisconnectedException，相邻多列删除时后面的列被跳过 ---
