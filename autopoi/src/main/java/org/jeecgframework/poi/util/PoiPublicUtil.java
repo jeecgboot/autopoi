@@ -625,6 +625,10 @@ public final class PoiPublicUtil {
 		boolean isBaseClass = false;
 		if (fieldType.isArray()) {
 			isBaseClass = false;
+		//update-begin---author:lvdandan ---date:20261020  for：[issues/18]字段类型是枚举时，被当成嵌套实体处理导致导入报错NPE------------
+		} else if (fieldType.isEnum()) {
+			isBaseClass = true;
+		//update-end---author:lvdandan ---date:20261020  for：[issues/18]字段类型是枚举时，被当成嵌套实体处理导致导入报错NPE------------
 		} else if (fieldType.isPrimitive()
 				|| fieldType.getPackage() == null
 				|| fieldType.getPackage().getName().equals("java.lang")

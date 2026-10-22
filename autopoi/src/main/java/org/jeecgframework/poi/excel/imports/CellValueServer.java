@@ -194,9 +194,55 @@ public class CellValueServer {
 		return result;
 	}
 
+	//update-begin---author:lvdandan ---date:20261020  for：[issues/18]字段类型是枚举时，把导入的文本转成枚举------------
+	/**
+	 * 获取字段的枚举类型，字段不是枚举返回 null
+	 *
+	 * @param entity
+	 * @return
+	 */
+	private Class<?> getEnumType(ExcelImportEntity entity) {
+		if (entity == null) {
+			return null;
+		}
+		Method setMethod = entity.getMethods() != null && entity.getMethods().size() > 0 ? entity.getMethods().get(entity.getMethods().size() - 1) : entity.getMethod();
+		if (setMethod == null || setMethod.getParameterTypes().length == 0) {
+			return null;
+		}
+		Class<?> paramType = setMethod.getParameterTypes()[0];
+		return paramType.isEnum() ? paramType : null;
+	}
+
+	/**
+	 * 把导入值转成枚举：先按枚举名称匹配，再按 toString 匹配，都匹配不到抛出异常
+	 *
+	 * @param enumType
+	 * @param result
+	 * @return
+	 */
+	private Object convertToEnum(Class<?> enumType, Object result) {
+		if (enumType.isInstance(result)) {
+			return result;
+		}
+		String text = String.valueOf(result).trim();
+		Object[] constants = enumType.getEnumConstants();
+		for (Object constant : constants) {
+			if (((Enum<?>) constant).name().equals(text)) {
+				return constant;
+			}
+		}
+		for (Object constant : constants) {
+			if (constant.toString().equals(text)) {
+				return constant;
+			}
+		}
+		throw new IllegalArgumentException("枚举值无法识别，枚举类型:" + enumType.getName() + "，导入值:" + text);
+	}
+	//update-end---author:lvdandan ---date:20261020  for：[issues/18]字段类型是枚举时，把导入的文本转成枚举------------
+
 	/**
 	 * 根据返回类型获取返回值
-	 * 
+	 *
 	 * @param xclass
 	 * @param result
 	 * @param entity
@@ -209,6 +255,12 @@ public class CellValueServer {
 				return null;
 			}
 			//update-end-author:scott date:20180711 for:TASK #2950 【bug】excel 导入报错，空指针问题
+			//update-begin---author:lvdandan ---date:20261020  for：[issues/18]字段类型是枚举时，把导入的文本转成枚举------------
+			Class<?> enumType = getEnumType(entity);
+			if (enumType != null) {
+				return convertToEnum(enumType, result);
+			}
+			//update-end---author:lvdandan ---date:20261020  for：[issues/18]字段类型是枚举时，把导入的文本转成枚举------------
 			if ("class java.util.Date".equals(xclass)) {
 				return result;
 			}

@@ -197,3 +197,9 @@ autopoi/src/test/java/org/jeecgframework/poi/excel/imports/ImportDictTrimTest.ja
 autopoi/src/main/java/org/jeecgframework/poi/util/PoiPublicUtil.java
 autopoi/src/test/java/org/jeecgframework/poi/util/SheetPicturesWithShapesTest.java (+)
 -- author:lvdandan---date:20261020--for: [issues/83,issues/73,issues/107] sheet中含非图片形状（文本框、箭头、组合图形）时导入强转XSSFPicture报错 ---
+
+-- author:lvdandan---date:20261020--for: [issues/18] 导入时没有考虑字段类型是枚举的情况，枚举字段导入报NPE ---
+autopoi/src/main/java/org/jeecgframework/poi/util/PoiPublicUtil.java
+autopoi/src/main/java/org/jeecgframework/poi/excel/imports/CellValueServer.java
+autopoi/src/test/java/org/jeecgframework/poi/excel/imports/ImportEnumFieldTest.java (+)
+-- author:lvdandan---date:20261020--for: [issues/18] 导入时没有考虑字段类型是枚举的情况，枚举字段导入报NPE ---
