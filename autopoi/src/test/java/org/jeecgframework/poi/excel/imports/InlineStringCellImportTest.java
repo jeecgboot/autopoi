@@ -103,6 +103,15 @@ public class InlineStringCellImportTest {
 		assertEquals(0, new BigDecimal("7.5").compareTo(list.get(0).getAmount()));
 	}
 
+	/** t="str"（公式字符串的缓存值写法，部分生成器用它保存普通文本） */
+	@Test
+	public void strTypeCellShouldBeImported() throws Exception {
+		String row = "<row r=\"2\"><c r=\"A2\" t=\"str\"><v>N003</v></c>" + is("B2", "3.25") + "</row>";
+		List<Inv> list = importDom(row);
+		assertEquals(1, list.size());
+		assertEquals("N003", list.get(0).getNo());
+	}
+
 	/** 多行都要读到 */
 	@Test
 	public void allRowsShouldBeImported() throws Exception {
