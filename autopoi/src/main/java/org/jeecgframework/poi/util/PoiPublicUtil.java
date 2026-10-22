@@ -36,6 +36,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
+import org.apache.poi.hssf.usermodel.HSSFPatriarch;
 import org.apache.poi.hssf.usermodel.HSSFPicture;
 import org.apache.poi.hssf.usermodel.HSSFPictureData;
 import org.apache.poi.hssf.usermodel.HSSFShape;
@@ -257,10 +258,16 @@ public final class PoiPublicUtil {
 	public static Map<String, PictureData> getSheetPictrues03(HSSFSheet sheet, HSSFWorkbook workbook) {
 		Map<String, PictureData> sheetIndexPicMap = new HashMap<String, PictureData>();
 		List<HSSFPictureData> pictures = workbook.getAllPictures();
+		//update-begin---author:lvdandan ---date:20261020  for：[issues/83,issues/73,issues/107]sheet没有绘图对象、或含非图片形状时报错------------
 		if (!pictures.isEmpty()) {
-			for (HSSFShape shape : sheet.getDrawingPatriarch().getChildren()) {
-				HSSFClientAnchor anchor = (HSSFClientAnchor) shape.getAnchor();
+			HSSFPatriarch patriarch = sheet.getDrawingPatriarch();
+			if (patriarch == null) {
+				return sheetIndexPicMap;
+			}
+			for (HSSFShape shape : patriarch.getChildren()) {
 				if (shape instanceof HSSFPicture) {
+					HSSFClientAnchor anchor = (HSSFClientAnchor) shape.getAnchor();
+					//update-end---author:lvdandan ---date:20261020  for：[issues/83,issues/73,issues/107]sheet没有绘图对象、或含非图片形状时报错------------
 					HSSFPicture pic = (HSSFPicture) shape;
 					int pictureIndex = pic.getPictureIndex() - 1;
 					HSSFPictureData picData = pictures.get(pictureIndex);
@@ -292,6 +299,11 @@ public final class PoiPublicUtil {
 				XSSFDrawing drawing = (XSSFDrawing) dr;
 				List<XSSFShape> shapes = drawing.getShapes();
 				for (XSSFShape shape : shapes) {
+					//update-begin---author:lvdandan ---date:20261020  for：[issues/83,issues/73,issues/107]sheet中含非图片形状（文本框、箭头、组合图形等）时强转XSSFPicture报错------------
+					if (!(shape instanceof XSSFPicture)) {
+						continue;
+					}
+					//update-end---author:lvdandan ---date:20261020  for：[issues/83,issues/73,issues/107]sheet中含非图片形状（文本框、箭头、组合图形等）时强转XSSFPicture报错------------
 					XSSFPicture pic = (XSSFPicture) shape;
 					XSSFClientAnchor anchor = pic.getPreferredSize();
 					CTMarker ctMarker = anchor.getFrom();
