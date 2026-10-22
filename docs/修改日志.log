@@ -288,3 +288,8 @@ autopoi/src/main/java/org/jeecgframework/poi/word/parse/excel/ExcelEntityParse.j
 autopoi/src/test/java/org/jeecgframework/poi/word/WordTableListEntityTest.java (+)
 -- author:lvdandan---date:20261022--for: [issues/108] Word模板表格用ExcelListEntity循环输出时占位符所在行没有删除，列表为空时导出死循环 ---
 
+-- author:lvdandan---date:20261022--for: [issues/40] 公式单元格的结果是日期时，导入到Date字段抛“Excel 值获取失败” ---
+autopoi/src/main/java/org/jeecgframework/poi/excel/imports/CellValueServer.java
+autopoi/src/test/java/org/jeecgframework/poi/excel/imports/FormulaDateCellImportTest.java (+)
+-- author:lvdandan---date:20261022--for: [issues/40] 公式单元格的结果是日期时，导入到Date字段抛“Excel 值获取失败” ---
+
