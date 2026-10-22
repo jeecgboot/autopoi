@@ -260,3 +260,8 @@ autopoi/src/main/java/org/jeecgframework/poi/word/parse/excel/ExcelMapParse.java
 autopoi/src/main/java/org/jeecgframework/poi/word/parse/excel/ExcelEntityParse.java
 autopoi/src/test/java/org/jeecgframework/poi/word/WordNewlineTest.java (+)
 -- author:lvdandan---date:20261020--for: [issues/165] Word模板填充时，文本中存在换行符，无法自动换行 ---
+
+-- author:lvdandan---date:20261020--for: [issues/140] SAX导入以Map.class作为目标类型时每行都是空Map，读取内容为空 ---
+autopoi/src/main/java/org/jeecgframework/poi/excel/imports/sax/parse/SaxRowRead.java
+autopoi/src/test/java/org/jeecgframework/poi/excel/imports/SaxImportMapTest.java (+)
+-- author:lvdandan---date:20261020--for: [issues/140] SAX导入以Map.class作为目标类型时每行都是空Map，读取内容为空 ---

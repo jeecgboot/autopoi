@@ -19,8 +19,10 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jeecgframework.poi.excel.annotation.ExcelTarget;
@@ -80,6 +82,11 @@ public class SaxRowRead extends ImportBaseService implements ISaxRowRead {
 	}
 
 	private void initParams(Class<?> pojoClass, ImportParams params) {
+		//update-begin---author:lvdandan ---date:20261020  for：[issues/140]SAX导入以Map.class作为目标类型时，每行返回一个Map，没有@Excel字段需要解析------------
+		if (Map.class.equals(pojoClass)) {
+			return;
+		}
+		//update-end---author:lvdandan ---date:20261020  for：[issues/140]SAX导入以Map.class作为目标类型时，每行返回一个Map，没有@Excel字段需要解析------------
 		try {
 
 			Field fileds[] = PoiPublicUtil.getClassFields(pojoClass);
@@ -141,12 +148,42 @@ public class SaxRowRead extends ImportBaseService implements ISaxRowRead {
 		}
 	}
 
+	//update-begin---author:lvdandan ---date:20261020  for：[issues/140]SAX导入以Map.class作为目标类型时，每行返回一个Map，key是表头，value是单元格的值------------
+	/**
+	 * 目标类型是 Map：每一行生成一个 Map，key 是表头，value 是单元格的值（与 DOM 导入一致）。
+	 * 按列顺序放入 LinkedHashMap，每个表头都有对应的 key，空单元格的值是 null。
+	 * 值保持 SAX 读到的类型：文本是 String，数字是 BigDecimal，日期是 Date。
+	 * Map 没有一对多的子行，每一行都是一条新数据，所以直接输出。
+	 *
+	 * @param datas
+	 */
+	private void addMapData(List<SaxReadCellEntity> datas) {
+		Map<String, Object> map = new LinkedHashMap<String, Object>();
+		for (Map.Entry<Integer, String> title : new TreeMap<Integer, String>(titlemap).entrySet()) {
+			int col = title.getKey();
+			SaxReadCellEntity cell = col < datas.size() ? datas.get(col) : null;
+			map.put(title.getValue(), cell == null ? null : cell.getValue());
+		}
+		if (hanlder != null) {
+			hanlder.hanlder(map);
+		} else {
+			list.add(map);
+		}
+	}
+	//update-end---author:lvdandan ---date:20261020  for：[issues/140]SAX导入以Map.class作为目标类型时，每行返回一个Map，key是表头，value是单元格的值------------
+
 	/**
 	 * 集合元素处理
-	 * 
+	 *
 	 * @param datas
 	 */
 	private void addListData(List<SaxReadCellEntity> datas) throws Exception {
+		//update-begin---author:lvdandan ---date:20261020  for：[issues/140]SAX导入以Map.class作为目标类型时，每行返回一个Map，key是表头，value是单元格的值------------
+		if (Map.class.equals(pojoClass)) {
+			addMapData(datas);
+			return;
+		}
+		//update-end---author:lvdandan ---date:20261020  for：[issues/140]SAX导入以Map.class作为目标类型时，每行返回一个Map，key是表头，value是单元格的值------------
 		// 判断是集合元素还是不是集合元素,如果是就继续加入这个集合,不是就创建新的对象
 		//update-begin---author:lvdandan ---date:20261020  for：[issues/190]SAX导入空单元格用null占位，主键列为空(含该行没有这一列)时是集合元素------------
 		// 与DOM导入一致：只有实体含集合(一对多)时，主键列为空才是上一条数据的集合元素，否则是一条新数据
