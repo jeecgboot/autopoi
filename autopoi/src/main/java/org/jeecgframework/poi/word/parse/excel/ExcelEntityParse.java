@@ -154,6 +154,10 @@ public class ExcelEntityParse extends ExportBase {
 		checkExcelParams(entity);
 		// 获取表头数据
 		Map<String, Integer> titlemap = getTitleMap(table, index, entity.getHeadRows());
+		//update-begin---author:lvdandan ---date:20261022  for：[issues/108]占位符所在行({{$fe:xxx}})没有删除，数据行追加在它后面；列表为空时调用方按"已删除一行"回退行号，会在这一行上死循环------------
+		// 和 ExcelMapParse(List 模式) 一致：先把占位符行删掉，后面生成的数据行从这个位置开始
+		table.removeRow(index);
+		//update-end---author:lvdandan ---date:20261022  for：[issues/108]占位符所在行({{$fe:xxx}})没有删除，数据行追加在它后面；列表为空时调用方按"已删除一行"回退行号，会在这一行上死循环------------
 		try {
 			// 得到所有字段
 			Field fileds[] = PoiPublicUtil.getClassFields(entity.getClazz());

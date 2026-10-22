@@ -283,3 +283,8 @@ autopoi/src/main/java/org/jeecgframework/poi/cache/ExcelCache.java
 autopoi/src/test/java/org/jeecgframework/poi/excel/export/template/TemplateClasspathLoadTest.java (+)
 -- author:lvdandan---date:20261022--for: [issues/54] 打成jar后模板在classpath里，模板导出只认文件系统路径读不到模板，改为文件找不到时再从classpath找 ---
 
+-- author:lvdandan---date:20261022--for: [issues/108] Word模板表格用ExcelListEntity循环输出时占位符所在行没有删除，列表为空时导出死循环 ---
+autopoi/src/main/java/org/jeecgframework/poi/word/parse/excel/ExcelEntityParse.java
+autopoi/src/test/java/org/jeecgframework/poi/word/WordTableListEntityTest.java (+)
+-- author:lvdandan---date:20261022--for: [issues/108] Word模板表格用ExcelListEntity循环输出时占位符所在行没有删除，列表为空时导出死循环 ---
+
