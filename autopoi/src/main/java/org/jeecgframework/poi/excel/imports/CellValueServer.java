@@ -121,8 +121,12 @@ public class CellValueServer {
 			try {
 				return format.parse(value);
 			} catch (ParseException e) {
-				LOGGER.error("时间格式化失败,格式化:{},值:{}", entity.getFormat(), value);
-				throw new ExcelImportException(ExcelImportEnum.GET_VALUE_ERROR);
+				//update-begin---author:lvdandan ---date:20261022  for：[issues/160]日期解析失败的异常带上列名、原始值和 format，并保留原始异常------------
+				LOGGER.error("时间格式化失败,列:{},格式化:{},值:{}", entity.getName(), entity.getFormat(), visible(value));
+				ExcelImportException ex = new ExcelImportException(ExcelImportEnum.GET_VALUE_ERROR.getMsg() + "：列[" + entity.getName() + "]的值[" + visible(value) + "]无法按格式 " + entity.getFormat() + " 解析为日期", ExcelImportEnum.GET_VALUE_ERROR);
+				ex.initCause(e);
+				throw ex;
+				//update-end---author:lvdandan ---date:20261022  for：[issues/160]日期解析失败的异常带上列名、原始值和 format，并保留原始异常------------
 			}
 		}
 		return null;
@@ -327,9 +331,11 @@ public class CellValueServer {
 			}
 			return result;
 		} catch (Exception e) {
-			LOGGER.error(e.getMessage(), e);
-			//update-begin---author:lvdandan ---date:20261021  for：[issues/190]值转换失败的报错信息带上列名、原始值和目标类型，方便定位------------
+			//update-begin---author:lvdandan ---date:20261022  for：[issues/160]日志也带上列名、原始值和目标类型（JDK 的异常信息不一定带值，如 BigDecimal 只提示非法字符）------------
 			String column = entity == null ? "" : entity.getName();
+			LOGGER.error("值转换失败,列:{},值:{},目标类型:{},原因:{}", column, visible(result), xclass, e.getMessage(), e);
+			//update-end---author:lvdandan ---date:20261022  for：[issues/160]日志也带上列名、原始值和目标类型（JDK 的异常信息不一定带值，如 BigDecimal 只提示非法字符）------------
+			//update-begin---author:lvdandan ---date:20261021  for：[issues/190]值转换失败的报错信息带上列名、原始值和目标类型，方便定位------------
 			ExcelImportException ex = new ExcelImportException(ExcelImportEnum.GET_VALUE_ERROR.getMsg() + "：列[" + column + "]的值[" + visible(result) + "]无法转换为 " + xclass.replace("class ", ""), ExcelImportEnum.GET_VALUE_ERROR);
 			ex.initCause(e);
 			throw ex;
