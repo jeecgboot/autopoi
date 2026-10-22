@@ -74,6 +74,12 @@ public class SheetHandler extends DefaultHandler {
 		lastContents = "";
 		// c => 单元格
 		if ("c".equals(name)) {
+			//update-begin---author:lvdandan ---date:20261020  for：[issues/190]SAX导入空单元格导致后面的列整体前移，按单元格坐标(r属性，如C5)确定列号------------
+			String cellRef = attributes.getValue("r");
+			if (cellRef != null) {
+				curCol = columnIndexOf(cellRef);
+			}
+			//update-end---author:lvdandan ---date:20261020  for：[issues/190]SAX导入空单元格导致后面的列整体前移，按单元格坐标(r属性，如C5)确定列号------------
 			// 如果下一个元素是 SST 的索引，则将nextIsString标记为true
 			String cellType = attributes.getValue("t");
 			if ("s".equals(cellType)) {
@@ -109,7 +115,7 @@ public class SheetHandler extends DefaultHandler {
 		// t元素也包含字符串
 		if (CellValueType.TElement.equals(type)) {
 			String value = lastContents.trim();
-			rowlist.add(curCol, new SaxReadCellEntity(CellValueType.String, value));
+			setCell(curCol, new SaxReadCellEntity(CellValueType.String, value));
 			curCol++;
 			type = CellValueType.None;
 			// v => 单元格的值，如果单元格是字符串则v标签的值为该字符串在SST中的索引
@@ -119,12 +125,12 @@ public class SheetHandler extends DefaultHandler {
 			value = value.equals("") ? " " : value;
 			if (CellValueType.Date.equals(type)) {
 				Date date = DateUtil.getJavaDate(Double.valueOf(value));
-				rowlist.add(curCol, new SaxReadCellEntity(CellValueType.Date, date));
+				setCell(curCol, new SaxReadCellEntity(CellValueType.Date, date));
 			} else if (CellValueType.Number.equals(type)) {
 				BigDecimal bd = new BigDecimal(value);
-				rowlist.add(curCol, new SaxReadCellEntity(CellValueType.Number, bd));
+				setCell(curCol, new SaxReadCellEntity(CellValueType.Number, bd));
 			} else if (CellValueType.String.equals(type)) {
-				rowlist.add(curCol, new SaxReadCellEntity(CellValueType.String, value));
+				setCell(curCol, new SaxReadCellEntity(CellValueType.String, value));
 			}
 			curCol++;
 		} else if (name.equals("row")) {// 如果标签名称为 row ，这说明已到行尾，调用 optRows() 方法
@@ -135,6 +141,40 @@ public class SheetHandler extends DefaultHandler {
 		}
 
 	}
+
+	//update-begin---author:lvdandan ---date:20261020  for：[issues/190]SAX导入空单元格导致后面的列整体前移，按单元格坐标(r属性，如C5)确定列号------------
+	/**
+	 * 把单元格放到指定列，前面没有值的列(空单元格在XML里没有对应元素)用 null 占位，保证列号与Excel中的位置一致
+	 */
+	private void setCell(int col, SaxReadCellEntity cell) {
+		while (rowlist.size() < col) {
+			rowlist.add(null);
+		}
+		if (rowlist.size() == col) {
+			rowlist.add(cell);
+		} else {
+			rowlist.set(col, cell);
+		}
+	}
+
+	/**
+	 * 根据单元格坐标（如 "C5"、"AB12"）得到从0开始的列号
+	 */
+	private static int columnIndexOf(String cellRef) {
+		int col = 0;
+		for (int i = 0; i < cellRef.length(); i++) {
+			char ch = cellRef.charAt(i);
+			if (ch >= 'A' && ch <= 'Z') {
+				col = col * 26 + (ch - 'A' + 1);
+			} else if (ch >= 'a' && ch <= 'z') {
+				col = col * 26 + (ch - 'a' + 1);
+			} else {
+				break;
+			}
+		}
+		return col - 1;
+	}
+	//update-end---author:lvdandan ---date:20261020  for：[issues/190]SAX导入空单元格导致后面的列整体前移，按单元格坐标(r属性，如C5)确定列号------------
 
 	@Override
 	public void characters(char[] ch, int start, int length) throws SAXException {
