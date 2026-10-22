@@ -71,7 +71,13 @@ public class CellValueServer {
 				|| ("class java.sql.Time").equals(xclass)
 				|| ("class java.time.LocalDate").equals(xclass)
 				|| ("class java.time.LocalDateTime").equals(xclass)) {
-			if ( CellType.NUMERIC == cell.getCellType()) {
+			//update-begin---author:lvdandan ---date:20261022  for：[issues/40]公式单元格(如 DATE(2026,1,2))的结果是日期时，类型是 FORMULA 不是 NUMERIC，被当成文本按 format 解析而失败，改为按公式缓存的结果类型判断------------
+			CellType dateCellType = cell.getCellType();
+			if (CellType.FORMULA == dateCellType) {
+				dateCellType = cell.getCachedFormulaResultType();
+			}
+			if (CellType.NUMERIC == dateCellType) {
+			//update-end---author:lvdandan ---date:20261022  for：[issues/40]公式单元格(如 DATE(2026,1,2))的结果是日期时，类型是 FORMULA 不是 NUMERIC，被当成文本按 format 解析而失败，改为按公式缓存的结果类型判断------------
 				// 日期格式
 				result = cell.getDateCellValue();
 			} else {
