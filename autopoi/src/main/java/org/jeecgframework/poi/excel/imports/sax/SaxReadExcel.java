@@ -22,6 +22,7 @@ import java.util.List;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
 import org.apache.poi.xssf.model.SharedStrings;
+import org.apache.poi.xssf.model.StylesTable;
 import org.jeecgframework.poi.excel.entity.ImportParams;
 import org.jeecgframework.poi.excel.imports.sax.parse.ISaxRowRead;
 import org.jeecgframework.poi.excel.imports.sax.parse.SaxRowRead;
@@ -69,7 +70,9 @@ public class SaxReadExcel {
 			if (rowRead == null) {
 				rowRead = new SaxRowRead(pojoClass, params, hanlder);
 			}
-			XMLReader parser = fetchSheetParser(sst, rowRead);
+			//update-begin---author:lvdandan ---date:20261020  for：[issues/190]SAX导入日期只认style下标为1的样式，其它日期样式被当成数字；需要样式表判断数字格式------------
+			XMLReader parser = fetchSheetParser(sst, xssfReader.getStylesTable(), rowRead);
+			//update-end---author:lvdandan ---date:20261020  for：[issues/190]SAX导入日期只认style下标为1的样式，其它日期样式被当成数字；需要样式表判断数字格式------------
 			Iterator<InputStream> sheets = xssfReader.getSheetsData();
 			int sheetIndex = 0;
 			//update-begin---author:lvdandan ---date:20261020  for：未设置sheetNum(默认0)时一个sheet都不读取，与DOM导入保持一致，0表示读取全部sheet------------
@@ -92,9 +95,9 @@ public class SaxReadExcel {
 		}
 	}
 
-	private XMLReader fetchSheetParser(SharedStrings sst, ISaxRowRead rowRead) throws SAXException {
+	private XMLReader fetchSheetParser(SharedStrings sst, StylesTable styles, ISaxRowRead rowRead) throws SAXException {
 		XMLReader parser = XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
-		ContentHandler handler = new SheetHandler(sst, rowRead);
+		ContentHandler handler = new SheetHandler(sst, styles, rowRead);
 		parser.setContentHandler(handler);
 		return parser;
 	}
