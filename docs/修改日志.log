@@ -209,3 +209,8 @@ autopoi/src/main/java/org/jeecgframework/poi/excel/imports/sax/SaxReadExcel.java
 autopoi/src/main/java/org/jeecgframework/poi/excel/imports/sax/SheetHandler.java
 autopoi/src/test/java/org/jeecgframework/poi/excel/imports/SaxImportParamsTest.java (+)
 -- author:lvdandan---date:20261020--for: [issues/91] SAX导入ImportParams为null报空指针；SAX导入默认sheetNum=0时读取全部sheet，多sheet时表头行不再被当成数据 ---
+
+-- author:lvdandan---date:20261020--for: [issues/29] 合并单元格，被合并列或依赖列是数值类型(type=4)时读取单元格内容报错 ---
+autopoi/src/main/java/org/jeecgframework/poi/util/PoiMergeCellUtil.java
+autopoi/src/test/java/org/jeecgframework/poi/util/PoiMergeCellUtilNumericTest.java (+)
+-- author:lvdandan---date:20261020--for: [issues/29] 合并单元格，被合并列或依赖列是数值类型(type=4)时读取单元格内容报错 ---
