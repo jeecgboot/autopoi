@@ -219,3 +219,10 @@ autopoi/src/test/java/org/jeecgframework/poi/util/PoiMergeCellUtilNumericTest.ja
 autopoi/src/main/java/org/jeecgframework/poi/util/PoiFunctionUtil.java
 autopoi/src/test/java/org/jeecgframework/poi/util/PoiFunctionUtilThreadSafeTest.java (+)
 -- author:lvdandan---date:20261020--for: [issues/52] PoiFunctionUtil共享的SimpleDateFormat、DecimalFormat线程不安全，并发格式化结果错误 ---
+
+-- author:lvdandan---date:20261020--for: [issues/189] SAX导入使用IExcelReadRowHanlder回调时，最后一行数据丢失（只有一行数据时一条都不回调） ---
+autopoi/src/main/java/org/jeecgframework/poi/excel/imports/sax/parse/ISaxRowRead.java
+autopoi/src/main/java/org/jeecgframework/poi/excel/imports/sax/parse/SaxRowRead.java
+autopoi/src/main/java/org/jeecgframework/poi/excel/imports/sax/SaxReadExcel.java
+autopoi/src/test/java/org/jeecgframework/poi/excel/imports/SaxImportHandlerTest.java (+)
+-- author:lvdandan---date:20261020--for: [issues/189] SAX导入使用IExcelReadRowHanlder回调时，最后一行数据丢失（只有一行数据时一条都不回调） ---

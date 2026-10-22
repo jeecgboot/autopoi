@@ -100,6 +100,18 @@ public class SaxRowRead extends ImportBaseService implements ISaxRowRead {
 		return list;
 	}
 
+	//update-begin---author:lvdandan ---date:20261020  for：[issues/189]SAX导入用IExcelReadRowHanlder回调时，最后一行数据丢失------------
+	@Override
+	public void endSheet() {
+		// 回调模式下，一条数据要等读到下一条才会输出，sheet读完后需要把最后一条补输出
+		if (object != null && hanlder != null) {
+			hanlder.hanlder(object);
+		}
+		// 下一个sheet的第一行不应该被当成上一个sheet最后一条数据的集合元素
+		object = null;
+	}
+	//update-end---author:lvdandan ---date:20261020  for：[issues/189]SAX导入用IExcelReadRowHanlder回调时，最后一行数据丢失------------
+
 	@Override
 	public void parse(int index, List<SaxReadCellEntity> datas) {
 		try {
