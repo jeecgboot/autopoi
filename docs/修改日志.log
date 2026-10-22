@@ -176,3 +176,11 @@ autopoi/src/test/java/org/jeecgframework/poi/excel/export/template/ExcelTemplate
 autopoi/src/test/resources/templates/issues9741/template_image.xlsx (+)
 autopoi/src/test/resources/templates/issues9741/template_image.xls (+)
 -- author:scott---date:20261012--for: [issues/9741] excel模板导出图片失败，单值占位符{{xxx}}支持ImageEntity ---
+
+-- author:lvdandan---date:20261021--for: [issues/190] 数字类型字段遇到无法转换的文本时报错信息笼统（SAX导入只提示“SAX导入数据失败”），改为带列名、原始值和目标类型，并去掉前后空格 ---
+autopoi/src/main/java/org/jeecgframework/poi/excel/imports/CellValueServer.java
+autopoi/src/main/java/org/jeecgframework/poi/excel/imports/ExcelImportServer.java
+autopoi/src/main/java/org/jeecgframework/poi/excel/imports/sax/SaxReadExcel.java
+autopoi/src/test/java/org/jeecgframework/poi/excel/imports/NumberTextCellImportTest.java (+)
+-- author:lvdandan---date:20261021--for: [issues/190] 数字类型字段遇到无法转换的文本时报错信息笼统（SAX导入只提示“SAX导入数据失败”），改为带列名、原始值和目标类型，并去掉前后空格 ---
+

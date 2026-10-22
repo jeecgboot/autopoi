@@ -128,9 +128,39 @@ public class CellValueServer {
 		return null;
 	}
 
+	//update-begin---author:lvdandan ---date:20261021  for：[issues/190]数字类型判断、报错信息里把不可见字符转成 \\uXXXX 显示------------
+	private static boolean isNumericType(String xclass) {
+		return "class java.lang.Integer".equals(xclass) || "int".equals(xclass)
+				|| "class java.lang.Long".equals(xclass) || "long".equals(xclass)
+				|| "class java.lang.Double".equals(xclass) || "double".equals(xclass)
+				|| "class java.lang.Float".equals(xclass) || "float".equals(xclass)
+				|| "class java.math.BigDecimal".equals(xclass);
+	}
+
+	/**
+	 * 报错信息里展示原始值：空白、控制字符、零宽字符等肉眼看不出的字符转成 \\uXXXX，否则用户看到 [5] 却不知道哪里错
+	 */
+	private static String visible(Object value) {
+		String text = String.valueOf(value);
+		StringBuilder sb = new StringBuilder(text.length());
+		for (int i = 0; i < text.length(); i++) {
+			char c = text.charAt(i);
+			int type = Character.getType(c);
+			boolean invisible = Character.isWhitespace(c) || Character.isSpaceChar(c) || Character.isISOControl(c)
+					|| type == Character.FORMAT || type == Character.UNASSIGNED;
+			if (invisible) {
+				sb.append(String.format("\\u%04X", (int) c));
+			} else {
+				sb.append(c);
+			}
+		}
+		return sb.toString();
+	}
+	//update-end---author:lvdandan ---date:20261021  for：[issues/190]数字类型判断、报错信息里把不可见字符转成 \\uXXXX 显示------------
+
 	/**
 	 * 获取cell的值
-	 * 
+	 *
 	 * @param object
 	 * @param excelParams
 	 * @param cell
@@ -209,6 +239,14 @@ public class CellValueServer {
 				return null;
 			}
 			//update-end-author:scott date:20180711 for:TASK #2950 【bug】excel 导入报错，空指针问题
+			//update-begin---author:lvdandan ---date:20261021  for：[issues/190]数字类型的文本值去掉前后空格（Double/Float 会自动去，BigDecimal/Integer/Long 不会，行为不一致），全是空格按空值处理------------
+			if (result instanceof String && isNumericType(xclass)) {
+				result = ((String) result).trim();
+				if ("".equals(result)) {
+					return null;
+				}
+			}
+			//update-end---author:lvdandan ---date:20261021  for：[issues/190]数字类型的文本值去掉前后空格（Double/Float 会自动去，BigDecimal/Integer/Long 不会，行为不一致），全是空格按空值处理------------
 			if ("class java.util.Date".equals(xclass)) {
 				return result;
 			}
@@ -290,7 +328,12 @@ public class CellValueServer {
 			return result;
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
-			throw new ExcelImportException(ExcelImportEnum.GET_VALUE_ERROR);
+			//update-begin---author:lvdandan ---date:20261021  for：[issues/190]值转换失败的报错信息带上列名、原始值和目标类型，方便定位------------
+			String column = entity == null ? "" : entity.getName();
+			ExcelImportException ex = new ExcelImportException(ExcelImportEnum.GET_VALUE_ERROR.getMsg() + "：列[" + column + "]的值[" + visible(result) + "]无法转换为 " + xclass.replace("class ", ""), ExcelImportEnum.GET_VALUE_ERROR);
+			ex.initCause(e);
+			throw ex;
+			//update-end---author:lvdandan ---date:20261021  for：[issues/190]值转换失败的报错信息带上列名、原始值和目标类型，方便定位------------
 		}
 	}
 
