@@ -262,6 +262,12 @@ public class CellValueServer {
 			}
 			//update-end---author:lvdandan ---date:20261020  for：[issues/18]字段类型是枚举时，把导入的文本转成枚举------------
 			if ("class java.util.Date".equals(xclass)) {
+				//update-begin---author:lvdandan ---date:20261020  for：[issues/190]SAX导入日期以字符串保存时，没有按@Excel的format转成Date，反射赋值类型不匹配------------
+				if (result instanceof String && entity != null && StringUtils.isNotEmpty(entity.getFormat())) {
+					// 与DOM导入一致：按format解析，解析失败抛出ExcelImportException
+					return getDateData(entity, ((String) result).trim());
+				}
+				//update-end---author:lvdandan ---date:20261020  for：[issues/190]SAX导入日期以字符串保存时，没有按@Excel的format转成Date，反射赋值类型不匹配------------
 				return result;
 			}
 			if ("class java.lang.Boolean".equals(xclass) || "boolean".equals(xclass)) {

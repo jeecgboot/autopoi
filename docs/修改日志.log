@@ -247,3 +247,8 @@ autopoi/src/test/java/org/jeecgframework/poi/excel/imports/SaxImportCellTypeTest
 autopoi/src/main/java/org/jeecgframework/poi/excel/export/template/ExcelExportOfTemplateUtil.java
 autopoi/src/test/java/org/jeecgframework/poi/excel/export/template/TemplateIfDeleteColumnTest.java (+)
 -- author:lvdandan---date:20261020--for: [issues/174] 模板导出!if指令删除当前列时报XmlValueDisconnectedException，相邻多列删除时后面的列被跳过 ---
+
+-- author:lvdandan---date:20261020--for: [issues/190] SAX导入日期以字符串保存时没有按@Excel的format转成Date，导致导入中断 ---
+autopoi/src/main/java/org/jeecgframework/poi/excel/imports/CellValueServer.java
+autopoi/src/test/java/org/jeecgframework/poi/excel/imports/SaxImportStringDateTest.java (+)
+-- author:lvdandan---date:20261020--for: [issues/190] SAX导入日期以字符串保存时没有按@Excel的format转成Date，导致导入中断 ---
