@@ -176,3 +176,8 @@ autopoi/src/test/java/org/jeecgframework/poi/excel/export/template/ExcelTemplate
 autopoi/src/test/resources/templates/issues9741/template_image.xlsx (+)
 autopoi/src/test/resources/templates/issues9741/template_image.xls (+)
 -- author:scott---date:20261012--for: [issues/9741] excel模板导出图片失败，单值占位符{{xxx}}支持ImageEntity ---
+
+-- author:lvdandan---date:20261022--for: [issues/38] StylerHelper.prontFonts 方法名拼写错误，改为 printFonts ---
+autopoi/src/main/java/org/jeecgframework/poi/excel/html/helper/StylerHelper.java
+-- author:lvdandan---date:20261022--for: [issues/38] StylerHelper.prontFonts 方法名拼写错误，改为 printFonts ---
+
