@@ -278,3 +278,8 @@ autopoi-spring-boot-3-starter/src/main/java/org/jeecgframework/poi/excel/view/Mi
 autopoi-spring-boot-3-starter/src/main/java/org/jeecgframework/poi/excel/view/JeecgTemplateWordView.java
 -- author:lvdandan---date:20261022--for: [issues/9] 请求没有 USER-AGENT 头(如 MockMvc 单元测试)时 isIE 空指针 ---
 
+-- author:lvdandan---date:20261022--for: [issues/54] 打成jar后模板在classpath里，模板导出只认文件系统路径读不到模板，改为文件找不到时再从classpath找 ---
+autopoi/src/main/java/org/jeecgframework/poi/cache/ExcelCache.java
+autopoi/src/test/java/org/jeecgframework/poi/excel/export/template/TemplateClasspathLoadTest.java (+)
+-- author:lvdandan---date:20261022--for: [issues/54] 打成jar后模板在classpath里，模板导出只认文件系统路径读不到模板，改为文件找不到时再从classpath找 ---
+
