@@ -89,6 +89,10 @@ public class SaxReadExcel {
 				sheet.close();
 			}
 			return rowRead.getList();
+		} catch (ExcelImportException e) {
+			//update-begin---author:lvdandan ---date:20261021  for：[issues/190]已带有列名、原始值的导入异常原样抛出，不再被替换成笼统的"SAX导入数据失败"------------
+			throw e;
+			//update-end---author:lvdandan ---date:20261021  for：[issues/190]已带有列名、原始值的导入异常原样抛出，不再被替换成笼统的"SAX导入数据失败"------------
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
 			throw new ExcelImportException("SAX导入数据失败");

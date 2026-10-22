@@ -284,7 +284,11 @@ public class ExcelImportServer extends ImportBaseService {
 					//update-end-author:taoyan date:20210526 for:autopoi导入excel 如果单元格被设置边框，即使没有内容也会被当做是一条数据导入 #2484
 				} catch (ExcelImportException e) {
 					if (!e.getType().equals(ExcelImportEnum.VERIFY_ERROR)) {
-						throw new ExcelImportException(e.getType(), e);
+						//update-begin---author:lvdandan ---date:20261021  for：[issues/190]保留原异常的详细信息（列名、原始值），不再只剩枚举里的笼统文案------------
+						ExcelImportException ex = new ExcelImportException(e.getMessage(), e.getType());
+						ex.initCause(e);
+						throw ex;
+						//update-end---author:lvdandan ---date:20261021  for：[issues/190]保留原异常的详细信息（列名、原始值），不再只剩枚举里的笼统文案------------
 					}
 				}
 			}
