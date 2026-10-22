@@ -176,3 +176,9 @@ autopoi/src/test/java/org/jeecgframework/poi/excel/export/template/ExcelTemplate
 autopoi/src/test/resources/templates/issues9741/template_image.xlsx (+)
 autopoi/src/test/resources/templates/issues9741/template_image.xls (+)
 -- author:scott---date:20261012--for: [issues/9741] excel模板导出图片失败，单值占位符{{xxx}}支持ImageEntity ---
+
+-- author:lvdandan---date:20261022--for: [issues/190] DOM导入遇到内联字符串(inlineStr)单元格，setCellType(STRING)把值清空，整行被当成空行丢弃，读出0条数据 ---
+autopoi/src/main/java/org/jeecgframework/poi/excel/imports/CellValueServer.java
+autopoi/src/test/java/org/jeecgframework/poi/excel/imports/InlineStringCellImportTest.java (+)
+-- author:lvdandan---date:20261022--for: [issues/190] DOM导入遇到内联字符串(inlineStr)单元格，setCellType(STRING)把值清空，整行被当成空行丢弃，读出0条数据 ---
+
