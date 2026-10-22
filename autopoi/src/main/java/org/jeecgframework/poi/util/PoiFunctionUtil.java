@@ -91,7 +91,11 @@ public final class PoiFunctionUtil {
 		} else {
 			decimalFormat = new DecimalFormat(format);
 		}
-		return decimalFormat.format(number);
+		//update-begin---author:lvdandan ---date:20261020  for：[issues/52]DecimalFormat是线程不安全的，共享的静态实例并发格式化会得到错误结果------------
+		synchronized (decimalFormat) {
+			return decimalFormat.format(number);
+		}
+		//update-end---author:lvdandan ---date:20261020  for：[issues/52]DecimalFormat是线程不安全的，共享的静态实例并发格式化会得到错误结果------------
 	}
 
 	/**
@@ -114,7 +118,11 @@ public final class PoiFunctionUtil {
 		} else {
 			dateFormat = new SimpleDateFormat(format);
 		}
-		return dateFormat.format(obj);
+		//update-begin---author:lvdandan ---date:20261020  for：[issues/52]SimpleDateFormat是线程不安全的，共享的静态实例并发格式化会得到错误结果------------
+		synchronized (dateFormat) {
+			return dateFormat.format(obj);
+		}
+		//update-end---author:lvdandan ---date:20261020  for：[issues/52]SimpleDateFormat是线程不安全的，共享的静态实例并发格式化会得到错误结果------------
 	}
 
 	/**
