@@ -48,6 +48,10 @@ public class SheetHandler extends DefaultHandler {
 
 	private CellValueType type;
 
+	//update-begin---author:lvdandan ---date:20261020  for：[issues/189]当前单元格的v是否是共享字符串的下标------------
+	private boolean sstIndex = false;
+	//update-end---author:lvdandan ---date:20261020  for：[issues/189]当前单元格的v是否是共享字符串的下标------------
+
 	private ISaxRowRead read;
 
 	// 存储行记录的容器
@@ -72,6 +76,23 @@ public class SheetHandler extends DefaultHandler {
 	public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException {
 		// 置空
 		lastContents = "";
+		//update-begin---author:lvdandan ---date:20261020  for：[issues/189]SAX导入数字单元格沿用了上一个单元格的类型，被当成共享字符串下标取到别的单元格(如表头)的文本------------
+		if ("c".equals(name)) {
+			// 每个单元格的类型由它自己的t属性决定，不能沿用上一个单元格的类型
+			String t = attributes.getValue("t");
+			sstIndex = "s".equals(t);
+			if (t == null || "n".equals(t)) {
+				// 数字单元格：Excel保存时通常不写t属性
+				type = CellValueType.Number;
+			} else if ("s".equals(t) || "str".equals(t) || "d".equals(t)) {
+				// s：v是共享字符串的下标；str(公式的字符串结果)、d(ISO日期)：v就是文本本身
+				type = CellValueType.String;
+			} else {
+				// inlineStr(文本在t元素里)、b(布尔)、e(错误)等：v 不按数字或共享字符串处理
+				type = CellValueType.None;
+			}
+		}
+		//update-end---author:lvdandan ---date:20261020  for：[issues/189]SAX导入数字单元格沿用了上一个单元格的类型，被当成共享字符串下标取到别的单元格(如表头)的文本------------
 		// c => 单元格
 		if ("c".equals(name)) {
 			//update-begin---author:lvdandan ---date:20261020  for：[issues/190]SAX导入空单元格导致后面的列整体前移，按单元格坐标(r属性，如C5)确定列号------------
@@ -104,7 +125,9 @@ public class SheetHandler extends DefaultHandler {
 
 		// 根据SST的索引值的到单元格的真正要存储的字符串
 		// 这时characters()方法可能会被调用多次
-		if (CellValueType.String.equals(type)) {
+		//update-begin---author:lvdandan ---date:20261020  for：[issues/189]只有共享字符串(t="s")的v才是下标，公式的字符串结果(t="str")的v就是文本本身------------
+		if (CellValueType.String.equals(type) && sstIndex) {
+		//update-end---author:lvdandan ---date:20261020  for：[issues/189]只有共享字符串(t="s")的v才是下标，公式的字符串结果(t="str")的v就是文本本身------------
 			try {
 				int idx = Integer.parseInt(lastContents);
 				lastContents = sst.getItemAt(idx).toString();
