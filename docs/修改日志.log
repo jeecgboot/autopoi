@@ -271,3 +271,10 @@ autopoi/src/main/java/org/jeecgframework/poi/excel/imports/CellValueServer.java
 autopoi/src/test/java/org/jeecgframework/poi/excel/imports/InlineStringCellImportTest.java (+)
 -- author:lvdandan---date:20261022--for: [issues/190] DOM导入遇到内联字符串(inlineStr)单元格，setCellType(STRING)把值清空，整行被当成空行丢弃，读出0条数据 ---
 
+-- author:lvdandan---date:20261022--for: [issues/9] 请求没有 USER-AGENT 头(如 MockMvc 单元测试)时 isIE 空指针 ---
+autopoi-spring-boot-2-starter/src/main/java/org/jeecgframework/poi/excel/view/MiniAbstractExcelView.java
+autopoi-spring-boot-2-starter/src/main/java/org/jeecgframework/poi/excel/view/JeecgTemplateWordView.java
+autopoi-spring-boot-3-starter/src/main/java/org/jeecgframework/poi/excel/view/MiniAbstractExcelView.java
+autopoi-spring-boot-3-starter/src/main/java/org/jeecgframework/poi/excel/view/JeecgTemplateWordView.java
+-- author:lvdandan---date:20261022--for: [issues/9] 请求没有 USER-AGENT 头(如 MockMvc 单元测试)时 isIE 空指针 ---
+

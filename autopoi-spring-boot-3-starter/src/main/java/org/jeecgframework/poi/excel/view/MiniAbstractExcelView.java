@@ -37,7 +37,14 @@ public abstract class MiniAbstractExcelView extends AbstractView {
 	}
 
 	protected boolean isIE(HttpServletRequest request) {
-		return (request.getHeader("USER-AGENT").toLowerCase().indexOf("msie") > 0 || request.getHeader("USER-AGENT").toLowerCase().indexOf("rv:11.0") > 0) ? true : false;
+		//update-begin---author:lvdandan ---date:20261022  for：[issues/9]请求没有 USER-AGENT 头(如 MockMvc 单元测试)时 isIE 空指针------------
+		String userAgent = request.getHeader("USER-AGENT");
+		if (userAgent == null) {
+			return false;
+		}
+		userAgent = userAgent.toLowerCase();
+		return userAgent.indexOf("msie") > 0 || userAgent.indexOf("rv:11.0") > 0;
+		//update-end---author:lvdandan ---date:20261022  for：[issues/9]请求没有 USER-AGENT 头(如 MockMvc 单元测试)时 isIE 空指针------------
 	}
 
 }
